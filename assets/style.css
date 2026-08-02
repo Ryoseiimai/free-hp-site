@@ -168,6 +168,15 @@ h2 { color: var(--ink-deep); font-size: clamp(31px, 4vw, 50px); font-weight: 900
 .moments-list { display: grid; grid-template-columns: 1fr 1fr; gap: 0 34px; margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--line); }
 .moments-list li { padding: 16px 0; border-bottom: 1px solid var(--line); font-size: 15px; }
 .moments-list li::before { content: "→"; display: inline-block; margin-right: 12px; color: var(--yamabuki-deep); font-family: "IBM Plex Mono", monospace; }
+.faq-list { border-top: 1px solid var(--line); }
+.faq-item { border-bottom: 1px solid var(--line); }
+.faq-item summary { display: flex; align-items: center; gap: 14px; padding: 20px 0; color: var(--ink-deep); font-family: "Zen Kaku Gothic New", sans-serif; font-size: 16px; font-weight: 900; cursor: pointer; list-style: none; }
+.faq-item summary::marker { content: ""; }
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item summary::before { content: ""; flex: 0 0 9px; width: 9px; height: 9px; margin-left: 3px; border-right: 2px solid var(--yamabuki); border-bottom: 2px solid var(--yamabuki); transform: rotate(45deg) translateY(-2px); transition: transform .2s ease; }
+.faq-item[open] summary::before { transform: rotate(225deg) translateY(-2px); }
+.faq-item summary:focus-visible { outline: 3px solid var(--yamabuki-deep); outline-offset: 4px; }
+.faq-item p { max-width: 700px; margin: -2px 0 22px 31px; font-size: 14px; line-height: 1.9; }
 .final-cta { background: var(--ink-deep); color: var(--paper); }
 .final-cta-inner { min-height: 300px; display: flex; align-items: center; justify-content: space-between; gap: 40px; }
 .final-cta h2 { margin: 0; color: var(--paper); font-size: clamp(28px, 4vw, 47px); }

@@ -1,0 +1,16 @@
+# 無料ホームページ製作所
+
+> お店や活動のホームページを、質問に答えるだけで無料で作れるサービス。運営：RYOSEIWORLD合同会社。
+
+## 概要
+- 質問（店名・業種・キャッチコピー・紹介文・色の雰囲気など）に答えるだけで、その場でホームページの見本ができる
+- 完全無料。あとから料金は発生しない
+- 所要時間は約3分
+- 対象：飲食店・美容室やサロン・その他の個人事業主やフリーランス
+
+## ページ
+- トップページ: https://imai-design.github.io/free-hp-site/index.html
+- ホームページを作る（体験ページ）: https://imai-design.github.io/free-hp-site/create.html
+
+## 運営
+RYOSEIWORLD合同会社（https://ryoseiworld.co.jp/）

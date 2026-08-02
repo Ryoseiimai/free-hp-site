@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://imai-design.github.io/free-hp-site/sitemap.xml
