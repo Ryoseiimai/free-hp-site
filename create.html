@@ -89,6 +89,14 @@
           <label class="sr-only" for="address">住所・営業時間</label>
           <input id="address" name="address" type="text" placeholder="例：東京都渋谷区 / 11:00〜18:00">
         </fieldset>
+
+        <fieldset class="question-group question-optional">
+          <legend><span class="question-number">08</span>「作りました」表示 <small>任意</small></legend>
+          <div class="choice-row">
+            <label class="choice"><input type="radio" name="badgeChoice" value="つけたまま（無料）" checked><span>つけたまま（無料）</span></label>
+            <label class="choice"><input type="radio" name="badgeChoice" value="外す（500円）"><span>外す（500円）</span></label>
+          </div>
+        </fieldset>
       </form>
 
       <section class="preview-column" aria-labelledby="preview-title">
@@ -133,6 +141,9 @@
               <span data-preview="phone">電話番号はここに表示されます</span>
               <span data-preview="address">住所・営業時間はここに表示されます</span>
             </footer>
+            <div class="made-with-badge">
+              <a href="https://imai-design.github.io/free-hp-site/" target="_blank" rel="noopener">無料でホームページくんで作りました。</a>
+            </div>
           </div>
         </div>
         <button class="button button-large apply-button" id="apply-button" type="button">このホームページを、無料でもらう <span aria-hidden="true">→</span></button>
