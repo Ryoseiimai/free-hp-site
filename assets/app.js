@@ -3,6 +3,8 @@
 
   const API_URL = "https://free-hp-engine.ryoseiworld.workers.dev/api/generate";
   const EXPECTED_WORKER_ORIGIN = "https://free-hp-engine.ryoseiworld.workers.dev";
+  const EXPIRY_CONTACT_EMAIL = "info@ryoseiworld.co.jp";
+  const EXPIRY_CONTACT_SUBJECT = "正式版への引っ越し希望";
 
   const form = document.querySelector("#site-form");
   if (!form) return;
@@ -39,6 +41,7 @@
   const copyGeneratedLinkButton = document.querySelector("#copy-generated-link");
   const generatedCopyStatus = document.querySelector("#generated-copy-status");
   const manualContactLink = document.querySelector("#manual-contact-link");
+  const expiryContactLink = document.querySelector("#expiry-contact-link");
 
   const getValue = (name) => {
     const field = form.elements[name];
@@ -121,7 +124,7 @@
   };
 
   const updateManualContactLink = () => {
-    manualContactLink.href = `mailto:kaeru3160@gmail.com?subject=${encodeURIComponent("無料ホームページの相談")}&body=${encodeURIComponent(buildApplicationText())}`;
+    manualContactLink.href = `mailto:info@ryoseiworld.co.jp?subject=${encodeURIComponent("無料ホームページの相談")}&body=${encodeURIComponent(buildApplicationText())}`;
   };
 
   const setGenerationState = (state) => {
@@ -261,4 +264,5 @@
 
   updatePreview();
   updateManualContactLink();
+  expiryContactLink.href = `mailto:${EXPIRY_CONTACT_EMAIL}?subject=${encodeURIComponent(EXPIRY_CONTACT_SUBJECT)}`;
 })();

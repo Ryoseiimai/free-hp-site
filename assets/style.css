@@ -669,6 +669,19 @@ textarea:focus {
   background: var(--white);
 }
 
+.expiry-notice {
+  margin: 14px 0 0 !important;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+  font-size: 11px !important;
+  line-height: 1.7;
+}
+
+.expiry-notice a {
+  color: var(--yamabuki-text);
+  text-underline-offset: 3px;
+}
+
 .generation-error {
   border-color: var(--yamabuki);
   background: #FFF9E8;
