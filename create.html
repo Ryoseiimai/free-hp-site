@@ -45,13 +45,13 @@
         <fieldset class="question-group">
           <legend><span class="question-number">01</span>お店・活動の名前</legend>
           <label class="sr-only" for="shop-name">お店・活動の名前</label>
-          <input id="shop-name" name="shopName" type="text" placeholder="例：喫茶かえる" autocomplete="organization">
+          <input id="shop-name" name="shopName" type="text" placeholder="例：喫茶かえる" autocomplete="organization" required maxlength="40">
         </fieldset>
 
         <fieldset class="question-group">
           <legend><span class="question-number">02</span>どんなお店・活動ですか？</legend>
           <div class="choice-row">
-            <label class="choice"><input type="radio" name="businessType" value="飲食店" checked><span>飲食店</span></label>
+            <label class="choice"><input type="radio" name="businessType" value="飲食店" checked required><span>飲食店</span></label>
             <label class="choice"><input type="radio" name="businessType" value="美容・サロン"><span>美容・サロン</span></label>
             <label class="choice"><input type="radio" name="businessType" value="その他"><span>その他</span></label>
           </div>
@@ -60,19 +60,19 @@
         <fieldset class="question-group">
           <legend><span class="question-number">03</span>ひとことキャッチコピー</legend>
           <label class="sr-only" for="catchcopy">ひとことキャッチコピー</label>
-          <input id="catchcopy" name="catchcopy" type="text" placeholder="三代つづく、町の定食屋">
+          <input id="catchcopy" name="catchcopy" type="text" placeholder="三代つづく、町の定食屋" required maxlength="60">
         </fieldset>
 
         <fieldset class="question-group">
           <legend><span class="question-number">04</span>紹介文</legend>
           <label class="sr-only" for="description">紹介文</label>
-          <textarea id="description" name="description" rows="3" placeholder="お店のこと、活動のことを自由に書いてください"></textarea>
+          <textarea id="description" name="description" rows="3" placeholder="お店のこと、活動のことを自由に書いてください" required maxlength="400"></textarea>
         </fieldset>
 
         <fieldset class="question-group">
           <legend><span class="question-number">05</span>色の雰囲気</legend>
           <div class="choice-row">
-            <label class="choice"><input type="radio" name="mood" value="あたたかい" checked><span>あたたかい</span></label>
+            <label class="choice"><input type="radio" name="mood" value="あたたかい" checked required><span>あたたかい</span></label>
             <label class="choice"><input type="radio" name="mood" value="落ち着いた"><span>落ち着いた</span></label>
             <label class="choice"><input type="radio" name="mood" value="さわやか"><span>さわやか</span></label>
           </div>
@@ -81,13 +81,13 @@
         <fieldset class="question-group question-optional">
           <legend><span class="question-number">06</span>電話番号 <small>任意</small></legend>
           <label class="sr-only" for="phone">電話番号</label>
-          <input id="phone" name="phone" type="tel" placeholder="例：03-1234-5678" autocomplete="tel">
+          <input id="phone" name="phone" type="tel" placeholder="例：03-1234-5678" autocomplete="tel" maxlength="40">
         </fieldset>
 
         <fieldset class="question-group question-optional">
           <legend><span class="question-number">07</span>住所・営業時間 <small>任意</small></legend>
           <label class="sr-only" for="address">住所・営業時間</label>
-          <input id="address" name="address" type="text" placeholder="例：東京都渋谷区 / 11:00〜18:00">
+          <input id="address" name="address" type="text" placeholder="例：東京都渋谷区 / 11:00〜18:00" maxlength="200">
         </fieldset>
 
         <fieldset class="question-group question-optional">
@@ -146,27 +146,40 @@
             </div>
           </div>
         </div>
-        <button class="button button-large apply-button" id="apply-button" type="button">このホームページを、無料でもらう <span aria-hidden="true">→</span></button>
+        <button class="button button-large apply-button" id="apply-button" type="submit" form="site-form">このホームページを、無料でもらう <span aria-hidden="true">→</span></button>
         <p class="privacy-note">お預かりした内容は、ホームページを作るためだけに使います。</p>
+        <a class="manual-contact-link" id="manual-contact-link" href="mailto:kaeru3160@gmail.com">自動生成がうまくいかないときは、メールで相談する</a>
+
+        <section class="generation-result" id="generation-result" hidden aria-labelledby="generation-status">
+          <p class="eyebrow">YOUR WEBSITE</p>
+          <h2 id="generation-status" role="status" aria-live="polite">ホームページを生成しています…</h2>
+
+          <div class="generation-panel generation-loading" id="generation-loading" hidden>
+            <span class="loading-mark" aria-hidden="true"></span>
+            <p>入力内容をもとに、ホームページを組み立てています。少しお待ちください。</p>
+          </div>
+
+          <div class="generation-panel generation-success" id="generation-success" hidden>
+            <p>このURLから、できあがったホームページを見られます。</p>
+            <div class="generated-link-row">
+              <a id="generated-link" class="generated-link" href="#" target="_blank" rel="noopener noreferrer"></a>
+              <button class="button button-secondary button-small" id="copy-generated-link" type="button">このリンクをコピー</button>
+            </div>
+            <p class="copy-status" id="generated-copy-status" role="status" aria-live="polite"></p>
+            <div class="generated-preview-wrap">
+              <p class="generated-preview-label">GENERATED PREVIEW</p>
+              <iframe id="generated-preview" title="生成されたホームページのプレビュー" loading="lazy" hidden></iframe>
+            </div>
+          </div>
+
+          <div class="generation-panel generation-error" id="generation-error" hidden role="alert">
+            <p id="generation-error-message"></p>
+            <a class="button button-secondary" href="mailto:kaeru3160@gmail.com" id="generation-error-contact">メールで相談する <span aria-hidden="true">→</span></a>
+          </div>
+        </section>
       </section>
     </div>
   </main>
-
-  <div class="modal-backdrop" id="application-modal" hidden>
-    <section class="application-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-      <button class="modal-close" id="modal-close" type="button" aria-label="申込画面を閉じる">×</button>
-      <p class="eyebrow">THANK YOU</p>
-      <h2 id="modal-title"><span class="u-line">ありがとうございます。</span><br class="brk-md"><br class="brk-sm"><span class="u-line">この内容で無料で</span><br class="brk-sm"><span class="u-line">お作りします。</span></h2>
-      <label class="modal-label" for="application-text">申込内容</label>
-      <textarea id="application-text" class="application-text" readonly rows="10"></textarea>
-      <div class="modal-actions">
-        <button class="button button-secondary" id="copy-button" type="button">内容をコピー</button>
-        <a class="button button-large" id="mail-link" href="mailto:kaeru3160@gmail.com">メールで申し込む <span aria-hidden="true">→</span></a>
-      </div>
-      <p class="modal-note">48時間以内に、本物のホームページを無料でお作りしてお返事します。</p>
-      <p class="copy-status" id="copy-status" role="status" aria-live="polite"></p>
-    </section>
-  </div>
 
   <script src="assets/app.js"></script>
 </body>

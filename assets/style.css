@@ -306,3 +306,33 @@ input[type="text"]:focus, input[type="tel"]:focus, textarea:focus { border-color
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
   .build-part { opacity: 1; transform: none; animation: none; }
 }
+
+/* Generated site result */
+.button:disabled { opacity: .65; cursor: wait; transform: none; }
+.manual-contact-link { display: block; margin-top: 20px; color: var(--ink); font-size: 12px; text-align: center; text-underline-offset: 3px; }
+.generation-result { margin-top: 42px; padding-top: 31px; border-top: 1px solid var(--line); }
+.generation-result > .eyebrow { margin-bottom: 10px; color: var(--yamabuki-deep); }
+.generation-result h2 { margin: 0 0 18px; color: var(--ink-deep); font-size: clamp(25px, 3vw, 34px); }
+.generation-panel { padding: 20px; border: 1px solid var(--line); border-radius: 5px; background: var(--white); }
+.generation-panel p { margin: 0; font-size: 13px; }
+.generation-loading { display: flex; align-items: center; gap: 14px; }
+.loading-mark { width: 20px; height: 20px; flex: 0 0 20px; border: 3px solid var(--line); border-top-color: var(--yamabuki-deep); border-radius: 50%; animation: loading-spin .8s linear infinite; }
+@keyframes loading-spin { to { transform: rotate(360deg); } }
+.generated-link-row { display: flex; align-items: center; gap: 10px; margin-top: 15px; }
+.generated-link { min-width: 0; overflow: hidden; color: var(--ink); font-family: "IBM Plex Mono", monospace; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+.generated-link-row .button { flex: 0 0 auto; }
+.generated-preview-wrap { margin-top: 25px; }
+.generated-preview-label { margin: 0 0 9px !important; color: var(--ink); font-family: "IBM Plex Mono", monospace; font-size: 10px !important; letter-spacing: .08em; }
+#generated-preview { display: block; width: 100%; height: 520px; border: 1px solid var(--line); background: var(--paper); }
+.generation-error { border-color: var(--yamabuki); background: #FFF9E8; }
+.generation-error .button { margin-top: 17px; }
+.generation-success { border-color: var(--sage, #6a8a6d); background: #F3F8F3; }
+.question-optional legend small { color: var(--ink); opacity: .6; }
+.sample-hero-copy { display: grid; gap: 6px; }
+body.create-page { background: var(--paper); }
+
+@media (max-width: 480px) {
+.generated-link-row { align-items: stretch; flex-direction: column; }
+  .generated-link { white-space: normal; overflow-wrap: anywhere; }
+  #generated-preview { height: 460px; }
+}
