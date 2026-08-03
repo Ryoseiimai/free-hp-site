@@ -49,10 +49,21 @@
 
   const displayValue = (value, fallback) => value || fallback;
 
+  const suggestedCatchphrase = () => {
+    const custom = getValue("catchcopy");
+    if (custom) return custom;
+    const description = getValue("description");
+    if (description) {
+      const firstPhrase = description.split(/[。！？!?\n]/u)[0].trim();
+      if (firstPhrase) return firstPhrase.slice(0, 60);
+    }
+    return "ここに、あなたの物語を。";
+  };
+
   const updatePreview = () => {
     const name = getValue("shopName");
     const type = getValue("businessType") || "飲食店";
-    const catchcopy = getValue("catchcopy");
+    const catchcopy = suggestedCatchphrase();
     const description = getValue("description");
     const mood = getValue("mood") || "あたたかい";
     const phone = getValue("phone");
@@ -60,8 +71,8 @@
 
     previewValues.shopName.textContent = displayValue(name, "あなたのお店");
     previewValues.businessType.textContent = type;
-    previewValues.catchcopy.textContent = displayValue(catchcopy, "ここに、あなたの物語を。");
-    previewValues.description.textContent = displayValue(description, "あなたのお店の紹介文がここに入ります。");
+    previewValues.catchcopy.textContent = catchcopy;
+    previewValues.description.textContent = displayValue(description, "お店の特徴を入れると、ここにすぐ反映されます。");
     previewValues.phone.textContent = displayValue(phone, "電話番号はここに表示されます");
     previewValues.address.textContent = displayValue(address, "住所・営業時間はここに表示されます");
     preview.style.setProperty("--preview-accent", moodColors[mood] || moodColors["あたたかい"]);
@@ -71,26 +82,29 @@
     });
   };
 
-  const buildSiteInput = () => ({
-    storeName: getValue("shopName"),
-    industry: getValue("businessType"),
-    catchphrase: getValue("catchcopy"),
-    description: getValue("description"),
-    colorTheme: getValue("mood"),
-    phone: getValue("phone"),
-    address: getValue("address")
-  });
+  const buildSiteInput = () => {
+    const catchphrase = suggestedCatchphrase();
+    return {
+      storeName: getValue("shopName"),
+      industry: getValue("businessType"),
+      catchphrase,
+      description: getValue("description"),
+      colorTheme: getValue("mood"),
+      phone: getValue("phone"),
+      address: getValue("address")
+    };
+  };
 
   const buildApplicationText = () => {
     const values = {
       name: displayValue(getValue("shopName"), "未入力"),
       type: getValue("businessType") || "未選択",
-      catchcopy: displayValue(getValue("catchcopy"), "未入力"),
+      catchcopy: getValue("catchcopy") || "おまかせ",
       description: displayValue(getValue("description"), "未入力"),
       mood: getValue("mood") || "未選択",
       phone: displayValue(getValue("phone"), "未入力"),
       address: displayValue(getValue("address"), "未入力"),
-      badgeChoice: getValue("badgeChoice") || "つけたまま（無料）"
+      badgeChoice: "つけたまま（無料）"
     };
     return [
       "無料ホームページ申込（自動生成がうまくいかない場合）",
