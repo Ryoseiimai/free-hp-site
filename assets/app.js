@@ -87,6 +87,7 @@
   const mailLink = document.querySelector("#mail-link");
   const copyButton = document.querySelector("#copy-button");
   const copyStatus = document.querySelector("#copy-status");
+  const focusableElements = [closeButton, applicationText, copyButton, mailLink];
   let lastFocusedElement = null;
 
   const updateApplication = () => {
@@ -116,6 +117,20 @@
   closeButton.addEventListener("click", closeModal);
   modal.addEventListener("click", (event) => {
     if (event.target === modal) closeModal();
+  });
+  modal.addEventListener("keydown", (event) => {
+    if (event.key !== "Tab") return;
+    const first = focusableElements[0];
+    const last = focusableElements[focusableElements.length - 1];
+    if (event.shiftKey) {
+      if (document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      }
+    } else if (document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
   });
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape" && !modal.hidden) closeModal();
