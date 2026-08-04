@@ -214,6 +214,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 
 .form-group legend,
 .optional-field > label,
+.optional-field > .field-label,
 .optional-field > legend {
   display: block;
   width: 100%;
@@ -769,3 +770,66 @@ textarea:focus {
 .faq dd { margin: 0 0 12px; color: var(--muted, #5a6b7c); border-bottom: 1px solid rgb(0 0 0 / 6%); padding-bottom: 12px; }
 .faq dd:last-child { border-bottom: none; }
 .faq a { color: var(--yamabuki-text, #8f6400); font-weight: 700; }
+
+/* 「連絡先と写真」の枠に添える一言。任意であることと、入れると何が良くなるかを先に伝える。 */
+.group-note {
+  margin: 0 0 14px;
+  color: var(--ink);
+  opacity: .72;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.form-group .optional-field + .optional-field {
+  margin-top: 14px;
+}
+
+/* 写真の選択ボタン。ブラウザ標準の英語ボタンを隠し、日本語のボタンに置き換えている。 */
+.file-picker {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.file-button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid var(--ink-deep);
+  border-radius: 10px;
+  background: var(--white);
+  color: var(--ink-deep);
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.file-button:hover {
+  background: var(--ink-deep);
+  color: var(--white);
+}
+
+/* キーボード操作でも、隠したinputにフォーカスが当たったことが分かるようにする。 */
+#photo:focus-visible + .file-picker .file-button {
+  outline: 3px solid var(--yamabuki);
+  outline-offset: 2px;
+}
+
+.file-name {
+  flex: 1;
+  min-width: 0;
+  color: var(--ink);
+  opacity: .7;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.photo-status {
+  margin: 10px 0 0;
+  color: var(--ink);
+  opacity: .72;
+  font-size: 12px;
+  line-height: 1.7;
+}

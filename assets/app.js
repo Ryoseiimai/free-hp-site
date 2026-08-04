@@ -54,6 +54,8 @@
 
   const photoInput = document.querySelector("#photo");
   const photoStatus = document.querySelector("#photo-status");
+  const photoName = document.querySelector("#photo-name");
+  const PHOTO_NAME_EMPTY = "まだ選ばれていません";
   const photoPreview = preview.querySelector('[data-preview="photo"]');
   const photoStatusDefault = photoStatus.textContent;
 
@@ -216,6 +218,7 @@
 
     if (!file) {
       clearPhoto();
+      photoName.textContent = PHOTO_NAME_EMPTY;
       photoStatus.textContent = photoStatusDefault;
       photoProcessing = Promise.resolve();
       updateManualContactLink();
@@ -225,12 +228,14 @@
     if (!file.type || !file.type.startsWith("image/")) {
       photoInput.value = "";
       clearPhoto();
+      photoName.textContent = PHOTO_NAME_EMPTY;
       photoStatus.textContent = "写真は画像ファイルを選んでください。";
       photoProcessing = Promise.resolve();
       updateManualContactLink();
       return;
     }
 
+    photoName.textContent = file.name;
     photoStatus.textContent = "写真を読み込んでいます…";
     photoProcessing = (async () => {
       try {
@@ -238,11 +243,12 @@
         if (generation !== photoGeneration) return;
         photoDataUri = dataUri;
         applyPhotoPreview(dataUri);
-        photoStatus.textContent = `写真を読み込みました（約${estimateKbFromDataUri(dataUri)}KB）。プレビューに反映しました。`;
+        photoStatus.textContent = `写真を読み込みました（約${estimateKbFromDataUri(dataUri)}KB）`;
       } catch (error) {
         if (generation !== photoGeneration) return;
         photoInput.value = "";
         clearPhoto();
+        photoName.textContent = PHOTO_NAME_EMPTY;
         photoStatus.textContent = photoErrorMessage(error, file);
       } finally {
         if (generation === photoGeneration) updateManualContactLink();

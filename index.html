@@ -75,8 +75,31 @@
             <textarea id="description" name="description" rows="3" placeholder="例：地元野菜を使った定食を、家族で40年つくっています。" required maxlength="400"></textarea>
           </fieldset>
 
+          <fieldset class="form-group">
+            <legend><span>4</span>連絡先と写真</legend>
+            <p class="group-note">入れておくと、見た人がその場で電話をかけたり、地図で道を調べたりできます。空欄のままでも作れます。</p>
+            <div class="optional-field">
+              <label for="phone">電話番号 <small>任意</small></label>
+              <input id="phone" name="phone" type="tel" placeholder="例：03-1234-5678" autocomplete="tel" maxlength="40">
+            </div>
+            <div class="optional-field">
+              <label for="address">住所 <small>任意</small></label>
+              <input id="address" name="address" type="text" placeholder="例：東京都渋谷区道玄坂1-2-3" autocomplete="street-address" maxlength="200">
+            </div>
+            <div class="optional-field">
+              <span class="field-label">お店の写真 <small>任意・1枚</small></span>
+              <!-- ブラウザ標準の「Choose File」は英語のまま変えられないので、inputは読み上げ用に隠してlabelをボタンにする -->
+              <input id="photo" name="photo" type="file" accept="image/jpeg,image/png,image/webp" class="sr-only">
+              <div class="file-picker">
+                <label class="file-button" for="photo">写真を選ぶ</label>
+                <span class="file-name" id="photo-name">まだ選ばれていません</span>
+              </div>
+              <p class="photo-status" id="photo-status" role="status">スマホで撮ったままの写真で大丈夫です。自動で小さくしてから使います。</p>
+            </div>
+          </fieldset>
+
           <details class="extra-options">
-            <summary>電話・住所・色なども設定する</summary>
+            <summary>キャッチコピー・色・営業時間も決める</summary>
             <div class="extra-options-body">
               <div class="optional-field">
                 <label for="catchcopy">キャッチコピー <small>空欄ならおまかせ</small></label>
@@ -91,21 +114,8 @@
                 </div>
               </fieldset>
               <div class="optional-field">
-                <label for="phone">電話番号 <small>任意</small></label>
-                <input id="phone" name="phone" type="tel" placeholder="例：03-1234-5678" autocomplete="tel" maxlength="40">
-              </div>
-              <div class="optional-field">
-                <label for="address">住所 <small>任意</small></label>
-                <input id="address" name="address" type="text" placeholder="例：東京都渋谷区道玄坂1-2-3" autocomplete="street-address" maxlength="200">
-              </div>
-              <div class="optional-field">
                 <label for="hours">営業時間・定休日 <small>任意</small></label>
                 <input id="hours" name="hours" type="text" placeholder="例：11:00〜18:00（水曜定休）" maxlength="100">
-              </div>
-              <div class="optional-field">
-                <label for="photo">お店の写真 <small>任意・1枚</small></label>
-                <input id="photo" name="photo" type="file" accept="image/jpeg,image/png,image/webp">
-                <p class="photo-status" id="photo-status" role="status">スマホで撮ったままの写真で大丈夫です。自動で小さくしてから使います。</p>
               </div>
             </div>
           </details>
