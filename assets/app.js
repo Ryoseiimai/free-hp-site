@@ -16,7 +16,8 @@
     catchcopy: preview.querySelector('[data-preview="catchcopy"]'),
     description: preview.querySelector('[data-preview="description"]'),
     phone: preview.querySelector('[data-preview="phone"]'),
-    address: preview.querySelector('[data-preview="address"]')
+    address: preview.querySelector('[data-preview="address"]'),
+    hours: preview.querySelector('[data-preview="hours"]')
   };
   const typeBlocks = {
     "飲食店": preview.querySelector('[data-type-block="restaurant"]'),
@@ -71,13 +72,15 @@
     const mood = getValue("mood") || "あたたかい";
     const phone = getValue("phone");
     const address = getValue("address");
+    const hours = getValue("hours");
 
     previewValues.shopName.textContent = displayValue(name, "あなたのお店");
     previewValues.businessType.textContent = type;
     previewValues.catchcopy.textContent = catchcopy;
     previewValues.description.textContent = displayValue(description, "お店の特徴を入れると、ここにすぐ反映されます。");
     previewValues.phone.textContent = displayValue(phone, "電話番号はここに表示されます");
-    previewValues.address.textContent = displayValue(address, "住所・営業時間はここに表示されます");
+    previewValues.address.textContent = displayValue(address, "住所はここに表示されます");
+    previewValues.hours.textContent = displayValue(hours, "営業時間はここに表示されます");
     preview.style.setProperty("--preview-accent", moodColors[mood] || moodColors["あたたかい"]);
 
     Object.entries(typeBlocks).forEach(([label, block]) => {
@@ -94,7 +97,8 @@
       description: getValue("description"),
       colorTheme: getValue("mood"),
       phone: getValue("phone"),
-      address: getValue("address")
+      address: getValue("address"),
+      businessHours: getValue("hours")
     };
   };
 
@@ -107,6 +111,7 @@
       mood: getValue("mood") || "未選択",
       phone: displayValue(getValue("phone"), "未入力"),
       address: displayValue(getValue("address"), "未入力"),
+      hours: displayValue(getValue("hours"), "未入力"),
       badgeChoice: "つけたまま（無料）"
     };
     return [
@@ -118,7 +123,8 @@
       `紹介文：${values.description}`,
       `色の雰囲気：${values.mood}`,
       `電話番号：${values.phone}`,
-      `住所・営業時間：${values.address}`,
+      `住所：${values.address}`,
+      `営業時間・定休日：${values.hours}`,
       `表示について：${values.badgeChoice}`
     ].join("\n");
   };

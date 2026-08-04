@@ -95,8 +95,12 @@
                 <input id="phone" name="phone" type="tel" placeholder="例：03-1234-5678" autocomplete="tel" maxlength="40">
               </div>
               <div class="optional-field">
-                <label for="address">住所・営業時間 <small>任意</small></label>
-                <input id="address" name="address" type="text" placeholder="例：東京都渋谷区 / 11:00〜18:00" maxlength="200">
+                <label for="address">住所 <small>任意</small></label>
+                <input id="address" name="address" type="text" placeholder="例：東京都渋谷区道玄坂1-2-3" autocomplete="street-address" maxlength="200">
+              </div>
+              <div class="optional-field">
+                <label for="hours">営業時間・定休日 <small>任意</small></label>
+                <input id="hours" name="hours" type="text" placeholder="例：11:00〜18:00（水曜定休）" maxlength="100">
               </div>
             </div>
           </details>
@@ -184,7 +188,8 @@
             </div>
             <footer class="sample-footer">
               <span data-preview="phone">電話番号はここに表示されます</span>
-              <span data-preview="address">住所・営業時間はここに表示されます</span>
+              <span data-preview="address">住所はここに表示されます</span>
+              <span data-preview="hours">営業時間はここに表示されます</span>
             </footer>
             <div class="made-with-badge">
               <a href="https://freehp.jp/" target="_blank" rel="noopener">無料でホームページくんで作りました。</a>
