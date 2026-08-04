@@ -521,6 +521,14 @@ textarea:focus {
   clip-path: polygon(0 100%, 32% 47%, 47% 67%, 69% 27%, 100% 100%);
 }
 
+.sample-photo.has-photo {
+  border-color: var(--ink-deep);
+}
+
+.sample-photo.has-photo::before {
+  display: none;
+}
+
 .sample-description {
   margin: 0 0 18px;
   padding-top: 17px;

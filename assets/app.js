@@ -6,6 +6,14 @@
   const EXPIRY_CONTACT_EMAIL = "info@ryoseiworld.co.jp";
   const EXPIRY_CONTACT_SUBJECT = "正式版への引っ越し希望";
 
+  // 写真の縮小仕様（サーバの上限2,000,000文字に合わせて余裕を持たせる）
+  const PHOTO_MAX_DIMENSION = 1400;
+  const PHOTO_FALLBACK_DIMENSION = 1000;
+  const PHOTO_SOFT_LIMIT_CHARS = 900000;
+  const PHOTO_HARD_LIMIT_CHARS = 2000000;
+  const PHOTO_QUALITY_STEPS = [0.8, 0.65, 0.5];
+  const JAPANESE_TEXT_PATTERN = /[぀-ヿ㐀-鿿]/u;
+
   const form = document.querySelector("#site-form");
   if (!form) return;
 
@@ -43,6 +51,15 @@
   const generatedCopyStatus = document.querySelector("#generated-copy-status");
   const manualContactLink = document.querySelector("#manual-contact-link");
   const expiryContactLink = document.querySelector("#expiry-contact-link");
+
+  const photoInput = document.querySelector("#photo");
+  const photoStatus = document.querySelector("#photo-status");
+  const photoPreview = preview.querySelector('[data-preview="photo"]');
+  const photoStatusDefault = photoStatus.textContent;
+
+  let photoDataUri = "";
+  let photoGeneration = 0;
+  let photoProcessing = Promise.resolve();
 
   const getValue = (name) => {
     const field = form.elements[name];
@@ -88,9 +105,154 @@
     });
   };
 
+  const estimateKbFromDataUri = (dataUri) => {
+    const base64 = dataUri.slice(dataUri.indexOf(",") + 1);
+    return Math.round((base64.length * 3) / 4 / 1024);
+  };
+
+  const resetPhotoPreview = () => {
+    photoPreview.classList.remove("has-photo");
+    photoPreview.style.backgroundImage = "";
+    photoPreview.style.backgroundSize = "";
+    photoPreview.style.backgroundPosition = "";
+  };
+
+  const applyPhotoPreview = (dataUri) => {
+    photoPreview.classList.add("has-photo");
+    photoPreview.style.backgroundImage = `url("${dataUri}")`;
+    photoPreview.style.backgroundSize = "cover";
+    photoPreview.style.backgroundPosition = "center";
+  };
+
+  const clearPhoto = () => {
+    photoDataUri = "";
+    resetPhotoPreview();
+  };
+
+  // createImageBitmapがあればEXIF回転（imageOrientation）を反映しつつ読み込む。
+  // 未対応環境ではImage要素+ObjectURLにフォールバックする。
+  const loadPhotoSource = async (file) => {
+    if (typeof createImageBitmap === "function") {
+      try {
+        const bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
+        return { source: bitmap, width: bitmap.width, height: bitmap.height, cleanup: () => bitmap.close() };
+      } catch {
+        // 未対応・失敗時はフォールバックへ
+      }
+    }
+    const objectUrl = URL.createObjectURL(file);
+    try {
+      const image = await new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = () => reject(new Error("photo decode failed"));
+        img.src = objectUrl;
+      });
+      return { source: image, width: image.naturalWidth, height: image.naturalHeight, cleanup: () => URL.revokeObjectURL(objectUrl) };
+    } catch (error) {
+      URL.revokeObjectURL(objectUrl);
+      throw error;
+    }
+  };
+
+  const drawScaledPhotoCanvas = (source, width, height, maxDimension) => {
+    const scale = Math.min(1, maxDimension / Math.max(width, height));
+    const targetWidth = Math.max(1, Math.round(width * scale));
+    const targetHeight = Math.max(1, Math.round(height * scale));
+    const canvas = document.createElement("canvas");
+    canvas.width = targetWidth;
+    canvas.height = targetHeight;
+    const context = canvas.getContext("2d");
+    // 透過PNGをJPEGに書き出すと透明部分が黒く潰れる（webp非対応ブラウザで起きる）。先に白で塗っておく。
+    context.fillStyle = "#ffffff";
+    context.fillRect(0, 0, targetWidth, targetHeight);
+    context.drawImage(source, 0, 0, targetWidth, targetHeight);
+    return canvas;
+  };
+
+  const encodePhotoCanvas = (canvas, quality) => {
+    const webp = canvas.toDataURL("image/webp", quality);
+    if (webp.startsWith("data:image/webp")) return webp;
+    return canvas.toDataURL("image/jpeg", quality);
+  };
+
+  const shrinkPhotoFile = async (file) => {
+    const { source, width, height, cleanup } = await loadPhotoSource(file);
+    try {
+      let canvas = drawScaledPhotoCanvas(source, width, height, PHOTO_MAX_DIMENSION);
+      let dataUri = "";
+      for (const quality of PHOTO_QUALITY_STEPS) {
+        dataUri = encodePhotoCanvas(canvas, quality);
+        if (dataUri.length <= PHOTO_SOFT_LIMIT_CHARS) break;
+      }
+      if (dataUri.length > PHOTO_SOFT_LIMIT_CHARS) {
+        canvas = drawScaledPhotoCanvas(source, width, height, PHOTO_FALLBACK_DIMENSION);
+        dataUri = encodePhotoCanvas(canvas, PHOTO_QUALITY_STEPS[PHOTO_QUALITY_STEPS.length - 1]);
+      }
+      if (dataUri.length > PHOTO_HARD_LIMIT_CHARS) {
+        const tooLargeError = new Error("photo too large");
+        tooLargeError.photoTooLarge = true;
+        throw tooLargeError;
+      }
+      return dataUri;
+    } finally {
+      cleanup();
+    }
+  };
+
+  // SafariはHEICを読めるがChrome・Firefoxは読めない。事前に弾かず、実際に読めなかった時だけ案内する。
+  const photoErrorMessage = (error, file) => {
+    if (error && error.photoTooLarge) return "写真が大きすぎて使えませんでした。別の写真でお試しください。";
+    if (/^image\/hei[cf]$/iu.test(file.type)) {
+      return "iPhoneの写真（HEIC形式）は、この画面では読み込めませんでした。写真アプリで「JPEG」に変換してからお試しください。";
+    }
+    return "写真を読み込めませんでした。別の写真でお試しください。";
+  };
+
+  const handlePhotoChange = () => {
+    const file = photoInput.files && photoInput.files[0];
+    photoGeneration += 1;
+    const generation = photoGeneration;
+
+    if (!file) {
+      clearPhoto();
+      photoStatus.textContent = photoStatusDefault;
+      photoProcessing = Promise.resolve();
+      updateManualContactLink();
+      return;
+    }
+
+    if (!file.type || !file.type.startsWith("image/")) {
+      photoInput.value = "";
+      clearPhoto();
+      photoStatus.textContent = "写真は画像ファイルを選んでください。";
+      photoProcessing = Promise.resolve();
+      updateManualContactLink();
+      return;
+    }
+
+    photoStatus.textContent = "写真を読み込んでいます…";
+    photoProcessing = (async () => {
+      try {
+        const dataUri = await shrinkPhotoFile(file);
+        if (generation !== photoGeneration) return;
+        photoDataUri = dataUri;
+        applyPhotoPreview(dataUri);
+        photoStatus.textContent = `写真を読み込みました（約${estimateKbFromDataUri(dataUri)}KB）。プレビューに反映しました。`;
+      } catch (error) {
+        if (generation !== photoGeneration) return;
+        photoInput.value = "";
+        clearPhoto();
+        photoStatus.textContent = photoErrorMessage(error, file);
+      } finally {
+        if (generation === photoGeneration) updateManualContactLink();
+      }
+    })();
+  };
+
   const buildSiteInput = () => {
     const catchphrase = suggestedCatchphrase();
-    return {
+    const input = {
       storeName: getValue("shopName"),
       industry: getValue("businessType"),
       catchphrase,
@@ -100,6 +262,7 @@
       address: getValue("address"),
       businessHours: getValue("hours")
     };
+    return photoDataUri ? { ...input, photo: photoDataUri } : input;
   };
 
   const buildApplicationText = () => {
@@ -112,7 +275,8 @@
       phone: displayValue(getValue("phone"), "未入力"),
       address: displayValue(getValue("address"), "未入力"),
       hours: displayValue(getValue("hours"), "未入力"),
-      badgeChoice: "つけたまま（無料）"
+      badgeChoice: "つけたまま（無料）",
+      photo: photoDataUri ? "あり（メールに添付してください）" : "なし"
     };
     return [
       "無料ホームページ申込（自動生成がうまくいかない場合）",
@@ -125,7 +289,8 @@
       `電話番号：${values.phone}`,
       `住所：${values.address}`,
       `営業時間・定休日：${values.hours}`,
-      `表示について：${values.badgeChoice}`
+      `表示について：${values.badgeChoice}`,
+      `写真：${values.photo}`
     ].join("\n");
   };
 
@@ -157,7 +322,10 @@
       [/^request body must be valid JSON$/u, "入力内容を読み取れませんでした。もう一度お試しください。"]
     ];
     const known = messages.find(([pattern]) => pattern.test(detail));
-    return known ? known[1] : "入力内容を確認してください。必須項目を入力して、もう一度お試しください。";
+    if (known) return known[1];
+    // サーバがすでに日本語で理由を返している場合（写真エラー等）はそのまま表示する
+    if (JAPANESE_TEXT_PATTERN.test(detail)) return detail;
+    return "入力内容を確認してください。必須項目を入力して、もう一度お試しください。";
   };
 
   const errorMessageFor = (status, serverMessage) => {
@@ -208,6 +376,7 @@
     setGenerationState("loading");
 
     try {
+      await photoProcessing; // 写真の縮小処理が残っていれば完了を待ってから送信する
       const response = await fetch(API_URL, {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -266,6 +435,7 @@
     event.preventDefault();
     void submitGeneration();
   });
+  photoInput.addEventListener("change", handlePhotoChange);
   copyGeneratedLinkButton.addEventListener("click", copyGeneratedLink);
 
   updatePreview();

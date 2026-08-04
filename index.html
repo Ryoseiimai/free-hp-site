@@ -102,6 +102,11 @@
                 <label for="hours">営業時間・定休日 <small>任意</small></label>
                 <input id="hours" name="hours" type="text" placeholder="例：11:00〜18:00（水曜定休）" maxlength="100">
               </div>
+              <div class="optional-field">
+                <label for="photo">お店の写真 <small>任意・1枚</small></label>
+                <input id="photo" name="photo" type="file" accept="image/jpeg,image/png,image/webp">
+                <p class="photo-status" id="photo-status" role="status">スマホで撮ったままの写真で大丈夫です。自動で小さくしてから使います。</p>
+              </div>
             </div>
           </details>
 
@@ -168,7 +173,7 @@
                 <span class="sample-kicker" data-preview="businessType">飲食店</span>
                 <h3 data-preview="catchcopy">ここに、あなたの物語を。</h3>
               </div>
-              <div class="sample-photo" aria-label="写真が入る場所"></div>
+              <div class="sample-photo" data-preview="photo" aria-label="写真が入る場所"></div>
             </div>
             <p class="sample-description" data-preview="description">お店の特徴を入れると、ここにすぐ反映されます。</p>
             <div class="sample-type-block" data-type-block="restaurant">
