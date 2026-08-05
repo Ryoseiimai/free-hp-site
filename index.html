@@ -18,6 +18,8 @@
   <meta name="twitter:description" content="3つ答えるだけ。あなたのお店のホームページを、その場で無料作成。">
   <meta name="twitter:image" content="https://freehp.jp/assets/ogp.png">
   <meta name="theme-color" content="#FBFAF6">
+  <!-- Googleログインのクライアント ID。空のあいだはログイン不要のまま動く。 -->
+  <meta name="google-client-id" content="">
   <link rel="icon" href="favicon.ico" type="image/x-icon">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -32,13 +34,13 @@
     </a>
     <div class="header-points" aria-label="サービスの特徴">
       <span>無料</span>
-      <span>登録なし</span>
+      <span>Googleアカウント</span>
     </div>
   </header>
 
   <main class="app-main page-wrap">
     <section class="app-intro" aria-labelledby="app-title">
-      <p class="eyebrow">無料・登録不要</p>
+      <p class="eyebrow">無料・Googleアカウントで作成</p>
       <h1 id="app-title">ホームページを、<span>今すぐ無料で。</span></h1>
       <p class="intro-lead">店名・業種・特徴の3つだけ。入力すると、右側に見本ができます。</p>
     </section>
@@ -120,11 +122,17 @@
             </div>
           </details>
 
+          <div class="signin-area" id="signin-area" hidden>
+            <p class="signin-note" id="signin-note">作ったホームページをあとから直せるように、Googleアカウントで確認させてください。</p>
+            <div id="google-signin-button"></div>
+            <p class="signin-status" id="signin-status" role="status"></p>
+          </div>
+
           <button class="button primary-action" id="apply-button" type="submit">
             無料でホームページを作る
             <span aria-hidden="true">→</span>
           </button>
-          <p class="privacy-note">登録不要。入力内容はホームページ作成にだけ使います。</p>
+          <p class="privacy-note">入力内容はホームページ作成にだけ使います。</p>
         </form>
 
         <section class="generation-result" id="generation-result" hidden aria-labelledby="generation-status">

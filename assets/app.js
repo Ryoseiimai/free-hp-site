@@ -52,6 +52,14 @@
   const manualContactLink = document.querySelector("#manual-contact-link");
   const expiryContactLink = document.querySelector("#expiry-contact-link");
 
+  // クライアントIDが空のあいだはログイン欄を出さず、これまでどおり誰でも作れる。
+  const googleClientId = (document.querySelector('meta[name="google-client-id"]') || {}).content || "";
+  const signinArea = document.querySelector("#signin-area");
+  const signinButton = document.querySelector("#google-signin-button");
+  const signinStatus = document.querySelector("#signin-status");
+  const GOOGLE_SCRIPT_SRC = "https://accounts.google.com/gsi/client";
+  let idToken = "";
+
   const photoInput = document.querySelector("#photo");
   const photoStatus = document.querySelector("#photo-status");
   const photoName = document.querySelector("#photo-name");
@@ -339,6 +347,10 @@
     switch (status) {
       case 400:
         return validationMessageFor(detail);
+      case 401:
+        return detail || "Googleでログインしてから、もう一度お試しください。";
+      case 403:
+        return detail || "このGoogleアカウントでは作成できませんでした。";
       case 422:
         return detail || "生成内容の確認に失敗しました。もう一度お試しください。";
       case 429:
@@ -383,9 +395,11 @@
 
     try {
       await photoProcessing; // 写真の縮小処理が残っていれば完了を待ってから送信する
+      const headers = { "content-type": "application/json" };
+      if (idToken) headers.authorization = `Bearer ${idToken}`;
       const response = await fetch(API_URL, {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        headers,
         body: JSON.stringify(buildSiteInput())
       });
       let result = {};
@@ -433,6 +447,51 @@
     }
   };
 
+  const setSigninState = (state, message) => {
+    signinArea.dataset.state = state;
+    signinStatus.textContent = message || "";
+  };
+
+  const onCredential = (response) => {
+    idToken = (response && response.credential) || "";
+    if (!idToken) {
+      setSigninState("error", "確認できませんでした。もう一度お試しください。");
+      return;
+    }
+    // 表示名の取り出しだけのためにJWTの真ん中を読む。中身の正しさはサーバ側で確かめる。
+    let who = "";
+    try {
+      const claims = JSON.parse(decodeURIComponent(escape(atob(idToken.split(".")[1].replace(/-/gu, "+").replace(/_/gu, "/")))));
+      who = claims.email || claims.name || "";
+    } catch {
+      who = "";
+    }
+    signinButton.hidden = true;
+    setSigninState("signed-in", who ? `${who} で確認できました。` : "確認できました。");
+  };
+
+  const setupGoogleSignin = () => {
+    if (!googleClientId) return;
+    signinArea.hidden = false;
+    const script = document.createElement("script");
+    script.src = GOOGLE_SCRIPT_SRC;
+    script.async = true;
+    script.defer = true;
+    script.onerror = () => setSigninState("error", "Googleの読み込みに失敗しました。通信環境をご確認ください。");
+    script.onload = () => {
+      if (!window.google || !window.google.accounts || !window.google.accounts.id) {
+        setSigninState("error", "Googleの読み込みに失敗しました。時間をおいてお試しください。");
+        return;
+      }
+      window.google.accounts.id.initialize({ client_id: googleClientId, callback: onCredential });
+      window.google.accounts.id.renderButton(signinButton, {
+        type: "standard", theme: "outline", size: "large", shape: "rectangular",
+        text: "signin_with", locale: "ja", width: 280
+      });
+    };
+    document.head.appendChild(script);
+  };
+
   form.addEventListener("input", updatePreview);
   form.addEventListener("change", updatePreview);
   form.addEventListener("input", updateManualContactLink);
@@ -444,6 +503,7 @@
   photoInput.addEventListener("change", handlePhotoChange);
   copyGeneratedLinkButton.addEventListener("click", copyGeneratedLink);
 
+  setupGoogleSignin();
   updatePreview();
   updateManualContactLink();
   expiryContactLink.href = `mailto:${EXPIRY_CONTACT_EMAIL}?subject=${encodeURIComponent(EXPIRY_CONTACT_SUBJECT)}`;

@@ -833,3 +833,31 @@ textarea:focus {
   font-size: 12px;
   line-height: 1.7;
 }
+
+/* Googleアカウントでの確認欄。クライアントIDが未設定のあいだは丸ごと隠れている。 */
+.signin-area {
+  margin: 0 0 16px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--paper);
+}
+
+.signin-note {
+  margin: 0 0 12px;
+  color: var(--ink);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.signin-status {
+  margin: 10px 0 0;
+  color: var(--ink);
+  opacity: .78;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.signin-area[data-state="signed-in"] {
+  border-color: var(--ink-deep);
+}
