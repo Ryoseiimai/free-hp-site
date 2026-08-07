@@ -18,8 +18,11 @@
     h2 { font-size:1.15rem; font-weight:900; margin:44px 0 12px; padding-left:12px; border-left:5px solid var(--gold); line-height:1.5; }
     p { margin:0 0 1em; }
     .card { background:#fff; border:1px solid var(--rule); border-radius:12px; padding:20px 22px; box-shadow:0 4px 18px rgb(0 0 0 / 4%); }
-    .count-row { display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; }
+    .count-row { display:flex; align-items:baseline; gap:24px; flex-wrap:wrap; }
+    .count-block { display:flex; flex-direction:column; }
+    .count-label { font-size:.8rem; color:var(--muted); margin:0 0 2px; }
     .count-num { font-size:2.3rem; font-weight:900; color:var(--navy); line-height:1; }
+    .count-num-sub { font-size:1.3rem; font-weight:700; color:var(--muted); line-height:1; }
     .count-note { color:var(--muted); font-size:.9rem; }
     a { color:var(--yamabuki); font-weight:700; }
     ul { margin:0 0 1em; padding-left:1.3em; }
@@ -43,9 +46,16 @@
   <h2>これまでの記録</h2>
   <div class="card">
     <div class="count-row">
-      <span class="count-num" id="works-count">182件</span>
-      <span class="count-note">作って公開した数（<a href="works.html">数え方の定義と内訳はこちら</a>）</span>
+      <div class="count-block">
+        <span class="count-label">お店に届いた</span>
+        <span class="count-num" id="works-count">1件</span>
+      </div>
+      <div class="count-block">
+        <span class="count-label">作った（見本を含む）</span>
+        <span class="count-num-sub">182件</span>
+      </div>
     </div>
+    <p class="count-note">お店に届いた＝ご本人にお渡しして公開されているもの。作った＝ご提案のために先に作った見本を含む総数です（<a href="works.html">数え方の定義と内訳はこちら</a>）。</p>
   </div>
 
   <h2>お約束していること</h2>
