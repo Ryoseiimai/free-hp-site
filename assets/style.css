@@ -569,6 +569,45 @@ textarea:focus {
   font-size: 10px;
 }
 
+.sample-menu-preview {
+  display: grid;
+  gap: 6px;
+  min-height: 0;
+  margin-bottom: 18px;
+  padding: 13px;
+  border-left: 4px solid var(--preview-accent);
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.sample-menu-list {
+  display: grid;
+  gap: 4px;
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sample-menu-item {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 11px;
+}
+
+.sample-menu-item-name {
+  color: var(--ink-deep);
+  font-weight: 700;
+}
+
+.sample-menu-item-price {
+  flex: 0 0 auto;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10px;
+  opacity: .8;
+}
+
 .sample-actions {
   display: flex;
   flex-wrap: wrap;
@@ -804,6 +843,15 @@ textarea:focus {
 
 .form-group .optional-field + .optional-field {
   margin-top: 14px;
+}
+
+/* メニュー欄の下に添える書き方の説明。 */
+.menu-note {
+  margin: 8px 0 0;
+  color: var(--ink);
+  opacity: .72;
+  font-size: 12px;
+  line-height: 1.7;
 }
 
 /* 写真の選択ボタン。ブラウザ標準の英語ボタンを隠し、日本語のボタンに置き換えている。 */

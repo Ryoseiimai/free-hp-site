@@ -101,6 +101,11 @@
               <input id="line-official" name="lineOfficial" type="text" placeholder="例：@sample_id、または lin.ee のURL" maxlength="120">
             </div>
             <div class="optional-field">
+              <label for="menu-text">メニュー・料金 <small>任意</small></label>
+              <textarea id="menu-text" name="menuText" rows="4" placeholder="本日の定食 800円&#10;コーヒー 400円" maxlength="500"></textarea>
+              <p class="menu-note">1行に1つ、「品名 価格」の形で入れてください。例：本日の定食 800円</p>
+            </div>
+            <div class="optional-field">
               <span class="field-label">お店の写真 <small>任意・1枚</small></span>
               <!-- ブラウザ標準の「Choose File」は英語のまま変えられないので、inputは読み上げ用に隠してlabelをボタンにする -->
               <input id="photo" name="photo" type="file" accept="image/jpeg,image/png,image/webp" class="sr-only">
@@ -220,6 +225,10 @@
               <span class="sample-block-label">お知らせ</span>
               <strong>活動予定を更新しました。</strong>
               <span>次の予定はこちらからご覧ください。</span>
+            </div>
+            <div class="sample-menu-preview" id="sample-menu-preview" hidden>
+              <span class="sample-block-label">メニュー・料金</span>
+              <ul class="sample-menu-list" data-preview="menuText"></ul>
             </div>
             <div class="sample-actions" id="sample-actions" hidden>
               <span class="sample-action-chip" data-preview-action="reserve" hidden>予約する</span>

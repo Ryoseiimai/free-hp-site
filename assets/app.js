@@ -27,6 +27,12 @@
     address: preview.querySelector('[data-preview="address"]'),
     hours: preview.querySelector('[data-preview="hours"]')
   };
+  const MENU_PREVIEW_MAX_ITEMS = 3;
+  // 価格として認めるのは「数字」「数字+円」「¥+数字」だけ（サーバ側の判定と揃えている）。
+  const MENU_PRICE_PATTERN = /^(?:[0-9]+(?:円)?|¥[0-9]+)$/u;
+  const menuPreviewWrap = document.querySelector("#sample-menu-preview");
+  const menuPreviewList = preview.querySelector('[data-preview="menuText"]');
+
   const sampleActions = document.querySelector("#sample-actions");
   const previewActionChips = {
     reserve: preview.querySelector('[data-preview-action="reserve"]'),
@@ -97,6 +103,49 @@
     return "ここに、あなたの物語を。";
   };
 
+  // 1行を「品名｜価格」または「品名 価格」として読む（サーバ側の解釈を、見本用に簡略化したもの）。
+  const parseMenuLineForPreview = (line) => {
+    const value = line.trim();
+    const separatorAt = value.indexOf("｜");
+    if (separatorAt >= 0) {
+      const name = value.slice(0, separatorAt).trim();
+      const price = value.slice(separatorAt + 1).trim();
+      if (name && MENU_PRICE_PATTERN.test(price)) return { name, price };
+      return { name: value, price: "" };
+    }
+    const spaced = /^(.*?)\s+(\S+)$/u.exec(value);
+    if (spaced) {
+      const name = spaced[1].trim();
+      const price = spaced[2];
+      if (name && MENU_PRICE_PATTERN.test(price)) return { name, price };
+    }
+    return { name: value, price: "" };
+  };
+
+  const updateMenuPreview = (menuText) => {
+    const lines = menuText
+      ? menuText.split(/\r?\n/u).map((line) => line.trim()).filter(Boolean).slice(0, MENU_PREVIEW_MAX_ITEMS)
+      : [];
+    menuPreviewList.textContent = "";
+    lines.forEach((line) => {
+      const item = parseMenuLineForPreview(line);
+      const listItem = document.createElement("li");
+      listItem.className = "sample-menu-item";
+      const nameSpan = document.createElement("span");
+      nameSpan.className = "sample-menu-item-name";
+      nameSpan.textContent = item.name;
+      listItem.appendChild(nameSpan);
+      if (item.price) {
+        const priceSpan = document.createElement("span");
+        priceSpan.className = "sample-menu-item-price";
+        priceSpan.textContent = item.price;
+        listItem.appendChild(priceSpan);
+      }
+      menuPreviewList.appendChild(listItem);
+    });
+    menuPreviewWrap.hidden = lines.length === 0;
+  };
+
   const updatePreview = () => {
     const name = getValue("shopName");
     const type = getValue("businessType") || "飲食店";
@@ -109,6 +158,7 @@
     const reserveUrl = getValue("reserveUrl");
     const instagram = getValue("instagram");
     const lineOfficial = getValue("lineOfficial");
+    const menuText = getValue("menuText");
 
     previewValues.shopName.textContent = displayValue(name, "あなたのお店");
     previewValues.businessType.textContent = type;
@@ -128,6 +178,8 @@
     previewActionChips.instagram.hidden = !instagram;
     previewActionChips.line.hidden = !lineOfficial;
     sampleActions.hidden = !(reserveUrl || instagram || lineOfficial);
+
+    updateMenuPreview(menuText);
   };
 
   const estimateKbFromDataUri = (dataUri) => {
@@ -281,6 +333,7 @@
 
   const buildSiteInput = () => {
     const catchphrase = suggestedCatchphrase();
+    const menuText = getValue("menuText");
     const input = {
       storeName: getValue("shopName"),
       industry: getValue("businessType"),
@@ -292,7 +345,8 @@
       businessHours: getValue("hours"),
       reserveUrl: getValue("reserveUrl"),
       instagram: getValue("instagram"),
-      lineOfficial: getValue("lineOfficial")
+      lineOfficial: getValue("lineOfficial"),
+      ...(menuText ? { menuText } : {})
     };
     return photoDataUri ? { ...input, photo: photoDataUri } : input;
   };
@@ -310,6 +364,7 @@
       reserveUrl: displayValue(getValue("reserveUrl"), "未入力"),
       instagram: displayValue(getValue("instagram"), "未入力"),
       lineOfficial: displayValue(getValue("lineOfficial"), "未入力"),
+      menuText: displayValue(getValue("menuText"), "未入力"),
       badgeChoice: "つけたまま（無料）",
       photo: photoDataUri ? "あり（メールに添付してください）" : "なし"
     };
@@ -327,6 +382,7 @@
       `予約ページのURL：${values.reserveUrl}`,
       `Instagram：${values.instagram}`,
       `LINE公式アカウント：${values.lineOfficial}`,
+      `メニュー・料金：${values.menuText}`,
       `表示について：${values.badgeChoice}`,
       `写真：${values.photo}`
     ].join("\n");
