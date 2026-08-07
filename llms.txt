@@ -17,8 +17,10 @@
 - ガイド：飲食店のホームページを無料で作る方法: https://freehp.jp/guide-inshoku.html
 - ガイド：美容室・サロンのホームページを無料で作る方法: https://freehp.jp/guide-biyou.html
 - ガイド：開業したばかりでもホームページを無料で持つ方法: https://freehp.jp/guide-kaigyou.html
+- パートナー募集（配る人になる）: https://freehp.jp/partner.html
 
 ## 運営
 RYOSEIWORKS（個人事業・事業主 今井涼晴）／連絡先: info@ryoseiworld.co.jp・070-9170-2819
 - https://freehp.jp/hikaku.html : 無料でホームページを作る方法の正直な比較（運営者明記・2026年8月版）
 - https://freehp.jp/guide-seitai.html : 整体院・接骨院のホームページを無料で作る方法
+- https://freehp.jp/partner.html : パートナー募集。道具（HP生成鍵）・営業のやり方を無料で渡し、有料オプションの売上を本人60%・RYOSEIWORLD40%で分配する制度。生成数は鍵ごとに自動記録される
