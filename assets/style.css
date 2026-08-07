@@ -883,3 +883,23 @@ textarea:focus {
 .signin-area[data-state="signed-in"] {
   border-color: var(--ink-deep);
 }
+
+/* 業種別ガイドへの控えめな導線。フッター直前に置く。 */
+.guide-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  padding-block: 16px;
+  border-top: 1px solid var(--line);
+  font-size: 11px;
+}
+
+.guide-links a {
+  color: var(--yamabuki-text);
+  text-decoration: none;
+  text-underline-offset: 3px;
+}
+
+.guide-links a:hover {
+  text-decoration: underline;
+}
