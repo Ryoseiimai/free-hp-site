@@ -569,6 +569,28 @@ textarea:focus {
   font-size: 10px;
 }
 
+.sample-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding-top: 4px;
+}
+
+.sample-action-chip {
+  padding: 6px 12px;
+  border: 1px solid var(--preview-accent);
+  border-radius: 3px;
+  color: var(--preview-accent);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 9px;
+}
+
+.sample-action-chip[data-preview-action="reserve"] {
+  border-color: transparent;
+  background: var(--preview-accent);
+  color: var(--white);
+}
+
 .sample-footer {
   display: grid;
   gap: 3px;

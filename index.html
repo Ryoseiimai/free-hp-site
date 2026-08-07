@@ -79,7 +79,7 @@
 
           <fieldset class="form-group">
             <legend><span>4</span>連絡先と写真</legend>
-            <p class="group-note">入れておくと、見た人がその場で電話をかけたり、地図で道を調べたりできます。空欄のままでも作れます。</p>
+            <p class="group-note">入れておくと、見た人がその場で電話をかけたり、地図で道を調べたり、予約や連絡ができます。空欄のままでも作れます。</p>
             <div class="optional-field">
               <label for="phone">電話番号 <small>任意</small></label>
               <input id="phone" name="phone" type="tel" placeholder="例：03-1234-5678" autocomplete="tel" maxlength="40">
@@ -87,6 +87,18 @@
             <div class="optional-field">
               <label for="address">住所 <small>任意</small></label>
               <input id="address" name="address" type="text" placeholder="例：東京都渋谷区道玄坂1-2-3" autocomplete="street-address" maxlength="200">
+            </div>
+            <div class="optional-field">
+              <label for="reserve-url">予約ページのURL <small>任意</small></label>
+              <input id="reserve-url" name="reserveUrl" type="url" placeholder="例：https://example.com/reserve" maxlength="300">
+            </div>
+            <div class="optional-field">
+              <label for="instagram">Instagramのユーザー名 <small>任意</small></label>
+              <input id="instagram" name="instagram" type="text" placeholder="例：@sample_shop" maxlength="120">
+            </div>
+            <div class="optional-field">
+              <label for="line-official">LINE公式アカウント <small>任意</small></label>
+              <input id="line-official" name="lineOfficial" type="text" placeholder="例：@sample_id、または lin.ee のURL" maxlength="120">
             </div>
             <div class="optional-field">
               <span class="field-label">お店の写真 <small>任意・1枚</small></span>
@@ -208,6 +220,11 @@
               <span class="sample-block-label">お知らせ</span>
               <strong>活動予定を更新しました。</strong>
               <span>次の予定はこちらからご覧ください。</span>
+            </div>
+            <div class="sample-actions" id="sample-actions" hidden>
+              <span class="sample-action-chip" data-preview-action="reserve" hidden>予約する</span>
+              <span class="sample-action-chip" data-preview-action="instagram" hidden>Instagram</span>
+              <span class="sample-action-chip" data-preview-action="line" hidden>LINE公式</span>
             </div>
             <footer class="sample-footer">
               <span data-preview="phone">電話番号はここに表示されます</span>

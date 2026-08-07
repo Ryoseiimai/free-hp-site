@@ -27,6 +27,12 @@
     address: preview.querySelector('[data-preview="address"]'),
     hours: preview.querySelector('[data-preview="hours"]')
   };
+  const sampleActions = document.querySelector("#sample-actions");
+  const previewActionChips = {
+    reserve: preview.querySelector('[data-preview-action="reserve"]'),
+    instagram: preview.querySelector('[data-preview-action="instagram"]'),
+    line: preview.querySelector('[data-preview-action="line"]')
+  };
   const typeBlocks = {
     "飲食店": preview.querySelector('[data-type-block="restaurant"]'),
     "美容・サロン": preview.querySelector('[data-type-block="beauty"]'),
@@ -100,6 +106,9 @@
     const phone = getValue("phone");
     const address = getValue("address");
     const hours = getValue("hours");
+    const reserveUrl = getValue("reserveUrl");
+    const instagram = getValue("instagram");
+    const lineOfficial = getValue("lineOfficial");
 
     previewValues.shopName.textContent = displayValue(name, "あなたのお店");
     previewValues.businessType.textContent = type;
@@ -113,6 +122,12 @@
     Object.entries(typeBlocks).forEach(([label, block]) => {
       block.hidden = label !== type;
     });
+
+    // 行動ボタンの気配だけをプレビューに反映する（実際のhref組み立て・検証はサーバ側で行う）。
+    previewActionChips.reserve.hidden = !reserveUrl;
+    previewActionChips.instagram.hidden = !instagram;
+    previewActionChips.line.hidden = !lineOfficial;
+    sampleActions.hidden = !(reserveUrl || instagram || lineOfficial);
   };
 
   const estimateKbFromDataUri = (dataUri) => {
@@ -274,7 +289,10 @@
       colorTheme: getValue("mood"),
       phone: getValue("phone"),
       address: getValue("address"),
-      businessHours: getValue("hours")
+      businessHours: getValue("hours"),
+      reserveUrl: getValue("reserveUrl"),
+      instagram: getValue("instagram"),
+      lineOfficial: getValue("lineOfficial")
     };
     return photoDataUri ? { ...input, photo: photoDataUri } : input;
   };
@@ -289,6 +307,9 @@
       phone: displayValue(getValue("phone"), "未入力"),
       address: displayValue(getValue("address"), "未入力"),
       hours: displayValue(getValue("hours"), "未入力"),
+      reserveUrl: displayValue(getValue("reserveUrl"), "未入力"),
+      instagram: displayValue(getValue("instagram"), "未入力"),
+      lineOfficial: displayValue(getValue("lineOfficial"), "未入力"),
       badgeChoice: "つけたまま（無料）",
       photo: photoDataUri ? "あり（メールに添付してください）" : "なし"
     };
@@ -303,6 +324,9 @@
       `電話番号：${values.phone}`,
       `住所：${values.address}`,
       `営業時間・定休日：${values.hours}`,
+      `予約ページのURL：${values.reserveUrl}`,
+      `Instagram：${values.instagram}`,
+      `LINE公式アカウント：${values.lineOfficial}`,
       `表示について：${values.badgeChoice}`,
       `写真：${values.photo}`
     ].join("\n");
@@ -333,6 +357,9 @@
       [/^colorTheme is invalid$/u, "色の雰囲気の選択を確認してください。"],
       [/^phone must be at most 40 characters$/u, "電話番号は40文字以内で入力してください。"],
       [/^address must be at most 200 characters$/u, "住所・営業時間は200文字以内で入力してください。"],
+      [/^reserveUrl must be at most 300 characters$/u, "予約ページのURLは300文字以内で入力してください。"],
+      [/^instagram must be at most 120 characters$/u, "Instagramのユーザー名は120文字以内で入力してください。"],
+      [/^lineOfficial must be at most 120 characters$/u, "LINE公式アカウントは120文字以内で入力してください。"],
       [/^request body must be valid JSON$/u, "入力内容を読み取れませんでした。もう一度お試しください。"]
     ];
     const known = messages.find(([pattern]) => pattern.test(detail));
