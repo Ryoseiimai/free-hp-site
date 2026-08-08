@@ -10,6 +10,8 @@
   --preview-warm: #C96F3B;
   --preview-calm: #3E4E3A;
   --preview-fresh: #2E6E8E;
+  --preview-fun: #D99A00;
+  --preview-moody: #182234;
 }
 
 * { box-sizing: border-box; }

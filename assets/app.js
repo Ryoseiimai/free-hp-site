@@ -50,7 +50,9 @@
   const moodColors = {
     "あたたかい": "var(--preview-warm)",
     "落ち着いた": "var(--preview-calm)",
-    "さわやか": "var(--preview-fresh)"
+    "さわやか": "var(--preview-fresh)",
+    "たのしい": "var(--preview-fun)",
+    "しっとり": "var(--preview-moody)"
   };
 
   const applyButton = document.querySelector("#apply-button");
