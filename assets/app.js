@@ -42,6 +42,9 @@
   const typeBlocks = {
     "飲食店": preview.querySelector('[data-type-block="restaurant"]'),
     "美容・サロン": preview.querySelector('[data-type-block="beauty"]'),
+    "教室・スクール": preview.querySelector('[data-type-block="school"]'),
+    "小売・物販": preview.querySelector('[data-type-block="retail"]'),
+    "修理・住まいのサービス": preview.querySelector('[data-type-block="home-service"]'),
     "その他": preview.querySelector('[data-type-block="other"]')
   };
   const moodColors = {
