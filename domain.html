@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="freehp.jpで作ったホームページに、お店専用の独自ドメインを申し込むフォームです。制作・設定費用はかからず、必要なのはドメインの実費だけです。">
+  <title>お店専用のアドレス（独自ドメイン）のお申し込み｜RYOSEIWORKS</title>
+  <link rel="canonical" href="https://freehp.jp/domain.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="RYOSEIWORKS｜RYOSEIWORLD 世界を無料にする。">
+  <meta property="og:title" content="お店専用のアドレス（独自ドメイン）のお申し込み">
+  <meta property="og:description" content="制作・設定費用はかからず、必要なのはドメインの実費だけ。カード登録や自動課金はありません。">
+  <meta property="og:url" content="https://freehp.jp/domain.html">
+  <meta property="og:image" content="https://freehp.jp/assets/ogp.png">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#FBFAF6">
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Zen+Kaku+Gothic+New:wght@400;500;700;900&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body class="app-page domain-page">
+  <header class="app-header page-wrap">
+    <a class="brand" href="./" aria-label="RYOSEIWORKS ホーム">
+      <span class="brand-mark">RYOSEIWORLD ｜ 世界を無料にする。</span>
+      <span class="brand-name">RYOSEIWORKS</span>
+    </a>
+    <div class="header-points" aria-label="サービスの特徴">
+      <span>制作・設定費なし</span>
+      <span>自動課金なし</span>
+    </div>
+  </header>
+
+  <main class="app-main page-wrap domain-main">
+    <section class="app-intro domain-intro" aria-labelledby="domain-title">
+      <p class="eyebrow">CUSTOM DOMAIN REQUEST</p>
+      <h1 id="domain-title">お店専用のアドレス<br><span>（独自ドメイン）</span><br>のお申し込み</h1>
+      <div class="domain-cost-summary" aria-label="料金について">
+        <p>ホームページの制作・公開は、これまでどおり費用をいただきません。</p>
+        <p>かかるのはドメインの実費だけです（.com・.net 年1,800円税込、.jp 年3,300円税込・目安）。</p>
+        <p>カード登録は不要で、自動課金もありません。</p>
+        <p>ドメインの名義（登録者）は、お店のお名前で登録します。</p>
+      </div>
+    </section>
+
+    <p class="previous-receipt" id="previous-receipt" hidden></p>
+
+    <section class="input-panel domain-panel" aria-labelledby="domain-form-title">
+      <div class="panel-heading">
+        <div>
+          <p class="panel-kicker">APPLICATION</p>
+          <h2 id="domain-form-title">必要な情報を入力してください</h2>
+        </div>
+        <span class="time-label">約3分</span>
+      </div>
+
+      <form class="quick-form domain-form" id="domain-form">
+        <fieldset class="form-group domain-section">
+          <legend><span>1</span>ホームページについて</legend>
+          <div class="optional-field">
+            <label for="store-name">お店の名前</label>
+            <input id="store-name" name="storeName" type="text" placeholder="例：喫茶かえる" autocomplete="organization" required maxlength="60">
+          </div>
+          <div class="optional-field">
+            <label for="site-url">公開中のページURL <small>任意</small></label>
+            <input id="site-url" name="siteUrl" type="url" placeholder="https://free-hp-engine.example.workers.dev/s/example" inputmode="url" maxlength="200">
+          </div>
+        </fieldset>
+
+        <fieldset class="form-group domain-section">
+          <legend><span>2</span>希望するアドレス</legend>
+          <div class="optional-field">
+            <label for="domain-label-1">希望ドメイン 第1希望</label>
+            <div class="domain-input-row">
+              <input id="domain-label-1" name="domainLabel1" type="text" placeholder="kissa-kaeru" required maxlength="63" pattern="[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?" autocapitalize="none" autocomplete="off" spellcheck="false" aria-describedby="domain-format-note">
+              <label class="sr-only" for="domain-tld-1">第1希望の末尾</label>
+              <select id="domain-tld-1" name="domainTld1">
+                <option value="com">.com</option>
+                <option value="net">.net</option>
+                <option value="jp">.jp</option>
+              </select>
+            </div>
+          </div>
+          <div class="optional-field">
+            <label for="domain-label-2">希望ドメイン 第2希望 <small>任意</small></label>
+            <div class="domain-input-row">
+              <input id="domain-label-2" name="domainLabel2" type="text" placeholder="kissakaeru" maxlength="63" pattern="[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?" autocapitalize="none" autocomplete="off" spellcheck="false" aria-describedby="domain-format-note">
+              <label class="sr-only" for="domain-tld-2">第2希望の末尾</label>
+              <select id="domain-tld-2" name="domainTld2">
+                <option value="com">.com</option>
+                <option value="net">.net</option>
+                <option value="jp">.jp</option>
+              </select>
+            </div>
+          </div>
+          <p class="domain-format-note" id="domain-format-note">英数字とハイフンのみ。ハイフンは先頭と末尾には使えません。</p>
+        </fieldset>
+
+        <fieldset class="form-group domain-section method-fieldset">
+          <legend><span>3</span>取得方法</legend>
+          <p class="group-note">ご希望に近いものを1つ選んでください。</p>
+          <div class="domain-methods">
+            <input class="domain-method-input" id="method-self" type="radio" name="method" value="self" checked required>
+            <label class="domain-method" for="method-self">
+              <strong>自分で取得する</strong>
+              <span>取得後にこちらで設定します。手順書をメールでお送りします。</span>
+            </label>
+
+            <input class="domain-method-input" id="method-wait" type="radio" name="method" value="wait_crowdfunding">
+            <label class="domain-method" for="method-wait">
+              <strong>こちらで取得（順番待ち）</strong>
+              <span>取得費用はクラウドファンディングで集める準備をしているため、順番にご案内します。時期はお約束できません。</span>
+            </label>
+
+            <input class="domain-method-input" id="method-prepay" type="radio" name="method" value="prepay">
+            <label class="domain-method" for="method-prepay">
+              <strong>こちらで取得（お急ぎ）</strong>
+              <span>実費を先にお振り込みいただければ、すぐ取得・設定します。振込先はメールでご案内します。</span>
+            </label>
+          </div>
+          <details class="extra-options">
+            <summary>「お急ぎ（先払い）」を選ぶ場合の表示（特定商取引法に基づく表記）</summary>
+            <div class="extra-options-body">
+              <dl class="tokushoho-list">
+                <dt>事業者名</dt>
+                <dd>RYOSEIWORKS（個人事業／事業主：今井 涼晴）</dd>
+                <dt>所在地</dt>
+                <dd>〒150-0021 東京都渋谷区恵比寿西2-4-8 ウィンド恵比寿ビル8F</dd>
+                <dt>連絡先</dt>
+                <dd>電話 <a href="tel:07091702819">070-9170-2819</a>／メール <a href="mailto:info@ryoseiworld.co.jp">info@ryoseiworld.co.jp</a></dd>
+                <dt>対価</dt>
+                <dd>ドメインの実費（.com・.net 年1,800円税込、.jp 年3,300円税込・目安）</dd>
+                <dt>支払時期</dt>
+                <dd>ご案内メール後、事前振込</dd>
+                <dt>役務提供時期</dt>
+                <dd>入金確認後、通常1〜3日でドメインを取得・設定</dd>
+                <dt>返品・キャンセル</dt>
+                <dd>ドメイン取得後の返金はできません。取得前であればキャンセルできます。</dd>
+              </dl>
+            </div>
+          </details>
+        </fieldset>
+
+        <fieldset class="form-group domain-section">
+          <legend><span>4</span>ご連絡先</legend>
+          <div class="domain-fields-grid">
+            <div class="optional-field">
+              <label for="contact-name">お名前</label>
+              <input id="contact-name" name="contactName" type="text" autocomplete="name" required maxlength="40">
+            </div>
+            <div class="optional-field">
+              <label for="email">メール</label>
+              <input id="email" name="email" type="email" autocomplete="email" inputmode="email" required maxlength="120">
+            </div>
+          </div>
+          <div class="optional-field">
+            <label for="contact-phone">電話 <small>任意</small></label>
+            <input id="contact-phone" name="phone" type="tel" placeholder="例：03-1234-5678" autocomplete="tel" inputmode="tel" maxlength="20" pattern="[0-9-]+">
+          </div>
+          <div class="optional-field">
+            <label for="note">ご要望 <small>任意</small></label>
+            <textarea id="note" name="note" rows="4" maxlength="300" placeholder="取得時期や領収書など、ご希望があればお書きください。"></textarea>
+          </div>
+        </fieldset>
+
+        <div class="agreement-field">
+          <input id="agree" name="agree" type="checkbox" required>
+          <label for="agree">制作・公開にはこれまでどおり費用がかからず、かかるのはドメインの実費のみで、自動課金はないことに同意します。</label>
+        </div>
+
+        <button class="button primary-action" id="domain-submit" type="submit">空き状況を確認して申し込む</button>
+        <p class="privacy-note">入力内容はドメイン取得のご案内と設定にだけ使います。</p>
+      </form>
+    </section>
+
+    <section class="domain-result" id="domain-result" hidden aria-live="polite">
+      <div id="domain-loading" hidden>
+        <span class="loading-mark" aria-hidden="true"></span>
+        <h2>空き状況を確認しています</h2>
+        <p>通常は数秒で終わります。そのままお待ちください。</p>
+      </div>
+
+      <div id="domain-success" hidden>
+        <p class="panel-kicker">REQUEST RECEIVED</p>
+        <h2>お申し込みを受け付けました</h2>
+        <p class="receipt-number">受付番号：<strong id="receipt-id"></strong></p>
+        <h3>希望ドメインの確認結果</h3>
+        <ul class="domain-status-list" id="domain-status-list"></ul>
+        <h3>次の手順</h3>
+        <ul class="next-steps" id="next-steps"></ul>
+        <p class="result-note">空き状況は申込時点の確認結果です。最終的な取得可否は、取得手続きの際にもう一度確認します。</p>
+      </div>
+
+      <div id="domain-error" hidden role="alert">
+        <p class="panel-kicker">PLEASE TRY AGAIN</p>
+        <h2>送信できませんでした</h2>
+        <p id="domain-error-message"></p>
+        <a class="button secondary-action" id="domain-error-contact" href="mailto:info@ryoseiworld.co.jp">メールで相談する</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="app-footer page-wrap">
+    <span>RYOSEIWORLD</span>
+    <span>ホームページの制作・公開費用はかかりません。</span>
+    <a href="domain.html" aria-current="page">独自ドメイン</a>
+    <a href="company.html">運営者情報</a>
+  </footer>
+
+  <script src="assets/domain.js"></script>
+</body>
+</html>

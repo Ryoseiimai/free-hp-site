@@ -1,8 +1,9 @@
 (() => {
   "use strict";
 
-  const API_URL = "https://free-hp-engine.ryoseiworld.workers.dev/api/generate";
-  const EXPECTED_WORKER_ORIGIN = "https://free-hp-engine.ryoseiworld.workers.dev";
+  const API_BASE = "https://free-hp-engine.ryoseiworld.workers.dev";
+  const API_URL = `${API_BASE}/api/generate`;
+  const EXPECTED_WORKER_ORIGIN = API_BASE;
   const EXPIRY_CONTACT_EMAIL = "info@ryoseiworld.co.jp";
   const EXPIRY_CONTACT_SUBJECT = "正式版への引っ越し希望";
 

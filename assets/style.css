@@ -28,7 +28,7 @@ body {
 }
 
 a { color: inherit; }
-button, input, textarea { font: inherit; }
+button, input, textarea, select { font: inherit; }
 button, a { -webkit-tap-highlight-color: transparent; }
 
 :focus-visible {
@@ -249,6 +249,9 @@ button, a { -webkit-tap-highlight-color: transparent; }
 
 input[type="text"],
 input[type="tel"],
+input[type="email"],
+input[type="url"],
+select,
 textarea {
   width: 100%;
   border: 1px solid var(--line);
@@ -260,7 +263,10 @@ textarea {
 }
 
 input[type="text"],
-input[type="tel"] {
+input[type="tel"],
+input[type="email"],
+input[type="url"],
+select {
   min-height: 44px;
 }
 
@@ -278,6 +284,9 @@ textarea::placeholder {
 
 input[type="text"]:focus,
 input[type="tel"]:focus,
+input[type="email"]:focus,
+input[type="url"]:focus,
+select:focus,
 textarea:focus {
   border-color: var(--ink);
   outline: 3px solid var(--yamabuki);
@@ -342,6 +351,28 @@ textarea:focus {
 
 .extra-options-body {
   padding: 6px 0 3px;
+}
+
+/* 「お急ぎ（先払い）」選択時のみ関係する特定商取引法に基づく表記。折りたたみの中の小さな注記。 */
+.tokushoho-list {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.7;
+  color: var(--ink);
+  opacity: .85;
+}
+
+.tokushoho-list dt {
+  font-weight: 700;
+  margin-top: 8px;
+}
+
+.tokushoho-list dt:first-child {
+  margin-top: 0;
+}
+
+.tokushoho-list dd {
+  margin: 0;
 }
 
 .mood-field { border: 0; }
@@ -772,6 +803,279 @@ textarea:focus {
   font-size: 9px;
 }
 
+/* 独自ドメイン申込ページ */
+.domain-main {
+  width: min(760px, calc(100% - 48px));
+}
+
+.domain-intro {
+  max-width: none;
+}
+
+.domain-intro h1 {
+  font-size: clamp(31px, 5vw, 48px);
+}
+
+.domain-cost-summary {
+  margin-top: 20px;
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-left: 5px solid var(--yamabuki);
+  border-radius: 8px;
+  background: var(--white);
+}
+
+.domain-cost-summary p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.75;
+}
+
+.domain-panel {
+  padding: clamp(20px, 4vw, 34px);
+}
+
+.domain-section {
+  padding-bottom: 9px;
+  border-bottom: 1px solid var(--line);
+}
+
+.domain-section + .domain-section {
+  padding-top: 7px;
+}
+
+.domain-input-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 90px;
+  gap: 8px;
+}
+
+.domain-input-row select {
+  width: 100%;
+  padding: 10px 11px;
+  cursor: pointer;
+}
+
+.domain-format-note,
+.result-note {
+  margin: -8px 0 18px;
+  color: var(--ink);
+  font-size: 10px;
+  opacity: .72;
+}
+
+.domain-methods {
+  display: grid;
+  gap: 9px;
+}
+
+.domain-method-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.domain-method {
+  display: grid;
+  gap: 3px;
+  padding: 13px 14px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--paper);
+  cursor: pointer;
+}
+
+.domain-method strong {
+  color: var(--ink-deep);
+  font-size: 13px;
+}
+
+.domain-method span {
+  font-size: 11px;
+  line-height: 1.65;
+}
+
+.domain-method-input:checked + .domain-method {
+  border-color: var(--ink);
+  background: #FFF9E8;
+  box-shadow: inset 4px 0 0 var(--yamabuki);
+}
+
+.domain-method-input:focus-visible + .domain-method {
+  outline: 3px solid var(--yamabuki-deep);
+  outline-offset: 2px;
+}
+
+.domain-fields-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.agreement-field {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  gap: 9px;
+  align-items: start;
+  margin: 22px 0 18px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #FFF9E8;
+}
+
+.agreement-field input {
+  width: 18px;
+  height: 18px;
+  margin: 3px 0 0;
+  accent-color: var(--ink);
+}
+
+.agreement-field label {
+  font-size: 12px;
+  line-height: 1.65;
+  cursor: pointer;
+}
+
+.previous-receipt {
+  margin: 0 0 16px;
+  padding: 10px 13px;
+  border: 1px solid #AEC4B0;
+  border-radius: 7px;
+  background: #F3F8F3;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10px;
+}
+
+.domain-result {
+  margin-top: 20px;
+  padding: clamp(20px, 4vw, 34px);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--white);
+  box-shadow: 0 2px 0 var(--line);
+}
+
+.domain-result h2 {
+  margin: 0 0 9px;
+  color: var(--ink-deep);
+  font-size: 23px;
+  line-height: 1.35;
+}
+
+.domain-result h3 {
+  margin: 24px 0 10px;
+  color: var(--ink-deep);
+  font-size: 14px;
+}
+
+#domain-loading {
+  text-align: center;
+}
+
+#domain-loading .loading-mark {
+  margin: 0 auto 15px;
+}
+
+.receipt-number {
+  margin: 12px 0 0;
+  padding: 10px 12px;
+  border-radius: 6px;
+  background: var(--paper);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11px;
+}
+
+.domain-status-list,
+.next-steps {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.domain-status-list {
+  display: grid;
+  gap: 8px;
+}
+
+.domain-status {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 2px 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--paper);
+}
+
+.domain-status strong {
+  overflow-wrap: anywhere;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 12px;
+}
+
+.domain-status > span {
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.domain-status small {
+  grid-column: 1 / -1;
+  font-size: 10px;
+  opacity: .72;
+}
+
+.domain-status.is-available {
+  border-color: #AEC4B0;
+  background: #F3F8F3;
+}
+
+.domain-status.is-taken {
+  border-color: #D8B5AD;
+  background: #FFF5F2;
+}
+
+.next-steps {
+  counter-reset: next-step;
+  display: grid;
+  gap: 10px;
+}
+
+.next-steps li {
+  position: relative;
+  min-height: 28px;
+  padding-left: 38px;
+  font-size: 12px;
+}
+
+.next-steps li::before {
+  counter-increment: next-step;
+  content: counter(next-step);
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: grid;
+  width: 26px;
+  height: 26px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--white);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 9px;
+}
+
+.result-note {
+  margin: 20px 0 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+#domain-error .secondary-action {
+  margin-top: 8px;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -812,6 +1116,20 @@ textarea:focus {
   .generated-link { white-space: normal; overflow-wrap: anywhere; }
   #generated-preview { height: 400px; }
   .app-footer { align-items: flex-start; flex-direction: column; justify-content: center; gap: 2px; padding-block: 13px; }
+  .domain-main { width: min(100% - 32px, 680px); }
+  .domain-intro h1 { font-size: clamp(28px, 8vw, 38px); }
+  .domain-intro h1 span { text-decoration-thickness: 7px; }
+  .domain-cost-summary { padding: 13px 14px; }
+  .domain-cost-summary p { font-size: 11px; }
+  .domain-page .app-header { gap: 10px; }
+  .domain-page .brand-mark { display: none; }
+  .domain-page .header-points { gap: 4px; }
+  .domain-page .header-points span { padding-inline: 6px; font-size: 7px; }
+  .domain-panel .panel-heading { align-items: flex-start; }
+  .domain-panel .panel-heading h2 { font-size: 18px; }
+  .domain-fields-grid { grid-template-columns: 1fr; gap: 0; }
+  .domain-status { grid-template-columns: 1fr; }
+  .domain-status small { grid-column: auto; }
 }
 
 @media (prefers-reduced-motion: reduce) {
