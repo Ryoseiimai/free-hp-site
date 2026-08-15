@@ -19,6 +19,7 @@
   const previousReceipt = document.querySelector("#previous-receipt");
   const statusList = document.querySelector("#domain-status-list");
   const nextSteps = document.querySelector("#next-steps");
+  const nextStepsGuideLink = document.querySelector("#next-steps-guide-link");
   const errorMessage = document.querySelector("#domain-error-message");
   const errorContact = document.querySelector("#domain-error-contact");
   let submitting = false;
@@ -145,7 +146,7 @@
       : `年${price}円（税込）`;
   };
 
-  const renderSuccess = (result, requestedDomains) => {
+  const renderSuccess = (result, requestedDomains, method) => {
     receiptId.textContent = result.id;
     statusList.replaceChildren();
     requestedDomains.forEach((domain) => {
@@ -168,6 +169,7 @@
       item.textContent = step;
       nextSteps.appendChild(item);
     });
+    if (nextStepsGuideLink) nextStepsGuideLink.hidden = method !== "self";
     saveReceipt(result.id);
     showPreviousReceipt();
     setResultState("success");
@@ -221,7 +223,7 @@
         showError("受付結果を確認できませんでした。受付状況をメールでお問い合わせください。");
         return;
       }
-      renderSuccess(result, payload.domains);
+      renderSuccess(result, payload.domains, payload.method);
     } catch {
       showError("通信に失敗しました。少し時間をおいて、もう一度お試しいただくか、メールでご相談ください。");
     } finally {

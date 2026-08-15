@@ -1066,6 +1066,15 @@ textarea:focus {
   font-size: 9px;
 }
 
+.next-steps-guide-link {
+  margin: 14px 0 0;
+  font-size: 13px;
+}
+
+.next-steps-guide-link a {
+  font-weight: 700;
+}
+
 .result-note {
   margin: 20px 0 0;
   padding-top: 14px;
