@@ -70,7 +70,7 @@
   const manualContactLink = document.querySelector("#manual-contact-link");
   const expiryContactLink = document.querySelector("#expiry-contact-link");
 
-  // クライアントIDが空のあいだはログイン欄を出さず、これまでどおり誰でも作れる。
+  // クライアントIDが空のあいだはログイン欄を出さず、従来どおり作成できる。
   const googleClientId = (document.querySelector('meta[name="google-client-id"]') || {}).content || "";
   const signinArea = document.querySelector("#signin-area");
   const signinButton = document.querySelector("#google-signin-button");
@@ -371,11 +371,11 @@
       instagram: displayValue(getValue("instagram"), "未入力"),
       lineOfficial: displayValue(getValue("lineOfficial"), "未入力"),
       menuText: displayValue(getValue("menuText"), "未入力"),
-      badgeChoice: "つけたまま（無料）",
+      badgeChoice: "つけたまま",
       photo: photoDataUri ? "あり（メールに添付してください）" : "なし"
     };
     return [
-      "無料ホームページ申込（自動生成がうまくいかない場合）",
+      "AIホームページ製作所 申込（自動生成がうまくいかない場合）",
       "",
       `お店・活動の名前：${values.name}`,
       `業種：${values.type}`,
@@ -395,7 +395,7 @@
   };
 
   const updateManualContactLink = () => {
-    manualContactLink.href = `mailto:info@ryoseiworld.co.jp?subject=${encodeURIComponent("無料ホームページの相談")}&body=${encodeURIComponent(buildApplicationText())}`;
+    manualContactLink.href = `mailto:info@ryoseiworld.co.jp?subject=${encodeURIComponent("AIホームページ製作所の相談")}&body=${encodeURIComponent(buildApplicationText())}`;
   };
 
   const setGenerationState = (state) => {
@@ -464,7 +464,7 @@
     generatedLink.textContent = url;
     generatedPreview.src = url;
     generatedPreview.hidden = false;
-    generationStatus.textContent = "ホームページができました";
+    generationStatus.textContent = "見本ができました";
     generatedCopyStatus.textContent = "";
     setGenerationState("success");
   };
@@ -478,8 +478,8 @@
     applyButton.disabled = true;
     applyButton.setAttribute("aria-busy", "true");
     applyButton.dataset.defaultLabel = applyButton.textContent;
-    applyButton.textContent = "ホームページを作っています…";
-    generationStatus.textContent = "ホームページを生成しています…";
+    applyButton.textContent = "見本を作っています…";
+    generationStatus.textContent = "見本を生成しています…";
     setGenerationState("loading");
 
     try {
@@ -520,7 +520,7 @@
     } finally {
       applyButton.disabled = false;
       applyButton.removeAttribute("aria-busy");
-      applyButton.textContent = applyButton.dataset.defaultLabel || "このホームページを、無料でもらう →";
+      applyButton.textContent = applyButton.dataset.defaultLabel || "ホームページを申し込む →";
     }
   };
 

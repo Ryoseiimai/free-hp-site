@@ -158,7 +158,7 @@
       const availability = document.createElement("span");
       availability.textContent = availabilityLabel(status);
       const quote = document.createElement("small");
-      quote.textContent = `見積：${priceLabel(domain, result.quote[domain])}`;
+      quote.textContent = `2年目以降の実費目安：${priceLabel(domain, result.quote[domain])}`;
       item.append(name, availability, quote);
       statusList.appendChild(item);
     });

@@ -1,11 +1,13 @@
-# 無料ホームページくん
+# AIホームページ製作所（freehp.jp）
 
-> 店名・業種・特徴の3つを入力するだけで、その場で無料ホームページを作れるサービス。運営：RYOSEIWORKS（個人事業・事業主 今井涼晴）。ブランド表記はRYOSEIWORLD。
+> RYOSEIWORLD ｜ ホームページは、翌日に届く。AIで作り、人が最後に整えるホームページ制作サービス。運営：RYOSEIWORKS（個人事業・事業主 今井涼晴）。
 
 ## 概要
 - 店名・業種・特徴の3つを入力すると、その場でホームページの見本ができる（約1分）
-- 基本の制作費は0円。有料になるのは、お店専用アドレス（独自ドメイン・取得実費 年1,500円前後）や更新代行を希望した場合のみ
-- 自動生成した体験版は90日間公開され、その後自動的に非公開になる。残したい場合は無料で正式版（期限なし）へ引っ越しできる
+- 通常プランは制作10,000円・管理費月5,000円（税込）。管理費には更新・修正の代行と表示の見守りを含む
+- 起業応援プランは開業・法人設立から1年以内の方が対象で、初期0円・月3,000円（税込）
+- 独自ドメインは希望者のみ＋10,000円（税込）。取得・接続作業と初年度取得費を含み、2年目以降はドメイン実費のみ（.com/.net 年1,800円〜）
+- 途中解約は自由。作ったページのデータを渡し、引き止めない
 - 対象：飲食店・美容室やサロン・その他の個人事業主やフリーランス
 - 頼まれる前に見本を作って店舗へ郵送でご提案する活動もしている（見本は検索に載せない設定・不要の連絡で即取り下げ）
 
@@ -14,16 +16,16 @@
 - よくある質問: https://freehp.jp/#faq-heading
 - 運営者情報: https://freehp.jp/company.html
 - 作って公開した記録（実績）: https://freehp.jp/works.html
-- ガイド：飲食店のホームページを無料で作る方法: https://freehp.jp/guide-inshoku.html
-- ガイド：美容室・サロンのホームページを無料で作る方法: https://freehp.jp/guide-biyou.html
-- ガイド：開業したばかりでもホームページを無料で持つ方法: https://freehp.jp/guide-kaigyou.html
-- ガイド：教室・スクールのホームページを無料で作る方法: https://freehp.jp/guide-kyoshitsu.html
-- ガイド：小売店・雑貨店のホームページを無料で作る方法: https://freehp.jp/guide-kouri.html
-- ガイド：修理・住まいのサービスのホームページを無料で作る方法: https://freehp.jp/guide-shuuri.html
+- ガイド：飲食店のホームページを作る方法: https://freehp.jp/guide-inshoku.html
+- ガイド：美容室・サロンのホームページを作る方法: https://freehp.jp/guide-biyou.html
+- ガイド：開業したばかりでもホームページを持つ方法: https://freehp.jp/guide-kaigyou.html
+- ガイド：教室・スクールのホームページを作る方法: https://freehp.jp/guide-kyoshitsu.html
+- ガイド：小売店・雑貨店のホームページを作る方法: https://freehp.jp/guide-kouri.html
+- ガイド：修理・住まいのサービスのホームページを作る方法: https://freehp.jp/guide-shuuri.html
 - パートナー募集（配る人になる）: https://freehp.jp/partner.html
 
 ## 運営
 RYOSEIWORKS（個人事業・事業主 今井涼晴）／連絡先: info@ryoseiworld.co.jp・070-9170-2819
-- https://freehp.jp/hikaku.html : 無料でホームページを作る方法の正直な比較（運営者明記・2026年8月版）
-- https://freehp.jp/guide-seitai.html : 整体院・接骨院のホームページを無料で作る方法
-- https://freehp.jp/partner.html : パートナー募集。道具（HP生成鍵）・営業のやり方を無料で渡し、有料オプションの売上を本人60%・RYOSEIWORLD40%で分配する制度。生成数は鍵ごとに自動記録される
+- https://freehp.jp/hikaku.html : ホームページ作成サービスの正直な比較（運営者明記・2026年8月版）
+- https://freehp.jp/guide-seitai.html : 整体院・接骨院のホームページを作る方法
+- https://freehp.jp/partner.html : パートナー募集。HP生成鍵・営業のやり方を渡し、売上を本人60%・RYOSEIWORLD40%で分配する制度。生成数は鍵ごとに自動記録される

@@ -1152,7 +1152,7 @@ textarea:focus {
   }
 }
 
-/* FAQ (AEO): 体験版90日・無料の理由への典型質問に一次回答する */
+/* FAQ (AEO): 料金・管理・公開期間への典型質問に一次回答する */
 .faq { margin: 48px auto 8px; max-width: 760px; }
 .faq h2 { font-size: 20px; margin: 0 0 14px; }
 .faq dl { margin: 0; background: var(--surface, #fff); border-radius: 14px; padding: 6px 20px; box-shadow: 0 6px 22px rgb(0 0 0 / 5%); }
