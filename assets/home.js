@@ -194,4 +194,39 @@
       event.preventDefault();
     });
   }
+
+  /* ---------- 6. 送信前チェック：未ログインならログイン欄へ誘導 ---------- */
+  // Googleログインが有効な設定（meta[google-client-id]が空でない）のときだけ、
+  // 未ログインでの送信をここで止めてログイン欄へ案内する。app.jsのsubmitリスナー
+  // （bubbleフェーズ・app.js先読込のため登録順は先）より先に動く必要があるため、
+  // 同じ<form>にcaptureフェーズで登録する。同一要素上ではcapture/bubbleの区別が
+  // 実行順を決める（captureが先）ため、登録順に関わらずここが先に走る。
+  if (form) {
+    const SIGNIN_HIGHLIGHT_MS = 2000;
+    const NOT_SIGNED_IN_MESSAGE = "先にGoogleでログインしてください（3秒で終わります）";
+    const googleClientIdMeta = document.querySelector('meta[name="google-client-id"]');
+    const googleClientId = (googleClientIdMeta && googleClientIdMeta.content) || "";
+    const signinArea = document.querySelector("#signin-area");
+    const signinStatus = document.querySelector("#signin-status");
+
+    form.addEventListener(
+      "submit",
+      (event) => {
+        if (!googleClientId || !signinArea) return; // ログイン欄が無い設定なら従来どおり素通り
+        if (signinArea.dataset.state === "signed-in") return; // ログイン済みなら何もしない
+
+        event.preventDefault();
+        event.stopImmediatePropagation();
+
+        signinArea.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "center" });
+        signinArea.classList.remove("needs-signin");
+        void signinArea.offsetWidth; // 再アニメーションのためリフローを挟む
+        signinArea.classList.add("needs-signin");
+        window.setTimeout(() => signinArea.classList.remove("needs-signin"), SIGNIN_HIGHLIGHT_MS);
+
+        if (signinStatus) signinStatus.textContent = NOT_SIGNED_IN_MESSAGE;
+      },
+      true
+    );
+  }
 })();

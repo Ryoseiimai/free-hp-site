@@ -450,8 +450,16 @@ details[open] > summary::after { content: "–"; }
 .photo-status { color: var(--paper-faint); font-size: 12px; margin: 10px 0 0; }
 
 .signin-area { margin: 28px 0; padding-top: 20px; border-top: 1px solid var(--paper-hair); }
+.signin-step-num { font-family: var(--mono); font-size: 12px; letter-spacing: .06em; color: var(--yamabuki); margin: 0 0 8px; }
 .signin-note { font-size: 13px; color: var(--paper-dim); margin: 0 0 12px; }
 .signin-status { font-size: 12px; color: var(--paper-faint); margin: 10px 0 0; }
+
+/* 未ログインで送信しようとした時、ここへスクロールさせた上で2秒ハイライトする（home.js） */
+.signin-area.needs-signin { animation: signin-highlight 2s ease; }
+@keyframes signin-highlight {
+  0%, 100% { box-shadow: none; background-color: transparent; }
+  15%, 70% { box-shadow: 0 0 0 2px var(--yamabuki); background-color: rgba(245, 181, 23, .08); }
+}
 
 .button {
   display: inline-flex;
