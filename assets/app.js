@@ -467,6 +467,7 @@
     generationStatus.textContent = "見本ができました";
     generatedCopyStatus.textContent = "";
     setGenerationState("success");
+    if (typeof gtag === 'function') { gtag('event', 'apply_success', { kind: 'site' }); }
   };
 
   const submitGeneration = async () => {

@@ -173,6 +173,7 @@
     saveReceipt(result.id);
     showPreviousReceipt();
     setResultState("success");
+    if (typeof gtag === 'function') { gtag('event', 'apply_success', { kind: 'domain' }); }
   };
 
   const validResult = (result) => result

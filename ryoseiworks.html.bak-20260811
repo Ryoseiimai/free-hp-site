@@ -31,14 +31,6 @@
     .contact { margin-top:8px; }
     footer { color:var(--muted); font-size:.8rem; margin-top:56px; border-top:1px solid var(--rule); padding-top:18px; }
   </style>
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-YR4TM0J5BT"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-YR4TM0J5BT');
-  </script>
 </head>
 <body>
 <main>
@@ -49,7 +41,7 @@
   <h2>やっていること</h2>
   <p>ホームページを持っていない町のお店のために、ホームページを作って提供しています。制作費・修正費はいただきません。あとから請求することもありません。</p>
   <p>AIが作るので、私の手を動かす時間のほかに、外へ出ていくお金がほとんどありません。値引きでもキャンペーンでもなく、この形をずっと続けます。</p>
-  <p>唯一の実費が、インターネット上の住所にあたる「ドメイン」の登録料（1軒あたり年1,800円ほど）です。ここだけは、私の努力だけでは費用をなくせません。</p>
+  <p>唯一の実費が、インターネット上の住所にあたる「ドメイン」の登録料（1軒あたり年1,800円ほど）です。ここだけは私の努力で0円にできません。</p>
 
   <h2>これまでの記録</h2>
   <div class="card">
@@ -60,10 +52,10 @@
       </div>
       <div class="count-block">
         <span class="count-label">作った（見本を含む）</span>
-        <span class="count-num-sub">155件</span>
+        <span class="count-num-sub">161件</span>
       </div>
     </div>
-    <p class="count-note">お店に届いた＝ご本人にお渡しして公開されているもの。作った＝ご提案のために先に作った見本を含む総数です（<a href="works.html">数え方の定義と内訳はこちら</a>）。2026年8月10日時点の数字で、今も日々増えています。</p>
+    <p class="count-note">お店に届いた＝ご本人にお渡しして公開されているもの。作った＝ご提案のために先に作った見本を含む総数です（<a href="works.html">数え方の定義と内訳はこちら</a>）。</p>
   </div>
 
   <h2>お約束していること</h2>
@@ -77,14 +69,6 @@
   <h2>支援者の記録</h2>
   <p>この活動を支えてくださった方のお名前を、ここに掲載していきます（ご希望の方のみ・ニックネーム可）。</p>
   <div class="supporters-empty" id="supporters">まだ掲載はありません。掲載が始まったら、お一人ずつここに追記します。</div>
-
-  <h2>支援企業・団体のロゴ</h2>
-  <p>このプロジェクトを支えてくださった企業・団体さまのロゴを、ここに掲載します（ご希望の方のみ）。掲載期間は1年間です。</p>
-  <div class="supporters-empty" id="supporter-logos">まだ掲載はありません。</div>
-
-  <h2>ドメイン取得台帳</h2>
-  <p>支援いただいた費用で取得したドメインを、取得日・金額・対象サイトとあわせて、ここで公開します。</p>
-  <div class="supporters-empty" id="domain-ledger">まだ取得はありません。開始しだい、1件ずつ追記します。</div>
 
   <h2>連絡先</h2>
   <p class="contact">今井涼晴（RYOSEIWORKS）<br>
