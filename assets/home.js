@@ -148,9 +148,32 @@
     const stepRest = form.querySelector('[data-step="rest"]');
     const businessRadios = form.querySelectorAll('input[name="businessType"]');
     const previewCol = document.querySelector(".preview-col");
+    const allSteps = form.querySelectorAll(".form-step");
+
+    // 未表示の段は hidden + inert（対応ブラウザ）+ 中の入力を disabled にして、
+    // タブ順・スクリーンリーダーのツリーから確実に外す（見た目はmax-height/opacityの
+    // CSSトランジションが担当するので、ここではアクセシビリティ面だけを扱う）。
+    const setStepInteractive = (step, interactive) => {
+      step.querySelectorAll("input, textarea, select, button").forEach((el) => {
+        el.disabled = !interactive;
+      });
+    };
+
+    allSteps.forEach((step) => {
+      if (!step.classList.contains("is-revealed")) {
+        step.hidden = true;
+        step.inert = true;
+        setStepInteractive(step, false);
+      }
+    });
 
     const reveal = (el) => {
-      if (el && !el.classList.contains("is-revealed")) el.classList.add("is-revealed");
+      if (!el || el.classList.contains("is-revealed")) return;
+      el.hidden = false;
+      el.inert = false;
+      setStepInteractive(el, true);
+      void el.offsetWidth; // hidden解除とis-revealed付与の間に1フレーム挟み、max-heightトランジションを発火させる
+      el.classList.add("is-revealed");
     };
 
     if (shopNameInput && stepType) {
@@ -175,22 +198,38 @@
       if (descriptionInput.value.trim().length >= 1) reveal(stepRest);
     }
 
+    const syncPreviewPlaceholder = () => {
+      if (!shopNameInput || !previewCol) return;
+      previewCol.classList.toggle("has-content", shopNameInput.value.trim().length > 0);
+    };
     if (shopNameInput && previewCol) {
-      const syncPreviewPlaceholder = () => {
-        previewCol.classList.toggle("has-content", shopNameInput.value.trim().length > 0);
-      };
       shopNameInput.addEventListener("input", syncPreviewPlaceholder);
       syncPreviewPlaceholder();
     }
 
-    // 段階表示のフォームは全ステップが同じ<form>内にあるため、途中の
-    // input（textarea以外）でEnterを押すとネイティブバリデーションが
-    // 通った時点で暗黙にsubmitされてしまう。textareaの改行とtype=submit
-    // ボタンでの明示的な送信だけは残し、それ以外のEnterは抑止する。
+    // 戻る（bfcache復元）や、ブラウザの「reload時に入力値を復元する」機能は
+    // input イベントを介さずに値だけを戻すことがあるため、pageshow のたびに
+    // 現在値から表示状態を再計算する。businessTypeは常にデフォルトでchecked
+    // されているため、typeの段が（=お店の名前が入っていて）表示済みの場合に
+    // 限ってチェック状態を「選んだ」とみなす（通常の初回読み込みでいきなり
+    // descriptionまで出てしまわないようにするため）。
+    window.addEventListener("pageshow", () => {
+      if (shopNameInput && shopNameInput.value.trim().length >= 1) reveal(stepType);
+      if (stepType && !stepType.hidden && form.querySelector('input[name="businessType"]:checked')) reveal(stepDescription);
+      if (descriptionInput && descriptionInput.value.trim().length >= 1) reveal(stepRest);
+      syncPreviewPlaceholder();
+    });
+
+    // 段階表示のフォームは全ステップが同じ<form>内にあるため、単行の
+    // テキスト系inputでEnterを押すとネイティブの暗黙送信が働いてしまう。
+    // 暗黙送信の対象になりうる単行テキスト系input（text/tel/url/email/search）
+    // だけを対象にし、日本語入力の変換確定Enter（isComposing / keyCode 229）と
+    // summary・file・button・textarea は素通しする。
+    const IMPLICIT_SUBMIT_INPUT_TYPES = ["text", "tel", "url", "email", "search"];
     form.addEventListener("keydown", (event) => {
-      if (event.key !== "Enter") return;
+      if (event.key !== "Enter" || event.isComposing || event.keyCode === 229) return;
       const target = event.target;
-      if (target.tagName === "TEXTAREA" || target.type === "submit") return;
+      if (target.tagName !== "INPUT" || !IMPLICIT_SUBMIT_INPUT_TYPES.includes(target.type)) return;
       event.preventDefault();
     });
   }
@@ -213,7 +252,9 @@
       "submit",
       (event) => {
         if (!googleClientId || !signinArea) return; // ログイン欄が無い設定なら従来どおり素通り
-        if (signinArea.dataset.state === "signed-in") return; // ログイン済みなら何もしない
+        // ログイン済み、またはGoogleの読み込み自体に失敗しているときはここで止めない。
+        // 失敗時はapp.js側の案内文とsignin-reloadリンクに委ね、送信自体はapp.jsに任せる。
+        if (signinArea.dataset.state === "signed-in" || signinArea.dataset.state === "error") return;
 
         event.preventDefault();
         event.stopImmediatePropagation();
@@ -228,5 +269,20 @@
       },
       true
     );
+
+    /* ---------- 7. Googleログイン読み込み失敗時の再読み込みリンク ---------- */
+    // signin-area[data-state]はapp.jsが更新するため、MutationObserverで変化を拾う。
+    const signinReload = document.querySelector("#signin-reload");
+    if (signinReload) {
+      const syncSigninReloadVisibility = () => {
+        signinReload.hidden = signinArea.dataset.state !== "error";
+      };
+      syncSigninReloadVisibility();
+      new MutationObserver(syncSigninReloadVisibility).observe(signinArea, {
+        attributes: true,
+        attributeFilter: ["data-state"]
+      });
+      signinReload.addEventListener("click", () => window.location.reload());
+    }
   }
 })();

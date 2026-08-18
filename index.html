@@ -8,13 +8,16 @@
   <link rel="canonical" href="https://freehp.jp/">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="AIホームページ製作所（freehp.jp）">
-  <meta property="og:title" content="RYOSEIWORLD ｜ ホームページは、翌日に届く。">
+  <meta property="og:title" content="AIホームページ製作所（freehp.jp）｜ホームページは、翌日に届く。">
   <meta property="og:description" content="AIで作り、人が最後に整えたホームページをお申し込みの翌日にお届けします。">
   <meta property="og:url" content="https://freehp.jp/">
   <meta property="og:locale" content="ja_JP">
   <meta property="og:image" content="https://freehp.jp/assets/ogp.png?v=20260818">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="AIホームページ製作所（freehp.jp）｜ホームページは、翌日に届く。">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="RYOSEIWORLD ｜ ホームページは、翌日に届く。">
+  <meta name="twitter:title" content="AIホームページ製作所（freehp.jp）｜ホームページは、翌日に届く。">
   <meta name="twitter:description" content="AIで作り、人が最後に整えたホームページをお申し込みの翌日にお届けします。">
   <meta name="twitter:image" content="https://freehp.jp/assets/ogp.png?v=20260818">
   <meta name="theme-color" content="#0A0F1C">
@@ -66,7 +69,7 @@
           <h2 id="workspace-title" class="section-title-mid">まずは、名前だけ。</h2>
           <p class="section-lead">お店・活動の名前を入れると、次が順番に出てきます。</p>
 
-          <form class="quick-form" id="site-form">
+          <form class="quick-form" id="site-form" method="post" action="#">
 
             <div class="form-step is-revealed" data-step="name">
               <span class="step-index">01</span>
@@ -165,9 +168,16 @@
                 <p class="signin-note" id="signin-note">作ったページを、あとから自分だけが直せるようにするためです。</p>
                 <div id="google-signin-button"></div>
                 <p class="signin-status" id="signin-status" role="status"></p>
+                <!-- Googleログインの読み込み失敗（signin-area[data-state="error"]）時だけhome.jsが表示する -->
+                <button type="button" class="signin-reload" id="signin-reload" hidden>もう一度ログインを読み込む</button>
               </div>
 
-              <button class="button primary-action" id="apply-button" type="submit">
+              <!-- JS無効時はここが唯一の分岐点。apply-buttonはdisabled属性で静的に無効化し、
+                   home.jsが動く環境ではform-stepの表示に合わせて解除する（下部#1参照） -->
+              <noscript>
+                <p class="no-js-notice">JavaScriptを有効にしてください。または<a href="mailto:info@freehp.jp">info@freehp.jp</a>へご連絡ください。</p>
+              </noscript>
+              <button class="button primary-action" id="apply-button" type="submit" disabled>
                 ホームページを申し込む
                 <span aria-hidden="true">→</span>
               </button>
@@ -176,9 +186,9 @@
             </div>
           </form>
 
-          <section class="generation-result" id="generation-result" hidden aria-labelledby="generation-status">
+          <section class="generation-result" id="generation-result" hidden aria-labelledby="generation-status" aria-live="polite">
             <p class="kicker">YOUR WEBSITE</p>
-            <h2 id="generation-status" role="status" aria-live="polite">見本を作っています</h2>
+            <h2 id="generation-status">見本を作っています</h2>
 
             <div class="generation-panel generation-loading" id="generation-loading" hidden>
               <span class="loading-mark" aria-hidden="true"></span>

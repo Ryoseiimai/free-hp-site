@@ -13,7 +13,9 @@
 
   --paper: #F5F1E4;
   --paper-dim: rgba(245, 241, 228, .70);
-  --paper-faint: rgba(245, 241, 228, .40);
+  /* .40だと最も明るい背景(--navy-0)でコントラスト比3.4:1程度でWCAG AA(4.5:1)未達。
+     .60で全背景ストップに対して6:1以上を確保する */
+  --paper-faint: rgba(245, 241, 228, .60);
   --paper-hair: rgba(245, 241, 228, .16);
   --paper-hair-strong: rgba(245, 241, 228, .30);
 
@@ -43,7 +45,9 @@
 /* ---------- リセット・下地 ---------- */
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
-html, body { overflow-x: hidden; }
+/* hiddenだと片軸だけ非visibleの場合overflow-yがautoに昇格しbody/htmlがスクロールコンテナ化して
+   position:stickyのヘッダーが効かなくなる。clipはスクロールコンテナを作らないため影響しない */
+html, body { overflow-x: clip; }
 
 body.page {
   margin: 0;
@@ -446,6 +450,11 @@ details[open] > summary::after { content: "–"; }
   transition: border-color .2s ease;
 }
 .file-button:hover { border-color: var(--yamabuki); }
+/* #photoはsr-onlyで視覚的に隠れているため、フォーカスの可視化は隣接するボタン側で行う */
+#photo:focus-visible + .file-picker .file-button {
+  outline: 2px solid var(--yamabuki);
+  outline-offset: 2px;
+}
 .file-name { color: var(--paper-faint); font-size: 13px; }
 .photo-status { color: var(--paper-faint); font-size: 12px; margin: 10px 0 0; }
 
@@ -453,6 +462,20 @@ details[open] > summary::after { content: "–"; }
 .signin-step-num { font-family: var(--mono); font-size: 12px; letter-spacing: .06em; color: var(--yamabuki); margin: 0 0 8px; }
 .signin-note { font-size: 13px; color: var(--paper-dim); margin: 0 0 12px; }
 .signin-status { font-size: 12px; color: var(--paper-faint); margin: 10px 0 0; }
+/* Googleログインの読み込み失敗時だけhome.jsが表示する再読み込みリンク */
+.signin-reload {
+  display: inline-block;
+  margin-top: 8px;
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--yamabuki);
+  font-size: 12px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.signin-reload:focus-visible { outline: 2px solid var(--yamabuki); outline-offset: 2px; }
 
 /* 未ログインで送信しようとした時、ここへスクロールさせた上で2秒ハイライトする（home.js） */
 .signin-area.needs-signin { animation: signin-highlight 2s ease; }
@@ -482,6 +505,15 @@ details[open] > summary::after { content: "–"; }
 }
 .primary-action:hover { background: var(--yamabuki-deep); }
 .primary-action[aria-busy="true"] { opacity: .7; cursor: progress; }
+.primary-action:disabled { opacity: .5; cursor: not-allowed; }
+.no-js-notice {
+  color: var(--paper-dim);
+  font-size: 13px;
+  margin: 0 0 16px;
+  padding: 12px 14px;
+  border: 1px solid var(--paper-hair-strong);
+}
+.no-js-notice a { color: var(--yamabuki); }
 .secondary-action {
   background: transparent;
   border: 1px solid var(--paper-hair-strong);
