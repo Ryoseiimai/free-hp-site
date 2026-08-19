@@ -36,7 +36,7 @@ TARGETS: dict[str, str] = {
 
 
 def _link_text(label: str) -> str:
-    return f"{label}のお支払いへ（Stripe）"
+    return label
 
 
 def build_block(links: dict[str, str], style: str) -> str:
@@ -46,7 +46,8 @@ def build_block(links: dict[str, str], style: str) -> str:
             f' target="_blank" rel="noopener noreferrer">{_link_text(label)}</a>'
             for label, url in links.items()
         )
-        body = f'    <div class="stripe-links">\n{items}\n    </div>'
+        note = '    <p class="stripe-note">お申し込み後のお支払いはこちら（カード決済・Stripe）</p>'
+        body = f'{note}\n    <div class="stripe-links">\n{items}\n    </div>'
     else:
         items = "\n".join(
             f'    <li><a href="{url}" target="_blank"'

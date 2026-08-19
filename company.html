@@ -20,6 +20,10 @@
     th { width:9em; color:var(--muted); font-weight:600; background:#fdfbf6; }
     tr:last-child th, tr:last-child td { border-bottom:none; }
     a { color:var(--yamabuki); font-weight:700; }
+    .stripe-links { list-style:none; margin:24px 0 0; padding:0; display:flex; flex-direction:column; gap:10px; }
+    .stripe-links li { margin:0; }
+    .stripe-links a { display:block; padding:12px 16px; border-radius:8px; border:1px solid var(--yamabuki); background:#fff; color:var(--yamabuki); font-weight:700; text-decoration:none; text-align:center; box-shadow:0 2px 8px rgb(0 0 0 / 4%); transition:background-color .2s ease, color .2s ease; }
+    .stripe-links a:hover { background:var(--yamabuki); color:#fff; }
     .back { display:inline-block; margin-top:40px; color:var(--navy); }
     footer { color:var(--muted); font-size:.8rem; margin-top:48px; }
   </style>
@@ -56,7 +60,13 @@
     <tr><th>お支払い</th><td>お申し込み後にご案内します。事前のご案内なく料金が発生することはありません。</td></tr>
   </table>
 
-  <!-- STRIPE_LINKS -->
+  <!-- STRIPE_LINKS:START -->
+  <ul class="stripe-links">
+    <li><a href="https://buy.stripe.com/8x28wI0iydYAfyFfPb6c000" target="_blank" rel="noopener noreferrer">通常プラン（制作1万円＋管理費 月5千円）</a></li>
+    <li><a href="https://buy.stripe.com/8x2aEQ2qGg6Idqx8mJ6c001" target="_blank" rel="noopener noreferrer">起業応援プラン（初期0円＋管理費 月3千円）</a></li>
+    <li><a href="https://buy.stripe.com/8x29AM1mC2fSaelcCZ6c002" target="_blank" rel="noopener noreferrer">独自ドメイン追加（1万円）</a></li>
+  </ul>
+<!-- STRIPE_LINKS:END -->
 
   <a class="back" href="./">← AIホームページ製作所にもどる</a>
 
