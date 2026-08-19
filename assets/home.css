@@ -763,6 +763,38 @@ details[open] > summary::after { content: "–"; }
 .pricing-note { color: var(--paper-faint); font-size: 12.5px; margin: 0; }
 .pricing-footnote { margin: 28px 0 0; color: var(--paper-dim); font-size: 13px; }
 
+/* ---------- 採用装置プラン ---------- */
+.hiring { padding: var(--gap-y) var(--side); max-width: 900px; margin: 0 auto; }
+.hiring-card { border: 1px solid var(--yamabuki); padding: clamp(24px, 4vw, 40px); }
+.hiring-copy { color: var(--paper-dim); font-size: 15px; max-width: 56ch; margin: 0 0 20px; }
+.hiring-price { font-size: clamp(20px, 2.6vw, 28px); font-weight: 700; color: var(--paper); margin: 0 0 24px; }
+.hiring-list { list-style: none; margin: 0 0 28px; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.hiring-list li {
+  position: relative;
+  padding-left: 20px;
+  color: var(--paper-dim);
+  font-size: 14px;
+  line-height: 1.75;
+}
+.hiring-list li::before {
+  content: "・";
+  position: absolute;
+  left: 0;
+  color: var(--yamabuki);
+}
+.hiring-target { color: var(--paper-dim); font-size: 13.5px; line-height: 1.8; margin: 0 0 16px; }
+.hiring-target strong { color: var(--paper); }
+.hiring-honest {
+  color: var(--paper-dim);
+  font-size: 13px;
+  line-height: 1.8;
+  margin: 0 0 16px;
+  padding: 14px 16px;
+  border: 1px solid var(--paper-hair-strong);
+}
+.hiring-exclude { color: var(--paper-faint); font-size: 13px; margin: 0 0 4px; }
+.hiring-cta { margin-top: 24px; }
+
 /* ---------- FAQ ---------- */
 .faq { padding: var(--gap-y) var(--side); max-width: 900px; margin: 0 auto; }
 .faq-list { border-bottom: 1px solid var(--paper-hair); }
