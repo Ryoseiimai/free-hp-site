@@ -46,6 +46,9 @@
     "教室・スクール": preview.querySelector('[data-type-block="school"]'),
     "小売・物販": preview.querySelector('[data-type-block="retail"]'),
     "修理・住まいのサービス": preview.querySelector('[data-type-block="home-service"]'),
+    "士業・専門サービス": preview.querySelector('[data-type-block="office"]'),
+    "不動産・建設": preview.querySelector('[data-type-block="company"]'),
+    "医療・クリニック": preview.querySelector('[data-type-block="clinic"]'),
     "その他": preview.querySelector('[data-type-block="other"]')
   };
   const moodColors = {
