@@ -68,6 +68,9 @@
   }
 
   /* ---------- 3. 数字のカウントアップ ---------- */
+  // 2026-08-26: 本番から data-count-to 要素（旧「155件」カウンター）を撤去した。
+  // querySelectorAll は対象0件でも空のNodeListを返すため、以下は自然に何もしない
+  // （data-count-toを使う要素が復活した場合のために処理自体は残す）。
   const easeOutCubic = (p) => 1 - Math.pow(1 - p, 3);
   const COUNT_DURATION_MS = 1300;
 

@@ -186,8 +186,10 @@ button { font: inherit; color: inherit; }
   .site-header-inner { padding-left: 16px; padding-right: 16px; }
   .brand-name { font-size: 11px; }
   .header-right { gap: 8px; }
-  .header-count { font-size: 10px; }
-  .header-count-label { display: none; }
+  /* 2026-08-26: header-countが短い数字表示から長文（2026年8月開業。まず1件…）に
+     変わり、nowrapのまま表示するとブランド名・申し込むボタンと重なるため、
+     狭い画面では非表示にする（フッターに同内容の表記があり情報は欠落しない）。 */
+  .header-count { display: none; }
   .header-cta { padding: 7px 12px; font-size: 11px; }
 }
 
