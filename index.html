@@ -208,30 +208,9 @@
             <h2 id="generation-status">見本を作っています</h2>
 
             <div class="generation-panel generation-loading" id="generation-loading" hidden>
-              <p><span class="loading-mark" aria-hidden="true"></span>内容を整えて、ホームページを組み立てています。</p>
-              <!-- ztconsole=見た目だけの演出（zoetropeターミナル風）。実データは持たない。中身はassets/app.jsが組み立てる -->
-              <div class="ztconsole" id="ztconsole" aria-hidden="true">
-                <div class="ztconsole-grid"></div>
-                <div class="ztconsole-scan"></div>
-                <div class="ztconsole-lanes" id="ztconsole-lanes"></div>
-                <div class="ztconsole-log" id="ztconsole-log"></div>
-                <div class="ztconsole-wave" id="ztconsole-wave">
-                  <div class="ztconsole-wave-glyphs" id="ztconsole-wave-glyphs"></div>
-                  <div class="ztconsole-wave-bars" id="ztconsole-wave-bars"></div>
-                  <span class="ztconsole-wave-cursor"></span>
-                </div>
-                <div class="ztconsole-meta">
-                  <span class="ztconsole-clock" id="ztconsole-clock"></span>
-                  <span class="ztconsole-live"><span class="ztconsole-live-dot"></span>LIVE</span>
-                </div>
-                <div class="ztconsole-footer">
-                  <span class="ztconsole-brand">freehp-engine</span>
-                  <span class="ztconsole-session">session <b>site-generator</b></span>
-                  <span class="ztconsole-count" id="ztconsole-count">1 agent · 0 tools</span>
-                  <span class="ztconsole-phase" id="ztconsole-phase">reading</span>
-                  <span class="ztconsole-hint">q quit · ? help · space pause</span>
-                </div>
-              </div>
+              <p><span class="loading-mark" aria-hidden="true"></span>お店の情報を読んで、文章を書いて、ページを組み立てて、確かめて、公開する。AIがいま、全部やっています。</p>
+              <!-- ztconsole=見た目だけの演出（NEURAL BUILD）。実データは持たない。中身は assets/zt-console.js が組み立てる -->
+              <div class="ztconsole" id="ztconsole" aria-hidden="true"></div>
             </div>
 
             <div class="generation-panel generation-success" id="generation-success" hidden>
@@ -265,6 +244,8 @@
               <span class="window-dot"></span><span class="window-dot"></span><span class="window-dot"></span>
               <span class="browser-address">your-shop.example</span>
             </div>
+            <!-- 生成中だけ、見本の骨組みが組み上がる演出を重ねる（assets/zt-console.js が中身を作り、完了で消える） -->
+            <div class="zt-phud" id="zt-preview-hud" hidden aria-hidden="true"></div>
             <p class="preview-placeholder" id="preview-placeholder">ここに、あなたのお店のホームページが出ます</p>
             <div class="sample-site" id="sample-site">
               <header class="sample-header">
@@ -571,6 +552,7 @@
     <p class="footer-tagline">AIで作って、人が最後に整えます。</p>
   </footer>
 
+  <script src="assets/zt-console.js"></script>
   <script src="assets/app.js"></script>
   <script src="assets/home.js"></script>
   <script src="assets/chat.js"></script>

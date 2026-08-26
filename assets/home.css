@@ -589,63 +589,239 @@ details[open] > summary::after { content: "–"; }
 .expiry-notice a { color: var(--yamabuki); }
 .generation-error p { color: #F2A7A7; }
 
-/* ---------- ztconsole（生成中のライブ演出。ビジュアルのみ・実データなし） ----------
-   本家zoetrope（Claude CodeセッションのTUI可視化）に寄せた構成:
-   ドット格子 → 横向きagentレーン（main + sub）→ ログ → アクティビティ波形 → 日時/LIVE → ステータスバー
-   色は黄土(--zt-ochre)・緑(--zt-green)・赤×(--zt-red)の3色に絞る */
+/* ---------- ztconsole v3「NEURAL BUILD」（生成中のライブ演出。ビジュアルのみ・実データなし） ----------
+   構成: ニューラルネット canvas（背景）→ HUD（工程ラベル・リングゲージ・数値）→ agentレーン
+         → 文章タイプ + コード流し → ログ → 波形 → 日時/LIVE → ステータスバー
+   その上に、工程切替のフラッシュ＋大ラベル、グリッチ、光の掃引を重ねる。
+   色は黄土(--zt-ochre)・緑(--zt-green)・赤(--zt-red)にシアン(--zt-cyan)を1色だけ追加。
+   中身のDOMはすべて assets/zt-console.js が組み立てる。通常時のサイトには一切影響しない（生成中のみ表示）。 */
 .ztconsole {
   --zt-ochre: #C9A227;
-  --zt-ochre-dim: #8A6F1C;
   --zt-green: #4ADE80;
   --zt-red: #E2645C;
+  --zt-cyan: #4FD1E8;
+  --zt-cyan-rgb: 79, 209, 232;
+  --zt-ink-rgb: 245, 241, 228;
   --zt-ink: rgba(245, 241, 228, .55);
   --zt-ink-dim: rgba(245, 241, 228, .32);
+  --zt-bg: #04060B;
   --zt-lane-label-w: 38px;
   position: relative;
   margin-top: 18px;
-  padding: 16px 16px 0;
-  min-height: 350px;
-  background: #04060B;
-  border: 1px solid var(--paper-hair-strong);
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .6), 0 12px 40px rgba(0, 0, 0, .45);
+  padding: 14px 16px 0;
+  background: var(--zt-bg);
+  border: 1px solid rgba(var(--zt-cyan-rgb), .28);
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, .6),
+    0 0 0 1px rgba(var(--zt-cyan-rgb), .06),
+    0 0 40px rgba(var(--zt-cyan-rgb), .08),
+    0 18px 50px rgba(0, 0, 0, .5);
   overflow: hidden;
   font-family: var(--mono);
   color: var(--zt-ink);
   display: flex;
   flex-direction: column;
+  isolation: isolate;
 }
-.ztconsole-grid {
+.ztconsole > * { position: relative; z-index: 1; }
+
+/* ---- 背景レイヤー: ニューラルネット canvas / ドット格子 / 光の掃引 / CRT走査線 ---- */
+.zt-net { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+.zt-grid {
   position: absolute;
   inset: 0;
+  z-index: 0;
   pointer-events: none;
-  background-image: radial-gradient(rgba(245, 241, 228, .2) 1px, transparent 1.2px);
+  background-image: radial-gradient(rgba(var(--zt-ink-rgb), .18) 1px, transparent 1.2px);
   background-size: 12px 12px;
   background-position: 6px 6px;
+  -webkit-mask-image: linear-gradient(180deg, #000 0, rgba(0, 0, 0, .35) 60%, transparent);
+  mask-image: linear-gradient(180deg, #000 0, rgba(0, 0, 0, .35) 60%, transparent);
 }
-/* CRT風: 薄いスキャンライン＋上下の縦グラデ（派手にしない） */
-.ztconsole-scan {
+.zt-sweep {
+  position: absolute;
+  inset: -40% -60%;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(115deg, transparent 44%, rgba(var(--zt-cyan-rgb), .07) 50%, transparent 56%);
+  animation: zt-sweep 5.5s linear infinite;
+}
+@keyframes zt-sweep { from { transform: translateX(-35%); } to { transform: translateX(35%); } }
+.zt-scanlines {
   position: absolute;
   inset: 0;
+  z-index: 4;
   pointer-events: none;
   background:
-    repeating-linear-gradient(0deg, rgba(0, 0, 0, .16) 0 1px, transparent 1px 3px),
-    linear-gradient(180deg, rgba(245, 241, 228, .035) 0, transparent 35%, transparent 70%, rgba(0, 0, 0, .35) 100%);
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, .18) 0 1px, transparent 1px 3px),
+    linear-gradient(180deg, rgba(var(--zt-ink-rgb), .03) 0, transparent 30%, transparent 70%, rgba(0, 0, 0, .4) 100%);
 }
-.ztconsole > * { position: relative; }
+/* 工程切替のフラッシュ（一瞬だけ画面全体が光る） */
+.zt-flash {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(ellipse at center, rgba(var(--zt-cyan-rgb), .55), rgba(var(--zt-cyan-rgb), .12) 60%, transparent);
+  mix-blend-mode: screen;
+}
+.zt-flash.is-on { animation: zt-flash .6s ease-out; }
+@keyframes zt-flash { 0% { opacity: 1; } 100% { opacity: 0; } }
+
+/* ---- 工程切替バナー（PHASE 02 / 05 COMPOSING 文章を書いています） ---- */
+.zt-banner {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-align: center;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(ellipse at center, rgba(4, 6, 11, .9), rgba(4, 6, 11, .55) 70%);
+}
+.zt-banner.is-on { animation: zt-banner 1.5s cubic-bezier(.2, .7, .2, 1) forwards; }
+@keyframes zt-banner {
+  0% { opacity: 0; transform: scale(1.12); filter: blur(8px); }
+  12% { opacity: 1; transform: scale(1); filter: blur(0); }
+  72% { opacity: 1; }
+  100% { opacity: 0; transform: scale(.985); }
+}
+.zt-banner-code { font-size: 10px; letter-spacing: .32em; color: var(--zt-cyan); }
+.zt-banner-en {
+  position: relative;
+  font-size: clamp(26px, 6vw, 44px);
+  font-weight: 500;
+  letter-spacing: .32em;
+  padding-left: .32em;
+  color: var(--paper);
+  text-shadow: 0 0 22px rgba(var(--zt-cyan-rgb), .55);
+}
+.zt-banner-en::before, .zt-banner-en::after,
+.ztconsole.is-glitch .zt-hud-phase-en::before, .ztconsole.is-glitch .zt-hud-phase-en::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  padding-left: inherit;
+  pointer-events: none;
+}
+.zt-banner-en::before, .ztconsole.is-glitch .zt-hud-phase-en::before {
+  color: var(--zt-cyan);
+  clip-path: inset(0 0 60% 0);
+  animation: zt-glitch-a .5s steps(2) 3;
+}
+.zt-banner-en::after, .ztconsole.is-glitch .zt-hud-phase-en::after {
+  color: var(--zt-red);
+  clip-path: inset(55% 0 0 0);
+  animation: zt-glitch-b .5s steps(2) 3;
+}
+@keyframes zt-glitch-a {
+  0% { transform: translate(-3px, -1px); opacity: .9; }
+  50% { transform: translate(2px, 1px); opacity: .6; }
+  100% { transform: translate(0, 0); opacity: 0; }
+}
+@keyframes zt-glitch-b {
+  0% { transform: translate(3px, 1px); opacity: .9; }
+  50% { transform: translate(-2px, -1px); opacity: .6; }
+  100% { transform: translate(0, 0); opacity: 0; }
+}
+.zt-banner-ja {
+  font-family: var(--sans);
+  font-size: 13px;
+  color: var(--paper-dim);
+  padding: 4px 12px;
+  background: rgba(4, 6, 11, .75);
+  border: 1px solid rgba(var(--zt-cyan-rgb), .25);
+}
+/* グリッチ中は全体が一瞬ズレる */
+.ztconsole.is-glitch .zt-hud, .ztconsole.is-glitch .zt-mid { animation: zt-jitter .42s steps(3) 1; }
+@keyframes zt-jitter {
+  0% { transform: translate(1px, 0) skewX(.6deg); }
+  40% { transform: translate(-1px, 0) skewX(-.4deg); }
+  100% { transform: none; }
+}
+
+/* ---- HUD ヘッダー ---- */
+.zt-hud {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(var(--zt-ink-rgb), .1);
+}
+.zt-hud-left { min-width: 0; }
+.zt-hud-brand { font-size: 10px; letter-spacing: .14em; color: var(--zt-ink-dim); text-transform: uppercase; white-space: nowrap; }
+.zt-hud-brand b { font-weight: 500; color: var(--zt-cyan); margin-left: 4px; }
+.zt-hud-dot {
+  display: inline-block;
+  width: 6px; height: 6px;
+  margin-right: 8px;
+  border-radius: 50%;
+  background: var(--zt-cyan);
+  box-shadow: 0 0 8px rgba(var(--zt-cyan-rgb), .9);
+  animation: ztconsole-blink 1.1s ease-in-out infinite;
+}
+.zt-hud-phase { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
+.zt-hud-phase-code { font-size: 11px; color: var(--zt-ochre); letter-spacing: .1em; }
+.zt-hud-phase-en {
+  position: relative;
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: .22em;
+  line-height: 1.1;
+  color: var(--paper);
+  text-shadow: 0 0 14px rgba(var(--zt-cyan-rgb), .35);
+}
+.zt-hud-phase-ja { font-family: var(--sans); font-size: 12px; color: var(--paper-dim); }
+.zt-hud-steps { display: flex; gap: 4px; margin-top: 8px; }
+.zt-hud-steps i { display: block; width: 26px; height: 3px; background: rgba(var(--zt-ink-rgb), .14); }
+.zt-hud-steps i.is-done { background: var(--zt-green); }
+.zt-hud-steps i.is-current {
+  background: var(--zt-cyan);
+  box-shadow: 0 0 8px rgba(var(--zt-cyan-rgb), .9);
+  animation: ztconsole-blink 1.1s ease-in-out infinite;
+}
+.zt-hud-right { display: flex; align-items: center; gap: 14px; flex: none; }
+.zt-ring {
+  --p: 0;
+  position: relative;
+  width: 64px; height: 64px;
+  border-radius: 50%;
+  background: conic-gradient(var(--zt-cyan) calc(var(--p) * 1%), rgba(var(--zt-ink-rgb), .1) 0);
+  display: grid;
+  place-items: center;
+  box-shadow: 0 0 16px rgba(var(--zt-cyan-rgb), .18);
+}
+.zt-ring::before { content: ""; position: absolute; inset: 5px; border-radius: 50%; background: var(--zt-bg); }
+.zt-ring-track {
+  position: absolute;
+  inset: -5px;
+  border-radius: 50%;
+  border: 1px dashed rgba(var(--zt-ink-rgb), .22);
+  animation: zt-spin 14s linear infinite;
+}
+@keyframes zt-spin { to { transform: rotate(360deg); } }
+.zt-ring-val { position: relative; font-size: 15px; font-weight: 500; color: var(--paper); font-variant-numeric: tabular-nums; }
+.zt-ring-val i { font-style: normal; font-size: 9px; color: var(--zt-ink-dim); margin-left: 1px; }
+.zt-metrics { margin: 0; display: grid; grid-template-columns: repeat(3, auto); gap: 6px 16px; }
+.zt-metrics div { display: flex; flex-direction: column; min-width: 52px; }
+.zt-metrics dt { font-size: 9px; letter-spacing: .12em; color: var(--zt-ink-dim); text-transform: uppercase; }
+.zt-metrics dd { margin: 0; font-size: 13px; line-height: 1.3; color: var(--paper); font-variant-numeric: tabular-nums; }
 
 /* ---- agentレーン（横向きタイムライン。バーが左→右に伸び、実行中の先頭だけ緑） ---- */
 .ztconsole-lanes {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  padding: 6px 0 10px;
-  border-bottom: 1px solid rgba(245, 241, 228, .08);
+  padding: 8px 0 10px;
+  border-bottom: 1px solid rgba(var(--zt-ink-rgb), .08);
 }
-.ztconsole-lane {
-  display: flex;
-  align-items: center;
-  height: 28px;
-}
+.ztconsole-lane { display: flex; align-items: center; height: 26px; }
 .ztconsole-lane-label {
   flex: 0 0 var(--zt-lane-label-w);
   font-size: 9px;
@@ -659,41 +835,32 @@ details[open] > summary::after { content: "–"; }
   flex: 1 1 auto;
   height: 100%;
   overflow: hidden;
-  /* 緑の細い破線＝バー同士をつなぐ線。バーの後ろに敷く */
   background: repeating-linear-gradient(90deg, rgba(74, 222, 128, .38) 0 3px, transparent 3px 7px) center / 100% 1px no-repeat;
 }
-.ztconsole-lane.is-idle .ztconsole-lane-track { background-image: repeating-linear-gradient(90deg, rgba(245, 241, 228, .14) 0 3px, transparent 3px 7px); }
-.ztconsole-lane-strip {
-  position: absolute;
-  inset: 0;
-  will-change: transform;
-}
+.ztconsole-lane.is-idle .ztconsole-lane-track { background-image: repeating-linear-gradient(90deg, rgba(var(--zt-ink-rgb), .14) 0 3px, transparent 3px 7px); }
+.ztconsole-lane-strip { position: absolute; inset: 0; will-change: transform; }
 .ztconsole-lane-bar {
   position: absolute;
-  top: 9px;
+  top: 8px;
   height: 10px;
   background: var(--zt-ochre);
   opacity: .82;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, .16), 0 0 0 1px rgba(0, 0, 0, .5);
 }
-.ztconsole-lane.is-main .ztconsole-lane-bar { top: 7px; height: 14px; }
+.ztconsole-lane.is-main .ztconsole-lane-bar { top: 6px; height: 14px; }
 .ztconsole-lane-bar.is-active {
   background: var(--zt-green);
   opacity: 1;
   box-shadow: 0 0 6px rgba(74, 222, 128, .55), 0 0 14px rgba(74, 222, 128, .22);
 }
 .ztconsole-lane-bar.is-active::after {
-  /* 先頭のヘッド（進行中の縦カーソル） */
   content: "";
   position: absolute;
-  top: -5px;
-  bottom: -5px;
-  right: -1px;
+  top: -5px; bottom: -5px; right: -1px;
   width: 2px;
   background: var(--zt-green);
   box-shadow: 0 0 6px rgba(74, 222, 128, .8);
 }
-/* ツール呼び出し位置の小さな下向き三角マーカー */
 .ztconsole-lane-mark {
   position: absolute;
   top: -7px;
@@ -705,10 +872,68 @@ details[open] > summary::after { content: "–"; }
 }
 .ztconsole-lane-bar:not(.is-active) .ztconsole-lane-mark { border-top-color: rgba(201, 162, 39, .9); }
 
-/* ---- ログ行（タイプライター的に下から追加され、古い行は上へ流れる） ---- */
+/* ---- 文章タイプ（AIが書いた文をトークン単位で打つ）＋ コード流し ---- */
+.zt-mid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(var(--zt-ink-rgb), .08);
+}
+.zt-composer {
+  min-width: 0;
+  padding: 8px 10px 10px;
+  border: 1px solid rgba(var(--zt-cyan-rgb), .3);
+  background: rgba(4, 6, 11, .62);
+  box-shadow: inset 0 0 28px rgba(var(--zt-cyan-rgb), .05), 0 0 12px rgba(var(--zt-cyan-rgb), .06);
+}
+.zt-composer-head { display: flex; gap: 8px; align-items: baseline; font-size: 10px; letter-spacing: .08em; color: var(--zt-ink-dim); white-space: nowrap; }
+.zt-composer-pen { color: var(--zt-cyan); }
+.zt-composer-field { color: var(--zt-ochre); min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.zt-composer-state { margin-left: auto; color: var(--zt-cyan); }
+.zt-composer-body {
+  margin-top: 6px;
+  min-height: 46px;
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--paper);
+  word-break: break-all;
+}
+.zt-caret {
+  display: inline-block;
+  width: 7px; height: 1em;
+  margin-left: 2px;
+  vertical-align: -2px;
+  background: var(--zt-cyan);
+  box-shadow: 0 0 8px rgba(var(--zt-cyan-rgb), .9);
+  animation: ztconsole-blink .8s steps(1) infinite;
+}
+.zt-composer-body.is-committed .zt-caret { background: var(--zt-green); box-shadow: 0 0 8px rgba(74, 222, 128, .9); animation: none; }
+.zt-composer-body.is-committed .zt-composer-text { color: var(--paper-dim); }
+.zt-composer-body.is-committed + .zt-composer-head .zt-composer-state,
+.zt-composer:has(.is-committed) .zt-composer-state { color: var(--zt-green); }
+.zt-stream {
+  position: relative;
+  min-width: 0;
+  height: 112px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  font-size: 10px;
+  line-height: 1.55;
+  color: var(--zt-ink);
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 45%);
+  mask-image: linear-gradient(180deg, transparent, #000 45%);
+}
+.zt-stream-line { flex: 0 0 auto; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.zt-stream-line.is-dim { color: var(--zt-ink-dim); }
+.zt-stream-line.is-hi { color: var(--zt-cyan); }
+
+/* ---- ログ行（下から追加され、古い行は上へ流れる） ---- */
 .ztconsole-log {
-  height: 128px;
-  margin-top: 2px;
+  height: 116px;
   padding-top: 8px;
   overflow: hidden;
   display: flex;
@@ -718,7 +943,6 @@ details[open] > summary::after { content: "–"; }
   font-size: 11.5px;
   line-height: 1.6;
   color: var(--zt-ink);
-  /* 上端に流れていく古い行はフェードで消す（半端に切れた行を見せない） */
   -webkit-mask-image: linear-gradient(180deg, transparent 6px, #000 34px);
   mask-image: linear-gradient(180deg, transparent 6px, #000 34px);
 }
@@ -732,7 +956,7 @@ details[open] > summary::after { content: "–"; }
   transform: translateY(4px);
   animation: ztconsole-log-in .22s ease forwards;
 }
-.ztconsole-log-line:last-child { color: rgba(245, 241, 228, .85); }
+.ztconsole-log-line:last-child { color: rgba(var(--zt-ink-rgb), .85); }
 .ztconsole-log-line:last-child::after {
   content: "▌";
   margin-left: 2px;
@@ -748,49 +972,26 @@ details[open] > summary::after { content: "–"; }
 .ztconsole-log-cmd { color: var(--zt-ink-dim); }
 @keyframes ztconsole-log-in { to { opacity: 1; transform: translateY(0); } }
 
-/* ---- アクティビティ波形（ツール呼び出しのヒートマップ風。上に記号、右端にカーソル線） ---- */
+/* ---- アクティビティ波形 ---- */
 .ztconsole-wave {
   position: relative;
-  margin-top: 10px;
+  margin-top: 8px;
   padding: 2px 0 0;
   height: 46px;
-  border-top: 1px solid rgba(245, 241, 228, .08);
+  border-top: 1px solid rgba(var(--zt-ink-rgb), .08);
 }
-.ztconsole-wave-glyphs {
-  display: flex;
-  height: 12px;
-  font-size: 9px;
-  line-height: 12px;
-  color: var(--zt-ink-dim);
-}
-.ztconsole-wave-glyphs span {
-  flex: 1 1 0;
-  text-align: center;
-  overflow: hidden;
-}
+.ztconsole-wave-glyphs { display: flex; height: 12px; font-size: 9px; line-height: 12px; color: var(--zt-ink-dim); }
+.ztconsole-wave-glyphs span { flex: 1 1 0; text-align: center; overflow: hidden; }
 .ztconsole-wave-glyphs span.is-hot { color: var(--zt-green); }
 .ztconsole-wave-glyphs span.is-warn { color: var(--zt-ochre); }
 .ztconsole-wave-glyphs span.is-fail { color: var(--zt-red); }
-.ztconsole-wave-bars {
-  display: flex;
-  align-items: flex-end;
-  gap: 2px;
-  height: 28px;
-}
-.ztconsole-wave-bar {
-  flex: 1 1 0;
-  min-width: 2px;
-  height: 20%;
-  background: rgba(245, 241, 228, .28);
-  transition: height .18s linear;
-}
+.ztconsole-wave-bars { display: flex; align-items: flex-end; gap: 2px; height: 28px; }
+.ztconsole-wave-bar { flex: 1 1 0; min-width: 2px; height: 20%; background: rgba(var(--zt-ink-rgb), .28); transition: height .18s linear; }
 .ztconsole-wave-bar.is-hot { background: rgba(74, 222, 128, .75); }
 .ztconsole-wave-bar.is-warm { background: rgba(201, 162, 39, .7); }
 .ztconsole-wave-cursor {
   position: absolute;
-  top: 0;
-  bottom: 0;
-  right: 0;
+  top: 0; bottom: 0; right: 0;
   width: 1px;
   background: var(--zt-green);
   box-shadow: 0 0 6px rgba(74, 222, 128, .9);
@@ -802,7 +1003,7 @@ details[open] > summary::after { content: "–"; }
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 8px;
+  margin-top: 6px;
   padding: 6px 0 8px;
   font-size: 10px;
   letter-spacing: .04em;
@@ -825,8 +1026,8 @@ details[open] > summary::after { content: "–"; }
   gap: 14px;
   margin: auto -16px 0;
   padding: 6px 16px;
-  background: rgba(245, 241, 228, .06);
-  border-top: 1px solid rgba(245, 241, 228, .1);
+  background: rgba(var(--zt-ink-rgb), .06);
+  border-top: 1px solid rgba(var(--zt-ink-rgb), .1);
   font-size: 10px;
   letter-spacing: .04em;
   color: var(--zt-ink-dim);
@@ -839,22 +1040,170 @@ details[open] > summary::after { content: "–"; }
 .ztconsole-phase::before { content: "▸ "; }
 .ztconsole-hint { margin-left: auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; color: var(--zt-ink-dim); }
 
+/* ---- 右カラム: 見本の骨組みが順に組み上がるオーバーレイ（.mini-browser 内） ---- */
+.zt-phud {
+  position: absolute;
+  inset: 42px 0 0 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 14px 12px;
+  overflow: hidden;
+  background: rgba(4, 6, 11, .982);
+  color: var(--zt-ink);
+  font-family: var(--mono);
+  --zt-cyan: #4FD1E8;
+  --zt-cyan-rgb: 79, 209, 232;
+  --zt-ink-rgb: 245, 241, 228;
+  --zt-ink: rgba(245, 241, 228, .55);
+  --zt-ink-dim: rgba(245, 241, 228, .32);
+  --zt-ochre: #C9A227;
+  --zt-green: #4ADE80;
+  transition: opacity .7s ease, transform .7s ease;
+}
+.zt-phud.is-done { opacity: 0; transform: scale(1.015); pointer-events: none; }
+.zt-phud-scan {
+  position: absolute;
+  left: 0; right: 0;
+  top: -44px;
+  height: 40px;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent, rgba(var(--zt-cyan-rgb), .16) 70%, rgba(var(--zt-cyan-rgb), .65));
+  animation: zt-phud-scan 2.6s linear infinite;
+}
+.zt-phud[data-phase="deploying"] .zt-phud-scan { animation-duration: 1.1s; }
+@keyframes zt-phud-scan { to { top: 100%; } }
+.zt-phud-corner { position: absolute; width: 12px; height: 12px; border: 1px solid var(--zt-cyan); opacity: .75; }
+.zt-phud-corner.is-tl { top: 6px; left: 6px; border-right: 0; border-bottom: 0; }
+.zt-phud-corner.is-tr { top: 6px; right: 6px; border-left: 0; border-bottom: 0; }
+.zt-phud-corner.is-bl { bottom: 6px; left: 6px; border-right: 0; border-top: 0; }
+.zt-phud-corner.is-br { bottom: 6px; right: 6px; border-left: 0; border-top: 0; }
+.zt-phud-head { display: flex; gap: 8px; align-items: baseline; font-size: 10px; letter-spacing: .12em; }
+.zt-phud-title { color: var(--zt-cyan); white-space: nowrap; }
+.zt-phud-status { font-family: var(--sans); letter-spacing: 0; color: var(--paper-dim); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.zt-phud-pct { margin-left: auto; font-size: 12px; color: var(--paper); font-variant-numeric: tabular-nums; }
+.zt-phud-blocks { display: flex; flex-direction: column; gap: 10px; flex: 1; min-height: 0; }
+.zt-phud[data-phase="deploying"] .zt-phud-blocks { animation: zt-publish 1.4s ease-in-out infinite; }
+@keyframes zt-publish { 0%, 100% { opacity: 1; } 50% { opacity: .55; } }
+.zt-phud-block {
+  position: relative;
+  padding: 9px 10px 8px;
+  border: 1px dashed rgba(var(--zt-ink-rgb), .22);
+  transition: border-color .3s ease, box-shadow .3s ease, background .3s ease;
+}
+.zt-phud-tag {
+  position: absolute;
+  top: -7px; left: 8px;
+  padding: 0 4px;
+  background: #04060B;
+  font-size: 9px;
+  letter-spacing: .12em;
+  color: var(--zt-ink-dim);
+  transition: color .3s ease;
+}
+.zt-phud-check {
+  position: absolute;
+  top: -8px; right: 8px;
+  padding: 0 4px;
+  background: #04060B;
+  font-size: 10px;
+  color: var(--zt-green);
+  opacity: 0;
+  transform: scale(.6);
+  transition: opacity .25s ease, transform .25s ease;
+}
+.zt-phud-block.is-scan { border-color: rgba(201, 162, 39, .75); background: rgba(201, 162, 39, .05); }
+.zt-phud-block[data-state="building"] {
+  border-style: solid;
+  border-color: rgba(var(--zt-cyan-rgb), .85);
+  background: rgba(var(--zt-cyan-rgb), .04);
+  box-shadow: 0 0 0 1px rgba(var(--zt-cyan-rgb), .15), 0 0 18px rgba(var(--zt-cyan-rgb), .2), inset 0 0 20px rgba(var(--zt-cyan-rgb), .06);
+}
+.zt-phud-block[data-state="building"] .zt-phud-tag { color: var(--zt-cyan); }
+.zt-phud-block[data-state="building"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(var(--zt-cyan-rgb), .14), transparent);
+  background-size: 50% 100%;
+  background-repeat: no-repeat;
+  animation: zt-shimmer 1s linear infinite;
+}
+@keyframes zt-shimmer { from { background-position: -50% 0; } to { background-position: 150% 0; } }
+.zt-phud-block[data-state="done"] { border-style: solid; border-color: rgba(var(--zt-ink-rgb), .3); }
+.zt-phud-block[data-state="done"] .zt-phud-tag { color: var(--zt-ink); }
+.zt-phud-block.is-verified { border-color: rgba(74, 222, 128, .7); animation: zt-verify .6s ease; }
+.zt-phud-block.is-verified .zt-phud-check { opacity: 1; transform: scale(1); }
+@keyframes zt-verify { 0% { box-shadow: 0 0 0 0 rgba(74, 222, 128, .6); } 100% { box-shadow: 0 0 0 10px rgba(74, 222, 128, 0); } }
+.zt-phud-row { position: relative; margin: 3px 0; min-height: 10px; }
+/* 未生成の行はスケルトン（破線の帯）。文字が入ったら消す */
+.zt-phud-row::before {
+  content: "";
+  display: block;
+  height: 7px;
+  width: var(--w, 60%);
+  max-width: 100%;
+  background: repeating-linear-gradient(90deg, rgba(var(--zt-ink-rgb), .16) 0 6px, transparent 6px 9px);
+}
+.zt-phud-row.has-text::before { display: none; }
+.zt-phud-text { display: none; }
+.zt-phud-row.has-text .zt-phud-text { display: inline; }
+.zt-phud-row.is-title .zt-phud-text { font-family: var(--sans); font-size: 13px; font-weight: 700; color: var(--paper); }
+.zt-phud-row.is-kicker .zt-phud-text { display: inline-block; font-size: 9px; letter-spacing: .06em; padding: 2px 6px; background: var(--zt-ochre); color: #0B0D06; }
+.zt-phud-row.is-h .zt-phud-text { font-family: var(--mincho); font-size: 15px; line-height: 1.4; color: var(--paper); }
+.zt-phud-row.is-p .zt-phud-text { font-family: var(--sans); font-size: 11px; line-height: 1.6; color: var(--paper-dim); }
+.zt-phud-row.is-label .zt-phud-text { font-size: 9px; letter-spacing: .06em; color: var(--zt-ochre); }
+.zt-phud-row.is-strong .zt-phud-text { font-family: var(--sans); font-size: 12px; font-weight: 700; color: var(--paper); }
+.zt-phud-row.is-menu { display: flex; justify-content: space-between; gap: 8px; font-family: var(--sans); font-size: 11px; color: var(--paper-dim); }
+.zt-phud-row.is-menu::before { flex: 0 0 var(--w, 60%); }
+.zt-phud-row.is-menu .zt-phud-price { display: none; font-family: var(--mono); color: var(--paper-faint); }
+.zt-phud-row.is-menu.has-text .zt-phud-price { display: inline; }
+.zt-phud-row.is-small .zt-phud-text { font-family: var(--sans); font-size: 10px; color: var(--paper-faint); }
+.zt-phud-row.is-photo { width: 52px; height: 40px; margin-top: 6px; border: 1px dashed rgba(var(--zt-ink-rgb), .3); transition: border-color .3s ease; }
+.zt-phud-row.is-photo::before { display: none; }
+.zt-phud-row.is-photo.has-text {
+  border-style: solid;
+  border-color: rgba(var(--zt-cyan-rgb), .6);
+  background: repeating-linear-gradient(135deg, rgba(var(--zt-cyan-rgb), .28) 0 2px, transparent 2px 6px);
+}
+.zt-phud-foot { display: flex; justify-content: space-between; font-size: 9px; letter-spacing: .08em; color: var(--zt-ink-dim); }
+.zt-phud-foot-live { color: var(--zt-cyan); animation: ztconsole-blink 1.1s ease-in-out infinite; }
+.mini-browser.is-building .browser-address::after { content: " · building"; color: #4FD1E8; }
+
 @media (max-width: 560px) {
-  .ztconsole { padding: 12px 12px 0; min-height: 300px; --zt-lane-label-w: 30px; }
-  .ztconsole-lane { height: 24px; }
-  .ztconsole-lane-bar { top: 8px; height: 8px; }
-  .ztconsole-lane.is-main .ztconsole-lane-bar { top: 6px; height: 12px; }
-  .ztconsole-log { height: 98px; font-size: 10px; }
+  .ztconsole { padding: 12px 12px 0; --zt-lane-label-w: 30px; }
+  .zt-hud { flex-direction: column; gap: 10px; }
+  .zt-hud-phase-en { font-size: 18px; }
+  .zt-hud-right { width: 100%; justify-content: space-between; }
+  .zt-ring { width: 52px; height: 52px; }
+  .zt-ring-val { font-size: 13px; }
+  .zt-metrics { grid-template-columns: repeat(4, auto); gap: 4px 10px; }
+  .zt-metrics div { min-width: 0; }
+  .zt-metrics div:nth-child(3) { display: none; } /* context は省く */
+  .zt-metrics dd { font-size: 12px; }
+  .ztconsole-lane { height: 22px; }
+  .ztconsole-lane-bar { top: 7px; height: 8px; }
+  .ztconsole-lane.is-main .ztconsole-lane-bar { top: 5px; height: 12px; }
+  .zt-mid { grid-template-columns: 1fr; gap: 8px; }
+  .zt-composer-body { font-size: 13px; min-height: 40px; }
+  .zt-stream { height: 64px; }
+  .ztconsole-log { height: 92px; font-size: 10px; }
   .ztconsole-wave { height: 40px; }
   .ztconsole-wave-bars { height: 24px; }
   .ztconsole-footer { margin: auto -12px 0; padding: 6px 12px; gap: 10px; }
   .ztconsole-hint, .ztconsole-session { display: none; }
+  .zt-phud { padding: 12px 12px 10px; gap: 8px; }
+  .zt-phud-blocks { gap: 9px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .ztconsole-wave-bar { transition: none; }
-  .ztconsole-live-dot, .ztconsole-wave-cursor, .ztconsole-log-line:last-child::after { animation: none; }
+  /* 動きは止め、状態表示だけ残す（canvasはJS側で静止画1枚を描く） */
+  .zt-sweep, .zt-phud-scan, .zt-flash, .zt-banner { display: none; }
+  .ztconsole-wave-bar, .zt-phud-block, .zt-phud { transition: none; }
   .ztconsole-log-line { animation: none; opacity: 1; transform: none; }
-  .ztconsole-lane-bar.is-active { box-shadow: none; }
+  .ztconsole-lane-bar.is-active, .zt-ring, .zt-composer { box-shadow: none; }
 }
 
 /* ---------- LIVE PREVIEW（sample-site） ---------- */
