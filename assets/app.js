@@ -73,6 +73,343 @@
   const manualContactLink = document.querySelector("#manual-contact-link");
   const expiryContactLink = document.querySelector("#expiry-contact-link");
 
+  // ---------- ztconsole: 生成中のライブ演出（見た目のみ・実データは持たない） ----------
+  // 意図的な簡略化: 本物のエージェント実行ログではなく、工程順（読み込み→構成→文章→組み立て→検証→配信）に
+  // 並べたダミー文言と、時間で伸びる横向きレーンを描くだけ。本格的に実処理と連動させるなら
+  // ztPushLog / ztTickLanes をサーバの生成進捗イベント（SSE/WebSocket等）から駆動する形に差し替える。
+  const ztconsole = document.querySelector("#ztconsole");
+  const ztLanesEl = document.querySelector("#ztconsole-lanes");
+  const ztLogEl = document.querySelector("#ztconsole-log");
+  const ztWaveGlyphsEl = document.querySelector("#ztconsole-wave-glyphs");
+  const ztWaveBarsEl = document.querySelector("#ztconsole-wave-bars");
+  const ztClockEl = document.querySelector("#ztconsole-clock");
+  const ztCountEl = document.querySelector("#ztconsole-count");
+  const ztPhaseEl = document.querySelector("#ztconsole-phase");
+
+  const ZT_MOBILE_MAX_WIDTH = 560;
+  const ZT_TICK_MS = 100;            // レーン・時計の更新間隔
+  const ZT_WAVE_MS = 170;            // 波形が1コマ左へ流れる間隔
+  const ZT_REDUCED_MOTION_SLOWDOWN = 4; // reduced-motion時は更新頻度を落とす
+  const ZT_LANE_SPEED_PX = 3;        // 1tickでタイムラインが進むpx（=30px/秒）
+  const ZT_LANE_RIGHT_PAD_PX = 28;   // 進行中バーの先頭と右端の余白
+  const ZT_LANE_PRUNE_PX = 40;       // 左へ流れ切ったバーを捨てる余裕
+  const ZT_MARK_CHANCE = 0.14;       // 1tickでツール呼び出しマーカーが打たれる確率
+  const ZT_MARK_MIN_SPACING_PX = 9;  // マーカー同士の最小間隔
+  const ZT_LOG_MAX_LINES = 6;
+  const ZT_WAVE_GLYPHS = ["×", "◆", "*", "※", "+", "·"];
+  const ZT_WAVE_GLYPH_CHANCE = 0.3;
+  const ZT_WAVE_HOT = 72;            // 波形バーを緑にする高さ(%)
+  const ZT_WAVE_WARM = 48;           // 波形バーを黄土にする高さ(%)
+  const ZT_PREFERS_REDUCED_MOTION = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // レーン定義（x=タイムライン上のpx）。main は最初から、sub は少し遅れて起動し「agentが増えていく」感を出す
+  const ZT_LANES = [
+    { label: "main", startX: 0, dur: [60, 170], gap: [6, 18] },
+    { label: "sub·1", startX: 45, dur: [30, 120], gap: [10, 48] },
+    { label: "sub·2", startX: 120, dur: [24, 90], gap: [16, 70] }
+  ];
+
+  // 工程（phase）。ランダムに選ぶのは同じ工程内だけ（前後2件の窓から選ぶので順序感が残る）。
+  // kind: ok=● / write=◆ / fail=×。fail の直後は必ず次の行（リトライ成功）を出す。
+  const ZT_PHASES = [
+    { name: "reading", logMs: 520, lines: [
+      ["ok", "Read", "shop-name → 入力内容"],
+      ["ok", "Read", "業種 → テンプレートを選択"],
+      ["ok", "Read", "写真 → sample-hero.jpg"],
+      ["ok", "Grep", "電話番号 / 住所 / 営業時間"]
+    ] },
+    { name: "composing", logMs: 620, lines: [
+      ["ok", "Plan", "セクション構成 hero / menu / access"],
+      ["ok", "Think", "catchcopy 候補を3案 生成"],
+      ["write", "Edit", "mood palette → 色の雰囲気を反映"],
+      ["ok", "Think", "メニュー・料金を整形"],
+      ["write", "Write", "copy/hero.md"]
+    ] },
+    { name: "building", logMs: 700, lines: [
+      ["write", "Write", "hero-section.html"],
+      ["write", "Write", "menu-section.html"],
+      ["ok", "Bash", "convert photo → webp (q=82)"],
+      ["fail", "Bash failed", "fetch fonts · retry (1/2)"],
+      ["ok", "Bash", "fetch fonts ✓"],
+      ["write", "Edit", "footer links を配置"],
+      ["ok", "Bash", "npm run build"]
+    ] },
+    { name: "verifying", logMs: 800, lines: [
+      ["ok", "Check", "HTML structure valid"],
+      ["ok", "Check", "mobile layout 375px"],
+      ["ok", "Check", "tel: リンク / 地図リンク"],
+      ["ok", "Check", "contrast / a11y"]
+    ] },
+    { name: "deploying", logMs: 1000, lines: [
+      ["write", "Write", "generated/site.html"],
+      ["ok", "Deploy", "→ workers.dev"],
+      ["ok", "Wait", "edge cache warming…"],
+      ["ok", "Deploy", "見本URLを発行中"]
+    ], loop: [ // 生成が長引いたときに繰り返す（連続重複はしない）
+      ["ok", "Wait", "edge cache warming…"],
+      ["ok", "Poll", "deploy status"],
+      ["ok", "Check", "DNS propagation"],
+      ["ok", "Wait", "見本URLの応答を確認中"]
+    ] }
+  ];
+  const ZT_LOG_WINDOW = 2; // 同工程内で「次の候補」として見る行数
+
+  const ztState = {
+    running: false,
+    timers: [],
+    logTimer: 0,
+    x: 0,
+    tools: 0,
+    agents: 1,
+    lanes: [],
+    wave: [],
+    glyphs: [],
+    phaseIndex: 0,
+    pending: [],
+    forcedNext: null,
+    lastLogText: ""
+  };
+
+  const ztIsMobile = () => window.innerWidth <= ZT_MOBILE_MAX_WIDTH;
+  const ztWaveCount = () => (ztIsMobile() ? 30 : 52);
+  const ztRand = ([min, max]) => min + Math.round(Math.random() * (max - min));
+  const ztPad2 = (n) => String(n).padStart(2, "0");
+  const ztClockText = (now) =>
+    `${now.getFullYear()}-${ztPad2(now.getMonth() + 1)}-${ztPad2(now.getDate())} ${ztPad2(now.getHours())}:${ztPad2(now.getMinutes())}:${ztPad2(now.getSeconds())}`;
+
+  const ztUpdateCount = () => {
+    if (!ztCountEl) return;
+    ztCountEl.textContent = `${ztState.agents} agent${ztState.agents === 1 ? "" : "s"} · ${ztState.tools} tools`;
+  };
+
+  // ---- レーン ----
+  const ztBuildLanes = () => {
+    if (!ztLanesEl) return;
+    ztLanesEl.textContent = "";
+    ztState.lanes = ZT_LANES.map((cfg, index) => {
+      const lane = document.createElement("div");
+      lane.className = `ztconsole-lane ${index === 0 ? "is-main" : "is-idle"}`;
+      const label = document.createElement("span");
+      label.className = "ztconsole-lane-label";
+      label.textContent = cfg.label;
+      const track = document.createElement("div");
+      track.className = "ztconsole-lane-track";
+      const strip = document.createElement("div");
+      strip.className = "ztconsole-lane-strip";
+      track.appendChild(strip);
+      lane.append(label, track);
+      ztLanesEl.appendChild(lane);
+      return { cfg, el: lane, track, strip, bars: [], active: null, nextStartX: cfg.startX };
+    });
+  };
+
+  const ztCreateBar = (lane, x) => {
+    const el = document.createElement("span");
+    el.className = "ztconsole-lane-bar is-active";
+    el.style.left = `${x}px`;
+    el.style.width = "0px";
+    lane.strip.appendChild(el);
+    const bar = { el, startX: x, endX: x + ztRand(lane.cfg.dur), width: 0, lastMarkAt: -ZT_MARK_MIN_SPACING_PX };
+    lane.bars.push(bar);
+    if (lane !== ztState.lanes[0]) ztState.agents += 1; // subのバー1本＝子agent1体
+    return bar;
+  };
+
+  const ztAddMark = (bar, atX) => {
+    if (atX - bar.lastMarkAt < ZT_MARK_MIN_SPACING_PX) return;
+    const mark = document.createElement("i");
+    mark.className = "ztconsole-lane-mark";
+    mark.style.left = `${atX}px`;
+    bar.el.appendChild(mark);
+    bar.lastMarkAt = atX;
+    ztState.tools += 1;
+  };
+
+  const ztTickLanes = () => {
+    if (!ztState.lanes.length) return;
+    ztState.x += ZT_LANE_SPEED_PX;
+    const x = ztState.x;
+    const trackWidth = ztState.lanes[0].track.clientWidth;
+    const offset = Math.max(0, x - trackWidth + ZT_LANE_RIGHT_PAD_PX);
+    ztState.lanes.forEach((lane) => {
+      if (x < lane.cfg.startX) return;
+      lane.el.classList.remove("is-idle");
+      if (lane.active) {
+        const bar = lane.active;
+        bar.width = x - bar.startX;
+        bar.el.style.width = `${bar.width}px`;
+        if (Math.random() < ZT_MARK_CHANCE) ztAddMark(bar, bar.width);
+        if (x >= bar.endX) {
+          bar.el.classList.remove("is-active");
+          lane.active = null;
+          lane.nextStartX = x + ztRand(lane.cfg.gap);
+        }
+      } else if (x >= lane.nextStartX) {
+        lane.active = ztCreateBar(lane, x);
+      }
+      lane.strip.style.transform = `translateX(${-offset}px)`;
+      // 左へ流れ切ったバーは捨てる（実データではないので保持不要）
+      while (lane.bars.length && lane.bars[0].startX + lane.bars[0].width < offset - ZT_LANE_PRUNE_PX) {
+        lane.bars.shift().el.remove();
+      }
+    });
+    ztUpdateCount();
+    if (ztClockEl) ztClockEl.textContent = ztClockText(new Date());
+  };
+
+  // ---- 波形 ----
+  const ztBuildWave = () => {
+    if (!ztWaveBarsEl || !ztWaveGlyphsEl) return;
+    ztWaveBarsEl.textContent = "";
+    ztWaveGlyphsEl.textContent = "";
+    ztState.wave = [];
+    ztState.glyphs = [];
+    const count = ztWaveCount();
+    for (let i = 0; i < count; i += 1) {
+      const bar = document.createElement("span");
+      bar.className = "ztconsole-wave-bar";
+      ztWaveBarsEl.appendChild(bar);
+      const glyph = document.createElement("span");
+      ztWaveGlyphsEl.appendChild(glyph);
+      ztState.wave.push({ el: bar, height: 10 + Math.round(Math.random() * 60) });
+      ztState.glyphs.push({ el: glyph, text: "" });
+    }
+  };
+
+  const ztNextWaveHeight = (prev) => {
+    const spike = Math.random() < 0.12 ? 40 : 0;
+    const next = prev * 0.45 + (8 + Math.random() * 62) * 0.55 + spike;
+    return Math.max(6, Math.min(100, Math.round(next)));
+  };
+
+  const ztNextGlyph = () => {
+    if (Math.random() > ZT_WAVE_GLYPH_CHANCE) return "";
+    return ZT_WAVE_GLYPHS[Math.floor(Math.random() * ZT_WAVE_GLYPHS.length)];
+  };
+
+  const ztTickWave = () => {
+    const { wave, glyphs } = ztState;
+    if (!wave.length) return;
+    // 右端に新しいコマを足し、全体を1コマ左へ流す（心電図的な動き）
+    const heights = wave.map((w) => w.height);
+    heights.shift();
+    heights.push(ztNextWaveHeight(heights[heights.length - 1]));
+    const texts = glyphs.map((g) => g.text);
+    texts.shift();
+    texts.push(ztNextGlyph());
+    wave.forEach((w, i) => {
+      w.height = heights[i];
+      w.el.style.height = `${w.height}%`;
+      w.el.classList.toggle("is-hot", w.height >= ZT_WAVE_HOT);
+      w.el.classList.toggle("is-warm", w.height >= ZT_WAVE_WARM && w.height < ZT_WAVE_HOT);
+    });
+    glyphs.forEach((g, i) => {
+      g.text = texts[i];
+      g.el.textContent = g.text;
+      g.el.className = g.text === "×" ? "is-fail" : g.text === "◆" ? "is-warn" : g.text === "*" || g.text === "※" ? "is-hot" : "";
+    });
+  };
+
+  // ---- ログ（工程順） ----
+  const ztCurrentPhase = () => ZT_PHASES[Math.min(ztState.phaseIndex, ZT_PHASES.length - 1)];
+
+  const ztLoadPhase = (index) => {
+    ztState.phaseIndex = index;
+    // fail 行は直後の行（リトライ成功）を抱き合わせにして、順序が入れ替わらないようにする
+    const pending = [];
+    const lines = ztCurrentPhase().lines;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i];
+      const then = line[0] === "fail" && i + 1 < lines.length ? lines[i + 1] : null;
+      pending.push({ line, then });
+      if (then) i += 1;
+    }
+    ztState.pending = pending;
+    if (ztPhaseEl) ztPhaseEl.textContent = ztCurrentPhase().name;
+  };
+
+  const ztPickLine = () => {
+    if (ztState.forcedNext) {
+      const forced = ztState.forcedNext;
+      ztState.forcedNext = null;
+      return forced;
+    }
+    if (!ztState.pending.length) {
+      if (ztState.phaseIndex < ZT_PHASES.length - 1) {
+        ztLoadPhase(ztState.phaseIndex + 1);
+      } else {
+        // 最終工程を使い切ったら loop 文言を回す（直前と同じ文言は避ける）
+        const loop = ztCurrentPhase().loop.filter((line) => line[2] !== ztState.lastLogText);
+        return loop[Math.floor(Math.random() * loop.length)];
+      }
+    }
+    const windowSize = Math.min(ZT_LOG_WINDOW, ztState.pending.length);
+    const pick = Math.floor(Math.random() * windowSize);
+    const entry = ztState.pending.splice(pick, 1)[0];
+    if (entry.then) ztState.forcedNext = entry.then; // リトライ成功行を必ず直後に出す
+    return entry.line;
+  };
+
+  const ztPushLog = () => {
+    if (!ztLogEl) return;
+    const [kind, cmd, text] = ztPickLine();
+    ztState.lastLogText = text;
+    const line = document.createElement("p");
+    line.className = `ztconsole-log-line${kind === "fail" ? " is-fail" : ""}`;
+    const timeSpan = document.createElement("span");
+    timeSpan.className = "ztconsole-log-time";
+    const now = new Date();
+    timeSpan.textContent = `${ztPad2(now.getHours())}:${ztPad2(now.getMinutes())}:${ztPad2(now.getSeconds())}`;
+    const markSpan = document.createElement("span");
+    markSpan.className = `ztconsole-log-mark is-${kind}`;
+    markSpan.textContent = kind === "fail" ? "×" : kind === "write" ? "◆" : "●";
+    const cmdSpan = document.createElement("span");
+    cmdSpan.className = "ztconsole-log-cmd";
+    cmdSpan.textContent = `${cmd} · `;
+    const textSpan = document.createElement("span");
+    textSpan.className = "ztconsole-log-text";
+    textSpan.textContent = text;
+    line.append(timeSpan, markSpan, cmdSpan, textSpan);
+    ztLogEl.appendChild(line);
+    while (ztLogEl.childElementCount > ZT_LOG_MAX_LINES) ztLogEl.removeChild(ztLogEl.firstChild);
+    ztState.tools += 1;
+  };
+
+  const ztScheduleLog = () => {
+    if (!ztState.running) return;
+    ztPushLog();
+    const slow = ZT_PREFERS_REDUCED_MOTION ? ZT_REDUCED_MOTION_SLOWDOWN : 1;
+    ztState.logTimer = setTimeout(ztScheduleLog, ztCurrentPhase().logMs * slow);
+  };
+
+  const ztStart = () => {
+    if (!ztconsole || ztState.running) return;
+    ztState.running = true;
+    ztState.x = 0;
+    ztState.tools = 0;
+    ztState.agents = 1;
+    ztState.forcedNext = null;
+    ztState.lastLogText = "";
+    if (ztLogEl) ztLogEl.textContent = "";
+    ztBuildLanes();
+    ztBuildWave();
+    ztLoadPhase(0);
+    ztTickLanes();
+    ztTickWave();
+    ztScheduleLog();
+    const slow = ZT_PREFERS_REDUCED_MOTION ? ZT_REDUCED_MOTION_SLOWDOWN : 1;
+    ztState.timers.push(setInterval(ztTickLanes, ZT_TICK_MS * slow));
+    ztState.timers.push(setInterval(ztTickWave, ZT_WAVE_MS * slow));
+  };
+
+  const ztStop = () => {
+    ztState.timers.forEach((id) => clearInterval(id));
+    ztState.timers = [];
+    clearTimeout(ztState.logTimer);
+    ztState.logTimer = 0;
+    ztState.running = false;
+  };
+
   // クライアントIDが空のあいだはログイン欄を出さず、従来どおり作成できる。
   const googleClientId = (document.querySelector('meta[name="google-client-id"]') || {}).content || "";
   const signinArea = document.querySelector("#signin-area");
@@ -485,6 +822,10 @@
     applyButton.textContent = "見本を作っています…";
     generationStatus.textContent = "見本を生成しています…";
     setGenerationState("loading");
+    ztStart();
+    // 生成が速すぎても演出が一瞬で消えないよう、最低表示時間を確保する（体感の「作っている感」のため）
+    const ZT_MIN_VISIBLE_MS = 1800;
+    const ztMinVisible = new Promise((resolve) => setTimeout(resolve, ZT_MIN_VISIBLE_MS));
 
     try {
       await photoProcessing; // 写真の縮小処理が残っていれば完了を待ってから送信する
@@ -501,6 +842,8 @@
       } catch {
         result = {};
       }
+
+      await ztMinVisible;
 
       if (!response.ok) {
         showError(errorMessageFor(response.status, result.error));
@@ -520,8 +863,10 @@
       }
       showSuccess(generatedUrl.href);
     } catch {
+      await ztMinVisible;
       showError("通信に失敗しました。少し時間をおいて、もう一度お試しください。");
     } finally {
+      ztStop();
       applyButton.disabled = false;
       applyButton.removeAttribute("aria-busy");
       applyButton.textContent = applyButton.dataset.defaultLabel || "ホームページを申し込む →";

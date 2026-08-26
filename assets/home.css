@@ -589,6 +589,274 @@ details[open] > summary::after { content: "–"; }
 .expiry-notice a { color: var(--yamabuki); }
 .generation-error p { color: #F2A7A7; }
 
+/* ---------- ztconsole（生成中のライブ演出。ビジュアルのみ・実データなし） ----------
+   本家zoetrope（Claude CodeセッションのTUI可視化）に寄せた構成:
+   ドット格子 → 横向きagentレーン（main + sub）→ ログ → アクティビティ波形 → 日時/LIVE → ステータスバー
+   色は黄土(--zt-ochre)・緑(--zt-green)・赤×(--zt-red)の3色に絞る */
+.ztconsole {
+  --zt-ochre: #C9A227;
+  --zt-ochre-dim: #8A6F1C;
+  --zt-green: #4ADE80;
+  --zt-red: #E2645C;
+  --zt-ink: rgba(245, 241, 228, .55);
+  --zt-ink-dim: rgba(245, 241, 228, .32);
+  --zt-lane-label-w: 38px;
+  position: relative;
+  margin-top: 18px;
+  padding: 16px 16px 0;
+  min-height: 350px;
+  background: #04060B;
+  border: 1px solid var(--paper-hair-strong);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .6), 0 12px 40px rgba(0, 0, 0, .45);
+  overflow: hidden;
+  font-family: var(--mono);
+  color: var(--zt-ink);
+  display: flex;
+  flex-direction: column;
+}
+.ztconsole-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(rgba(245, 241, 228, .2) 1px, transparent 1.2px);
+  background-size: 12px 12px;
+  background-position: 6px 6px;
+}
+/* CRT風: 薄いスキャンライン＋上下の縦グラデ（派手にしない） */
+.ztconsole-scan {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, .16) 0 1px, transparent 1px 3px),
+    linear-gradient(180deg, rgba(245, 241, 228, .035) 0, transparent 35%, transparent 70%, rgba(0, 0, 0, .35) 100%);
+}
+.ztconsole > * { position: relative; }
+
+/* ---- agentレーン（横向きタイムライン。バーが左→右に伸び、実行中の先頭だけ緑） ---- */
+.ztconsole-lanes {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px 0 10px;
+  border-bottom: 1px solid rgba(245, 241, 228, .08);
+}
+.ztconsole-lane {
+  display: flex;
+  align-items: center;
+  height: 28px;
+}
+.ztconsole-lane-label {
+  flex: 0 0 var(--zt-lane-label-w);
+  font-size: 9px;
+  letter-spacing: .08em;
+  color: var(--zt-ink-dim);
+  text-transform: lowercase;
+}
+.ztconsole-lane.is-main .ztconsole-lane-label { color: var(--zt-ochre); }
+.ztconsole-lane-track {
+  position: relative;
+  flex: 1 1 auto;
+  height: 100%;
+  overflow: hidden;
+  /* 緑の細い破線＝バー同士をつなぐ線。バーの後ろに敷く */
+  background: repeating-linear-gradient(90deg, rgba(74, 222, 128, .38) 0 3px, transparent 3px 7px) center / 100% 1px no-repeat;
+}
+.ztconsole-lane.is-idle .ztconsole-lane-track { background-image: repeating-linear-gradient(90deg, rgba(245, 241, 228, .14) 0 3px, transparent 3px 7px); }
+.ztconsole-lane-strip {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
+.ztconsole-lane-bar {
+  position: absolute;
+  top: 9px;
+  height: 10px;
+  background: var(--zt-ochre);
+  opacity: .82;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .16), 0 0 0 1px rgba(0, 0, 0, .5);
+}
+.ztconsole-lane.is-main .ztconsole-lane-bar { top: 7px; height: 14px; }
+.ztconsole-lane-bar.is-active {
+  background: var(--zt-green);
+  opacity: 1;
+  box-shadow: 0 0 6px rgba(74, 222, 128, .55), 0 0 14px rgba(74, 222, 128, .22);
+}
+.ztconsole-lane-bar.is-active::after {
+  /* 先頭のヘッド（進行中の縦カーソル） */
+  content: "";
+  position: absolute;
+  top: -5px;
+  bottom: -5px;
+  right: -1px;
+  width: 2px;
+  background: var(--zt-green);
+  box-shadow: 0 0 6px rgba(74, 222, 128, .8);
+}
+/* ツール呼び出し位置の小さな下向き三角マーカー */
+.ztconsole-lane-mark {
+  position: absolute;
+  top: -7px;
+  width: 0; height: 0;
+  margin-left: -3px;
+  border-left: 3px solid transparent;
+  border-right: 3px solid transparent;
+  border-top: 4px solid rgba(74, 222, 128, .85);
+}
+.ztconsole-lane-bar:not(.is-active) .ztconsole-lane-mark { border-top-color: rgba(201, 162, 39, .9); }
+
+/* ---- ログ行（タイプライター的に下から追加され、古い行は上へ流れる） ---- */
+.ztconsole-log {
+  height: 128px;
+  margin-top: 2px;
+  padding-top: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 1px;
+  font-size: 11.5px;
+  line-height: 1.6;
+  color: var(--zt-ink);
+  /* 上端に流れていく古い行はフェードで消す（半端に切れた行を見せない） */
+  -webkit-mask-image: linear-gradient(180deg, transparent 6px, #000 34px);
+  mask-image: linear-gradient(180deg, transparent 6px, #000 34px);
+}
+.ztconsole-log-line {
+  flex: 0 0 auto;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0;
+  transform: translateY(4px);
+  animation: ztconsole-log-in .22s ease forwards;
+}
+.ztconsole-log-line:last-child { color: rgba(245, 241, 228, .85); }
+.ztconsole-log-line:last-child::after {
+  content: "▌";
+  margin-left: 2px;
+  color: var(--zt-green);
+  animation: ztconsole-blink .9s steps(1) infinite;
+}
+.ztconsole-log-time { color: var(--zt-ink-dim); margin-right: 8px; }
+.ztconsole-log-mark { display: inline-block; width: 12px; font-size: .78em; }
+.ztconsole-log-mark.is-ok { color: var(--zt-green); }
+.ztconsole-log-mark.is-write { color: var(--zt-ochre); }
+.ztconsole-log-mark.is-fail { color: var(--zt-red); }
+.ztconsole-log-line.is-fail .ztconsole-log-text { color: rgba(226, 100, 92, .9); }
+.ztconsole-log-cmd { color: var(--zt-ink-dim); }
+@keyframes ztconsole-log-in { to { opacity: 1; transform: translateY(0); } }
+
+/* ---- アクティビティ波形（ツール呼び出しのヒートマップ風。上に記号、右端にカーソル線） ---- */
+.ztconsole-wave {
+  position: relative;
+  margin-top: 10px;
+  padding: 2px 0 0;
+  height: 46px;
+  border-top: 1px solid rgba(245, 241, 228, .08);
+}
+.ztconsole-wave-glyphs {
+  display: flex;
+  height: 12px;
+  font-size: 9px;
+  line-height: 12px;
+  color: var(--zt-ink-dim);
+}
+.ztconsole-wave-glyphs span {
+  flex: 1 1 0;
+  text-align: center;
+  overflow: hidden;
+}
+.ztconsole-wave-glyphs span.is-hot { color: var(--zt-green); }
+.ztconsole-wave-glyphs span.is-warn { color: var(--zt-ochre); }
+.ztconsole-wave-glyphs span.is-fail { color: var(--zt-red); }
+.ztconsole-wave-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 28px;
+}
+.ztconsole-wave-bar {
+  flex: 1 1 0;
+  min-width: 2px;
+  height: 20%;
+  background: rgba(245, 241, 228, .28);
+  transition: height .18s linear;
+}
+.ztconsole-wave-bar.is-hot { background: rgba(74, 222, 128, .75); }
+.ztconsole-wave-bar.is-warm { background: rgba(201, 162, 39, .7); }
+.ztconsole-wave-cursor {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 1px;
+  background: var(--zt-green);
+  box-shadow: 0 0 6px rgba(74, 222, 128, .9);
+  animation: ztconsole-blink 1.1s ease-in-out infinite;
+}
+
+/* ---- 日時 / LIVE ---- */
+.ztconsole-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+  padding: 6px 0 8px;
+  font-size: 10px;
+  letter-spacing: .04em;
+  color: var(--zt-ink-dim);
+}
+.ztconsole-live { display: inline-flex; align-items: center; gap: 5px; color: var(--zt-green); font-weight: 500; }
+.ztconsole-live-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--zt-green);
+  box-shadow: 0 0 6px rgba(74, 222, 128, .9);
+  animation: ztconsole-blink 1.1s ease-in-out infinite;
+}
+@keyframes ztconsole-blink { 0%, 100% { opacity: 1; } 50% { opacity: .15; } }
+
+/* ---- 最下段ステータスバー ---- */
+.ztconsole-footer {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: auto -16px 0;
+  padding: 6px 16px;
+  background: rgba(245, 241, 228, .06);
+  border-top: 1px solid rgba(245, 241, 228, .1);
+  font-size: 10px;
+  letter-spacing: .04em;
+  color: var(--zt-ink-dim);
+  white-space: nowrap;
+}
+.ztconsole-brand { color: var(--zt-ochre); font-weight: 500; letter-spacing: .1em; }
+.ztconsole-session b { font-weight: 400; color: var(--zt-ink); }
+.ztconsole-count { color: var(--zt-ink); font-variant-numeric: tabular-nums; }
+.ztconsole-phase { color: var(--zt-green); }
+.ztconsole-phase::before { content: "▸ "; }
+.ztconsole-hint { margin-left: auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; color: var(--zt-ink-dim); }
+
+@media (max-width: 560px) {
+  .ztconsole { padding: 12px 12px 0; min-height: 300px; --zt-lane-label-w: 30px; }
+  .ztconsole-lane { height: 24px; }
+  .ztconsole-lane-bar { top: 8px; height: 8px; }
+  .ztconsole-lane.is-main .ztconsole-lane-bar { top: 6px; height: 12px; }
+  .ztconsole-log { height: 98px; font-size: 10px; }
+  .ztconsole-wave { height: 40px; }
+  .ztconsole-wave-bars { height: 24px; }
+  .ztconsole-footer { margin: auto -12px 0; padding: 6px 12px; gap: 10px; }
+  .ztconsole-hint, .ztconsole-session { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ztconsole-wave-bar { transition: none; }
+  .ztconsole-live-dot, .ztconsole-wave-cursor, .ztconsole-log-line:last-child::after { animation: none; }
+  .ztconsole-log-line { animation: none; opacity: 1; transform: none; }
+  .ztconsole-lane-bar.is-active { box-shadow: none; }
+}
+
 /* ---------- LIVE PREVIEW（sample-site） ---------- */
 .preview-col { position: relative; }
 .mini-browser {
