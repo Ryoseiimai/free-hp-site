@@ -1544,3 +1544,318 @@ details[open] > summary::after { content: "–"; }
   .form-step:first-child { margin-top: 0; }
   .hero-scroll-line::after { display: none; }
 }
+
+/* ---------- 常時稼働演出（zt-ambient）。DOMは index.html と assets/zt-ambient.js が用意する ----------
+   生成していない時も「裏でAIが動いている」密度を出す層。色は本番演出（.ztconsole）と同じ
+   シアン #4FD1E8・緑 #4ADE80・黄土 #C9A227 を使い、文字の可読性（ヒーロー左側）を最優先にする。 */
+
+/* ページ全体の薄いドット格子（固定・静止。右上寄りの楕円で減衰） */
+body.page::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: radial-gradient(rgba(245, 241, 228, .13) 1px, transparent 1.4px);
+  background-size: 26px 26px;
+  -webkit-mask-image: radial-gradient(ellipse 75% 65% at 68% 35%, #000 0, rgba(0, 0, 0, .35) 55%, transparent 100%);
+  mask-image: radial-gradient(ellipse 75% 65% at 68% 35%, #000 0, rgba(0, 0, 0, .35) 55%, transparent 100%);
+}
+
+/* 時々ページを走る光（縦1本・横1本。ほとんどの時間は透明で、compositorだけが動く） */
+.zt-beam { position: fixed; z-index: 0; pointer-events: none; opacity: 0; will-change: transform, opacity; }
+.zt-beam.is-v {
+  top: 0; bottom: 0; left: 0;
+  width: 1px;
+  background: linear-gradient(180deg, transparent, rgba(79, 209, 232, .6) 35%, rgba(79, 209, 232, .6) 65%, transparent);
+  animation: zt-beam-v 13s linear infinite;
+}
+.zt-beam.is-h {
+  left: 0; right: 0; top: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(201, 162, 39, .55) 30%, rgba(79, 209, 232, .6) 70%, transparent);
+  animation: zt-beam-h 19s linear 4s infinite;
+}
+@keyframes zt-beam-v {
+  0%, 86% { opacity: 0; transform: translateX(0); }
+  87% { opacity: 1; transform: translateX(0); }
+  100% { opacity: 0; transform: translateX(100vw); }
+}
+@keyframes zt-beam-h {
+  0%, 90% { opacity: 0; transform: translateY(0); }
+  91% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(100vh); }
+}
+
+/* ---- ヘッダー右上 LIVE ---- */
+.header-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .1em;
+  color: #4ADE80;
+  white-space: nowrap;
+}
+.header-live b { font-weight: 400; color: var(--paper-dim); font-variant-numeric: tabular-nums; letter-spacing: .02em; }
+.header-live-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #4ADE80;
+  box-shadow: 0 0 8px rgba(74, 222, 128, .9);
+  animation: ztconsole-blink 1.1s ease-in-out infinite;
+}
+
+/* ---- ヒーロー：背景レイヤー ---- */
+.hero-net { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; pointer-events: none; }
+.hero-veil {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(20, 31, 58, .94) 0%, rgba(20, 31, 58, .82) 28%, rgba(20, 31, 58, .4) 55%, rgba(20, 31, 58, 0) 80%),
+    linear-gradient(180deg, rgba(20, 31, 58, .55), transparent 22%, transparent 78%, rgba(20, 31, 58, .55));
+}
+.hero-inner, .hero-scroll-cue { position: relative; z-index: 1; }
+.hero-inner { margin-bottom: auto; }
+
+/* ---- ヒーロー上端の稼働ストリップ ---- */
+.hero-strip {
+  position: relative;
+  z-index: 1;
+  align-self: stretch;
+  margin: calc(-1 * var(--gap-y)) calc(-1 * var(--side)) auto;
+  padding: 0 var(--side);
+  height: 36px;
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .04em;
+  color: var(--paper-faint);
+  white-space: nowrap;
+  border-bottom: 1px solid rgba(79, 209, 232, .18);
+  background: linear-gradient(90deg, rgba(5, 7, 13, .6), rgba(5, 7, 13, .25));
+}
+.hero-strip-live { display: inline-flex; align-items: center; gap: 6px; color: #4ADE80; letter-spacing: .12em; }
+.hero-strip-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #4ADE80;
+  box-shadow: 0 0 8px rgba(74, 222, 128, .9);
+  animation: ztconsole-blink 1.1s ease-in-out infinite;
+}
+.hero-strip-engine { color: #C9A227; letter-spacing: .12em; }
+.hero-strip-demo {
+  font-size: 9px;
+  letter-spacing: .12em;
+  color: rgba(245, 241, 228, .55);
+  border: 1px solid rgba(74, 222, 128, .5);
+  border-radius: 3px;
+  padding: 1px 5px;
+  line-height: 1.6;
+}
+.hero-strip > * { flex: none; } /* ticker以外は縮めない（縮むと店名が消えて数値と重なる） */
+.hero-strip-job { display: inline-flex; align-items: baseline; gap: 8px; }
+.hero-strip-phase { color: #4FD1E8; }
+.hero-strip-phase::before { content: "▸ "; }
+.hero-strip-job b { font-family: var(--sans); font-weight: 700; color: var(--paper); max-width: 22ch; overflow: hidden; text-overflow: ellipsis; }
+.hero-strip-pct { color: var(--paper-dim); font-variant-numeric: tabular-nums; min-width: 4ch; }
+.hero-strip-meters { display: inline-flex; gap: 18px; }
+.hero-strip-meter small { font-size: 9px; letter-spacing: .12em; text-transform: uppercase; margin-right: 6px; color: rgba(245, 241, 228, .35); }
+.hero-strip-meter b { display: inline-block; min-width: 4.5ch; font-weight: 500; color: var(--paper); font-variant-numeric: tabular-nums; }
+.hero-strip-ticker {
+  flex: 1 1 0;
+  min-width: 0;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+.hero-strip-ticker-inner {
+  display: inline-block;
+  white-space: nowrap;
+  color: rgba(245, 241, 228, .38);
+  animation: zt-ticker 56s linear infinite;
+  will-change: transform;
+}
+@keyframes zt-ticker { to { transform: translateX(-50%); } }
+
+/* ---- ヒーロー右上の readout（PCのみ）。稼働ストリップの直下・右端に置き、右下固定のチャット窓口（assets/chat.css）と重ならないようにする ---- */
+.hero-readout {
+  position: absolute;
+  right: var(--side);
+  top: 46px; /* 稼働ストリップ（高さ36px+下線1px）のすぐ下 */
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  line-height: 1.4;
+  letter-spacing: .02em;
+  color: rgba(245, 241, 228, .42);
+  white-space: pre;
+  pointer-events: none;
+  padding-left: 12px;
+  border-left: 1px solid rgba(79, 209, 232, .3);
+}
+.hero-readout-line:first-child { color: #4FD1E8; }
+.hero-readout-line:nth-child(5) { color: rgba(201, 162, 39, .7); }
+
+@media (max-width: 899px) {
+  .hero-readout { display: none; }
+  .hero-strip-meters { display: none; }
+}
+@media (max-width: 560px) {
+  .hero-strip { gap: 12px; font-size: 10px; height: 32px; }
+  .hero-strip-ticker, .hero-strip-pct { display: none; }
+  .hero-strip-job b { max-width: 14ch; }
+}
+@media (max-width: 480px) {
+  .hero-strip { margin-top: -20px; margin-bottom: 18px; }
+  .hero-inner { margin-bottom: 0; }
+}
+
+/* ---- セクションのスキャン出現（横一線が上から下へ走り、見出しがデコードされる） ---- */
+.zt-scan { position: relative; }
+.zt-scan::before {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; top: 0;
+  height: 2px;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(90deg, transparent, rgba(79, 209, 232, .9) 25%, rgba(79, 209, 232, .9) 75%, transparent);
+  box-shadow: 0 0 18px rgba(79, 209, 232, .6);
+}
+.zt-scan.is-scanned::before { animation: zt-section-scan 1.1s cubic-bezier(.2, .7, .2, 1) forwards; }
+@keyframes zt-section-scan {
+  0% { top: 0; opacity: 1; }
+  80% { opacity: .8; }
+  100% { top: 100%; opacity: 0; }
+}
+.zt-decode-char { display: inline-block; white-space: pre; animation: zt-decode .5s steps(4) both; }
+@keyframes zt-decode {
+  0% { opacity: 0; transform: translateY(.15em); color: #4FD1E8; }
+  45% { opacity: 1; transform: translateX(-.04em); color: #4FD1E8; }
+  100% { opacity: 1; transform: none; color: var(--paper); }
+}
+
+/* ---- ギャラリー：hoverでHUDコーナー＋薄いグリッド＋SAMPLE番号 ---- */
+.gallery-grid { counter-reset: gal; }
+.gallery-item { position: relative; transition: border-color .25s ease, transform .25s ease, opacity .6s cubic-bezier(.2, .7, .2, 1); }
+.gallery-item::before {
+  counter-increment: gal;
+  content: "SAMPLE 0" counter(gal) " · SCAN";
+  position: absolute;
+  top: 10px; left: 10px;
+  z-index: 2;
+  padding: 3px 7px;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: .14em;
+  color: #4FD1E8;
+  background: rgba(4, 6, 11, .8);
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity .25s ease, transform .25s ease;
+  pointer-events: none;
+}
+.gallery-item::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .25s ease;
+  background:
+    radial-gradient(rgba(79, 209, 232, .32) 1px, transparent 1.3px) 0 0 / 14px 14px,
+    linear-gradient(#4FD1E8, #4FD1E8) top left / 16px 1px no-repeat,
+    linear-gradient(#4FD1E8, #4FD1E8) top left / 1px 16px no-repeat,
+    linear-gradient(#4FD1E8, #4FD1E8) top right / 16px 1px no-repeat,
+    linear-gradient(#4FD1E8, #4FD1E8) top right / 1px 16px no-repeat,
+    linear-gradient(#4FD1E8, #4FD1E8) bottom left / 16px 1px no-repeat,
+    linear-gradient(#4FD1E8, #4FD1E8) bottom left / 1px 16px no-repeat,
+    linear-gradient(#4FD1E8, #4FD1E8) bottom right / 16px 1px no-repeat,
+    linear-gradient(#4FD1E8, #4FD1E8) bottom right / 1px 16px no-repeat;
+}
+.gallery-item:hover { border-color: rgba(79, 209, 232, .7); transform: translateY(-3px); }
+.gallery-item:hover::before, .gallery-item:hover::after { opacity: 1; transform: none; }
+
+/* ---- 料金の数字（カウントアップ） ---- */
+.zt-num { font-variant-numeric: tabular-nums; }
+
+/* ---- ダッシュボード：数字の微動とスパークライン ---- */
+.watcher-live-num.is-bump, .watcher-card-value.is-bump { animation: zt-bump .5s ease; }
+@keyframes zt-bump {
+  0% { color: #4FD1E8; transform: translateY(-2px); }
+  100% { transform: none; }
+}
+.watcher-spark {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 36px;
+  padding-top: 8px;
+  border-top: 1px solid var(--paper-hair);
+}
+.watcher-spark i { display: block; flex: 1 1 0; min-width: 2px; background: rgba(79, 209, 232, .45); transition: height .5s ease; }
+
+/* ---- 「いまの見本」デモリール（.zt-phud の見た目を流用し、完成スタンプと注記を足す） ---- */
+.zt-phud-demo-note { font-family: var(--sans); letter-spacing: 0; color: rgba(245, 241, 228, .32); }
+/* デモは本番より1ブロック多く、枠（sample-site の高さ）に収まりきらないことがある。詰めて、下端は暗く溶かす */
+.zt-phud.is-demo { gap: 8px; }
+.zt-phud.is-demo .zt-phud-blocks {
+  gap: 8px;
+  padding-top: 8px; /* overflow:hidden で上端の tag（top:-7px）が切れないぶん */
+  margin-top: -8px;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(180deg, #000 82%, transparent);
+  mask-image: linear-gradient(180deg, #000 82%, transparent);
+}
+.zt-phud.is-demo .zt-phud-block { padding: 8px 10px 7px; }
+.zt-phud.is-demo .zt-phud-foot { position: relative; z-index: 1; }
+.zt-phud-stamp {
+  position: absolute;
+  left: 50%; top: 46%;
+  z-index: 3;
+  padding: 6px 16px;
+  border: 2px solid #4ADE80;
+  color: #4ADE80;
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: .2em;
+  background: rgba(4, 6, 11, .85);
+  text-shadow: 0 0 14px rgba(74, 222, 128, .6);
+  box-shadow: 0 0 0 1px rgba(4, 6, 11, .8), 0 0 24px rgba(74, 222, 128, .25);
+  opacity: 0;
+  transform: translate(-50%, -50%) rotate(-8deg) scale(1.6);
+  pointer-events: none;
+}
+.zt-phud.is-complete .zt-phud-stamp { animation: zt-stamp .45s cubic-bezier(.2, .9, .3, 1.2) forwards; }
+@keyframes zt-stamp {
+  0% { opacity: 0; transform: translate(-50%, -50%) rotate(-8deg) scale(1.6); }
+  100% { opacity: 1; transform: translate(-50%, -50%) rotate(-8deg) scale(1); }
+}
+.zt-phud.is-complete .zt-phud-scan { display: none; }
+.zt-phud.is-complete .zt-phud-foot-live { color: #4ADE80; animation: none; }
+.zt-phud[data-phase="done"] .zt-phud-blocks { animation: none; }
+/* 店の切替: 枠自体（不透明な背景）は消さず、中身だけ一瞬フェードして裏のプレースホルダーが見えないようにする */
+.zt-phud.is-swap .zt-phud-head,
+.zt-phud.is-swap .zt-phud-blocks,
+.zt-phud.is-swap .zt-phud-stamp,
+.zt-phud.is-swap .zt-phud-foot {
+  opacity: 0;
+  transition: opacity .35s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .zt-beam, .zt-scan::before, .hero-readout { display: none; }
+  .hero-strip-ticker-inner, .zt-decode-char, .hero-strip-dot, .header-live-dot { animation: none; }
+  .zt-phud-stamp { opacity: 1; transform: translate(-50%, -50%) rotate(-8deg); }
+}

@@ -47,6 +47,8 @@
         <span class="brand-name">AIホームページ製作所</span>
       </a>
       <div class="header-right">
+        <!-- 常時稼働インジケーター（見た目だけ。時間はこのページを開いてからの経過。assets/zt-ambient.js が更新） -->
+        <span class="header-live" id="zt-header-live" aria-hidden="true"><i class="header-live-dot"></i>LIVE <b id="zt-header-uptime">00:00</b></span>
         <span class="header-count">2026年8月開業。まず1件、お店に届けました。</span>
         <a class="header-cta" href="#site-form">申し込む</a>
       </div>
@@ -56,6 +58,22 @@
   <main class="page-main">
 
     <section class="hero" id="hero" aria-labelledby="hero-title">
+      <!-- 常時稼働の演出レイヤー（見た目だけ・実データなし。中身は assets/zt-ambient.js が描く） -->
+      <canvas class="hero-net" id="zt-hero-net" aria-hidden="true"></canvas>
+      <div class="hero-veil" aria-hidden="true"></div>
+      <div class="hero-strip" id="zt-strip" aria-hidden="true">
+        <span class="hero-strip-live"><i class="hero-strip-dot"></i>LIVE</span>
+        <span class="hero-strip-engine">freehp-engine</span>
+        <span class="hero-strip-demo" title="数値は演出用のデモ表示です">DEMO</span>
+        <span class="hero-strip-job"><span class="hero-strip-phase" id="zt-strip-phase">building</span><b id="zt-strip-name">喫茶みなも</b><span class="hero-strip-pct" id="zt-strip-pct">0%</span></span>
+        <span class="hero-strip-meters">
+          <span class="hero-strip-meter"><small>tokens/s</small><b id="zt-strip-tps">—</b></span>
+          <span class="hero-strip-meter"><small>agents</small><b id="zt-strip-agents">—</b></span>
+          <span class="hero-strip-meter"><small>latency</small><b id="zt-strip-lat">—</b></span>
+        </span>
+        <span class="hero-strip-ticker"><span class="hero-strip-ticker-inner" id="zt-strip-ticker"></span></span>
+      </div>
+      <div class="hero-readout" id="zt-readout" aria-hidden="true"></div>
       <div class="hero-inner">
         <p class="kicker" data-reveal>AIで作って、人が整える</p>
         <h1 class="hero-title" id="hero-title" data-split-title>ホームページは、<span class="accent">翌日に届く。</span></h1>
@@ -555,6 +573,7 @@
   <script src="assets/zt-console.js"></script>
   <script src="assets/app.js"></script>
   <script src="assets/home.js"></script>
+  <script src="assets/zt-ambient.js"></script>
   <script src="assets/chat.js"></script>
   <script type="application/ld+json">
   {
