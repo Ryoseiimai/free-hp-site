@@ -29,6 +29,318 @@
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Zen+Kaku+Gothic+New:wght@400;500;700;900&amp;family=Shippori+Mincho:wght@600&amp;display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/home.css">
   <link rel="stylesheet" href="assets/chat.css">
+  <style>
+    /* 日本語の泣き別れ防止。見出しはbalance、リード文はprettyで孤立文字の行送りを抑える。
+       手動spanで括った文節は、幅が変わっても文節単位で折り返す（inline-block）。 */
+    h1, h2, h3 { text-wrap: balance; }
+    .hero-lead, .hero-price, .ai-build-lead, .section-lead, .watcher-list li,
+    .hiring-copy, .hiring-honest, .step-label, .group-note { text-wrap: pretty; }
+    .brk { display: inline-block; }
+    /* index.html限定の没入レイヤー。既存コンポーネントのCSSには干渉させない。 */
+    .hero {
+      isolation: isolate;
+      overflow: clip;
+      background:
+        radial-gradient(circle at var(--immersive-x, 50%) var(--immersive-y, 42%), rgba(72, 171, 255, .15), transparent 24%),
+        linear-gradient(145deg, #071125 0%, #050914 52%, #090612 100%);
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(143, 196, 255, .035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(143, 196, 255, .035) 1px, transparent 1px);
+      background-size: 56px 56px;
+      mask-image: linear-gradient(to bottom, transparent, #000 22%, #000 78%, transparent);
+    }
+    #zt-hero-net { display: none; }
+    .immersive-field {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+    .hero-veil { opacity: .42; }
+    .hero-inner { text-shadow: 0 3px 28px rgba(0, 0, 0, .72); }
+    .hero-title .accent::after { box-shadow: 0 0 32px rgba(245, 181, 23, .18); }
+
+    .ai-build {
+      --build-progress: 0;
+      --build-wire: 0;
+      --build-color: 0;
+      --build-copy: 0;
+      position: relative;
+      height: 300vh;
+      min-height: 1800px;
+      color: #f7f4ea;
+      background: #030711;
+      border-top: 1px solid rgba(137, 196, 255, .18);
+      border-bottom: 1px solid rgba(137, 196, 255, .14);
+    }
+    .ai-build-sticky {
+      position: sticky;
+      top: var(--header-h);
+      height: calc(100svh - var(--header-h));
+      min-height: 620px;
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: minmax(260px, .78fr) minmax(440px, 1.22fr);
+      align-items: center;
+      gap: clamp(32px, 6vw, 96px);
+      padding: clamp(36px, 6vh, 72px) var(--side);
+      isolation: isolate;
+    }
+    .ai-build-sticky::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background:
+        radial-gradient(circle at 76% 48%, rgba(36, 124, 210, calc(.06 + var(--build-color) * .14)), transparent 35%),
+        linear-gradient(115deg, rgba(5, 10, 24, .96), rgba(4, 7, 16, .98));
+    }
+    .ai-build-copy { max-width: 520px; }
+    .ai-build-kicker {
+      margin: 0 0 18px;
+      color: #8ccaff;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: .18em;
+    }
+    .ai-build-title {
+      max-width: 9em;
+      margin: 0;
+      color: #fff;
+      font-size: clamp(36px, 5.2vw, 76px);
+      font-weight: 900;
+      line-height: 1.08;
+      letter-spacing: -.035em;
+    }
+    .ai-build-lead {
+      max-width: 34em;
+      margin: 22px 0 30px;
+      color: rgba(239, 246, 255, .76);
+      font-size: clamp(15px, 1.35vw, 18px);
+      line-height: 1.85;
+    }
+    .build-phases {
+      list-style: none;
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding: 0;
+    }
+    .build-phase {
+      display: grid;
+      grid-template-columns: 34px 1fr auto;
+      align-items: center;
+      gap: 12px;
+      padding: 9px 0;
+      color: rgba(226, 237, 250, .4);
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: .06em;
+      border-bottom: 1px solid rgba(143, 196, 255, .1);
+      transition: color .25s ease, border-color .25s ease;
+    }
+    .build-phase::after {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 0 transparent;
+    }
+    .ai-build[data-build-phase="0"] .build-phase:nth-child(1),
+    .ai-build[data-build-phase="1"] .build-phase:nth-child(2),
+    .ai-build[data-build-phase="2"] .build-phase:nth-child(3) {
+      color: #f5c54d;
+      border-color: rgba(245, 197, 77, .36);
+    }
+    .ai-build[data-build-phase="0"] .build-phase:nth-child(1)::after,
+    .ai-build[data-build-phase="1"] .build-phase:nth-child(2)::after,
+    .ai-build[data-build-phase="2"] .build-phase:nth-child(3)::after {
+      box-shadow: 0 0 18px rgba(245, 197, 77, .8);
+    }
+    .build-phase-num { color: rgba(140, 202, 255, .72); }
+    .build-progress {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 3px;
+      background: rgba(255,255,255,.08);
+    }
+    .build-progress-bar {
+      display: block;
+      width: calc(var(--build-progress) * 100%);
+      height: 100%;
+      background: #f5c54d;
+      box-shadow: 0 0 20px rgba(245, 197, 77, .65);
+    }
+    .build-browser-wrap {
+      position: relative;
+      width: min(100%, 780px);
+      justify-self: end;
+      perspective: 1200px;
+    }
+    .build-browser-wrap::before {
+      content: "";
+      position: absolute;
+      inset: 10% 4% -8%;
+      background: rgba(44, 142, 230, calc(.05 + var(--build-color) * .2));
+      filter: blur(64px);
+      transform: translateZ(-1px);
+    }
+    .build-browser {
+      position: relative;
+      overflow: hidden;
+      min-height: 510px;
+      border: 1px solid rgba(155, 205, 255, calc(.2 + var(--build-wire) * .38));
+      border-radius: 16px;
+      background: rgba(8, 16, 31, .9);
+      box-shadow: 0 36px 90px rgba(0, 0, 0, .52);
+      transform: rotateY(calc((1 - var(--build-progress)) * -4deg)) translateY(calc((1 - var(--build-progress)) * 18px));
+    }
+    .build-browser-top {
+      height: 42px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 0 14px;
+      border-bottom: 1px solid rgba(149, 202, 255, .16);
+      background: rgba(4, 10, 20, .86);
+    }
+    .build-dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(223, 237, 250, .28); }
+    .build-address {
+      min-width: 0;
+      margin-left: 8px;
+      overflow: hidden;
+      color: rgba(220, 236, 252, .58);
+      font: 10px/1 var(--mono);
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .build-site {
+      min-height: 468px;
+      padding: clamp(28px, 4.5vw, 58px);
+      background:
+        linear-gradient(rgba(45, 83, 67, calc(var(--build-color) * .97)), rgba(45, 83, 67, calc(var(--build-color) * .97))),
+        #f5f0e4;
+      color: #15271f;
+      transition: background-color .2s linear;
+    }
+    .build-site-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid rgba(235, 244, 238, calc(var(--build-color) * .35));
+    }
+    .build-logo, .build-nav-links, .build-eyebrow, .build-site-title, .build-site-text, .build-site-button, .build-card {
+      position: relative;
+      overflow: hidden;
+    }
+    .build-logo { width: 34%; height: 18px; }
+    .build-nav-links { width: 27%; height: 10px; }
+    .build-site-content { padding: clamp(42px, 7vw, 84px) 0 34px; }
+    .build-eyebrow { width: 30%; height: 12px; margin-bottom: 20px; }
+    .build-site-title { width: 78%; min-height: 78px; margin-bottom: 20px; }
+    .build-site-text { width: 58%; min-height: 42px; margin-bottom: 30px; }
+    .build-site-button { width: 142px; min-height: 42px; }
+    .build-site-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .build-card { min-height: 74px; }
+    .build-logo::before, .build-nav-links::before, .build-eyebrow::before, .build-site-title::before, .build-site-text::before, .build-site-button::before, .build-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border: 1px solid rgba(124, 170, 215, calc(.14 + var(--build-wire) * .7));
+      background:
+        linear-gradient(90deg, rgba(90, 149, 205, calc(var(--build-wire) * .13)), transparent 70%);
+      opacity: calc(.18 + var(--build-wire) * .82);
+      transform: scaleX(max(.04, var(--build-wire)));
+      transform-origin: left;
+    }
+    .build-card:nth-child(2)::before { transition-delay: .05s; }
+    .build-card:nth-child(3)::before { transition-delay: .1s; }
+    .build-content {
+      position: relative;
+      z-index: 1;
+      opacity: var(--build-copy);
+      transform: translateY(calc((1 - var(--build-copy)) * 10px));
+    }
+    .build-logo .build-content { color: #fff; font-size: 13px; font-weight: 700; letter-spacing: .08em; }
+    .build-nav-links .build-content { color: rgba(255,255,255,.72); font: 9px/1.4 var(--mono); text-align: right; }
+    .build-eyebrow .build-content { color: #d9efdf; font: 10px/1 var(--mono); letter-spacing: .16em; }
+    .build-site-title .build-content { max-width: 11em; color: #fff; font-family: var(--mincho); font-size: clamp(28px, 4.2vw, 52px); font-weight: 600; line-height: 1.25; }
+    .build-site-text .build-content { color: rgba(255,255,255,.78); font-size: 13px; line-height: 1.7; }
+    .build-site-button .build-content { display: grid; min-height: 42px; place-items: center; color: #22392f; background: #f5c54d; font-size: 12px; font-weight: 700; }
+    .build-card .build-content { min-height: 74px; padding: 12px; color: rgba(255,255,255,.8); border: 1px solid rgba(255,255,255,.16); font-size: 10px; }
+    .build-status {
+      position: absolute;
+      top: 58px;
+      right: 16px;
+      z-index: 3;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 10px;
+      color: #a8d9ff;
+      background: rgba(3, 8, 17, .82);
+      border: 1px solid rgba(129, 194, 255, .25);
+      font: 10px/1 var(--mono);
+      letter-spacing: .08em;
+    }
+    .build-status::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: #f5c54d; box-shadow: 0 0 12px #f5c54d; }
+
+    @media (max-width: 820px) {
+      .ai-build { height: 280vh; min-height: 1680px; }
+      .ai-build-sticky {
+        min-height: calc(100svh - var(--header-h));
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+        align-content: center;
+        gap: 22px;
+        padding: 28px 20px 32px;
+      }
+      .ai-build-copy { max-width: none; }
+      .ai-build-title { max-width: none; font-size: clamp(30px, 9vw, 46px); }
+      .ai-build-lead { margin: 10px 0 16px; font-size: 14px; line-height: 1.65; }
+      .build-phases { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+      .build-phase { grid-template-columns: 1fr; gap: 2px; padding: 6px 0; font-size: 10px; }
+      .build-phase::after { display: none; }
+      .build-browser-wrap { width: 100%; justify-self: center; align-self: start; }
+      .build-browser { min-height: 350px; border-radius: 10px; }
+      .build-site { min-height: 308px; padding: 26px; }
+      .build-site-content { padding: 36px 0 22px; }
+      .build-site-title { min-height: 56px; }
+      .build-site-title .build-content { font-size: clamp(25px, 7vw, 36px); }
+      .build-site-cards { gap: 7px; }
+      .build-card, .build-card .build-content { min-height: 54px; }
+    }
+    @media (max-width: 390px) {
+      .ai-build-sticky { padding-left: 16px; padding-right: 16px; }
+      .ai-build-kicker { margin-bottom: 8px; }
+      .ai-build-lead { font-size: 13px; }
+      .build-phase { font-size: 9px; letter-spacing: 0; }
+      .build-site { padding: 22px; }
+      .build-site-text { width: 78%; }
+      .build-status { top: 52px; right: 10px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .ai-build { height: auto; min-height: 0; --build-progress: 1; --build-wire: 1; --build-color: 1; --build-copy: 1; }
+      .ai-build-sticky { position: relative; top: auto; height: auto; min-height: 720px; }
+      .build-browser, .build-content, .build-progress-bar { transform: none !important; transition: none !important; }
+      .build-progress-bar { width: 100%; }
+    }
+  </style>
   <script>document.documentElement.classList.replace("no-js","js");</script>
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-YR4TM0J5BT"></script>
@@ -61,6 +373,7 @@
       <!-- 常時稼働の演出レイヤー（見た目だけ・実データなし。中身は assets/zt-ambient.js が描く） -->
       <canvas class="hero-net" id="zt-hero-net" aria-hidden="true"></canvas>
       <div class="hero-veil" aria-hidden="true"></div>
+      <canvas class="immersive-field" id="immersive-field" aria-hidden="true"></canvas>
       <div class="hero-strip" id="zt-strip" aria-hidden="true">
         <span class="hero-strip-live"><i class="hero-strip-dot"></i>LIVE</span>
         <span class="hero-strip-engine">freehp-engine</span>
@@ -76,9 +389,9 @@
       <div class="hero-readout" id="zt-readout" aria-hidden="true"></div>
       <div class="hero-inner">
         <p class="kicker" data-reveal>AIで作って、人が整える</p>
-        <h1 class="hero-title" id="hero-title" data-split-title>ホームページは、<span class="accent">翌日に届く。</span></h1>
-        <p class="hero-lead" data-reveal>AIで作って、人が最後に整えます。名刺代わりに、そのまま使えます。</p>
-        <p class="hero-price" data-reveal>制作 10,000円 ＋ 管理費 月5,000円<span class="hero-price-dot" aria-hidden="true">・</span>起業応援は初期0円＋月3,000円</p>
+        <h1 class="hero-title" id="hero-title" data-split-title><span class="brk">ホームページは、</span><span class="accent brk">翌日に届く。</span></h1>
+        <p class="hero-lead" data-reveal><span class="brk">AIで作って、</span><span class="brk">人が最後に整えます。</span><span class="brk">名刺代わりに、</span><span class="brk">そのまま使えます。</span></p>
+        <p class="hero-price" data-reveal><span class="brk">制作 10,000円 ＋ 管理費 月5,000円</span><span class="hero-price-dot" aria-hidden="true">・</span><span class="brk">起業応援は初期0円＋月3,000円</span></p>
       </div>
       <a class="hero-scroll-cue" href="#apply" aria-label="申し込みフォームまでスクロール">
         <span class="hero-scroll-line" aria-hidden="true"></span>
@@ -86,13 +399,57 @@
       </a>
     </section>
 
+    <section class="ai-build" id="ai-build" data-build-phase="0" aria-labelledby="ai-build-title">
+      <div class="ai-build-sticky">
+        <div class="ai-build-copy">
+          <p class="ai-build-kicker">SCROLL TO BUILD / AI GENERATION</p>
+          <h2 class="ai-build-title" id="ai-build-title"><span class="brk">見ている間に、</span><br><span class="brk">できていく。</span></h2>
+          <p class="ai-build-lead"><span class="brk">骨組みを考え、</span><span class="brk">色を選び、</span><span class="brk">言葉を置く。</span><span class="brk">スクロールして、</span><span class="brk">AIがホームページを</span><span class="brk">組み上げる流れを</span><span class="brk">体験してください。</span></p>
+          <ol class="build-phases" aria-label="ホームページ生成の3段階">
+            <li class="build-phase"><span class="build-phase-num">01</span><span>骨組みを設計</span></li>
+            <li class="build-phase"><span class="build-phase-num">02</span><span>色と空気を選択</span></li>
+            <li class="build-phase"><span class="build-phase-num">03</span><span>言葉を配置</span></li>
+          </ol>
+        </div>
+        <div class="build-browser-wrap" aria-hidden="true">
+          <div class="build-browser">
+            <div class="build-browser-top">
+              <span class="build-dot"></span><span class="build-dot"></span><span class="build-dot"></span>
+              <span class="build-address">preview.freehp.jp / 喫茶ひだまり</span>
+            </div>
+            <span class="build-status" id="build-status">WIREFRAME</span>
+            <div class="build-site">
+              <div class="build-site-nav">
+                <div class="build-logo"><div class="build-content">喫茶ひだまり</div></div>
+                <div class="build-nav-links"><div class="build-content">ABOUT　MENU　ACCESS</div></div>
+              </div>
+              <div class="build-site-content">
+                <div class="build-eyebrow"><div class="build-content">LOCAL COFFEE &amp; LUNCH</div></div>
+                <div class="build-site-title"><div class="build-content">今日も、いつもの窓ぎわで。</div></div>
+                <div class="build-site-text"><div class="build-content">季節のごはんと、ゆっくり淹れた珈琲。町の小さな喫茶店です。</div></div>
+                <div class="build-site-button"><div class="build-content">メニューを見る</div></div>
+              </div>
+              <div class="build-site-cards">
+                <div class="build-card"><div class="build-content">季節のランチ<br>11:30—14:30</div></div>
+                <div class="build-card"><div class="build-content">自家焙煎珈琲<br>一杯ずつ丁寧に</div></div>
+                <div class="build-card"><div class="build-content">駅から徒歩4分<br>水曜定休</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="build-progress" role="progressbar" aria-label="ホームページ生成の進捗" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <span class="build-progress-bar"></span>
+        </div>
+      </div>
+    </section>
+
     <section class="workspace" id="apply" aria-labelledby="workspace-title">
       <div class="workspace-inner">
 
         <div class="form-col">
           <p class="kicker">APPLICATION</p>
-          <h2 id="workspace-title" class="section-title-mid">まずは、名前だけ。</h2>
-          <p class="section-lead">お店・活動の名前を入れると、次が順番に出てきます。</p>
+          <h2 id="workspace-title" class="section-title-mid"><span class="brk">まずは、</span><span class="brk">名前だけ。</span></h2>
+          <p class="section-lead"><span class="brk">お店・活動の名前を入れると、</span><span class="brk">次が順番に出てきます。</span></p>
 
           <form class="quick-form" id="site-form" method="post" action="#">
 
@@ -350,7 +707,7 @@
     <section class="gallery" id="examples" aria-labelledby="gallery-title">
       <p class="kicker">EXAMPLES</p>
       <h2 id="gallery-title" class="section-title-lg">つくった見本</h2>
-      <p class="section-lead">実在しない、架空のお店で作った見本です。</p>
+      <p class="section-lead"><span class="brk">実在しない、</span><span class="brk">架空のお店で作った見本です。</span></p>
       <div class="gallery-grid">
         <figure class="gallery-item" data-reveal-stagger>
           <img src="assets/examples/ex-01.png" width="780" height="1688" loading="lazy" alt="喫茶みなも（飲食店）の見本ホームページ、暖簾の骨格・藍の配色">
@@ -428,13 +785,13 @@
       <div class="watcher-inner">
         <div class="watcher-text">
           <p class="kicker">DASHBOARD</p>
-          <h2 id="watcher-title" class="section-title-lg">きてる人が、見える。</h2>
-          <p class="section-lead">作ったホームページには、見守る画面がついてきます。鍵付きのURLをスマホで開くだけです。</p>
+          <h2 id="watcher-title" class="section-title-lg"><span class="brk">きてる人が、</span><span class="brk">見える。</span></h2>
+          <p class="section-lead"><span class="brk">作ったホームページには、</span><span class="brk">見守る画面がついてきます。</span><span class="brk">鍵付きのURLを</span><span class="brk">スマホで開くだけです。</span></p>
           <ul class="watcher-list">
-            <li>いま何人があなたのページを見ているか、スマホでわかる</li>
-            <li>電話が何回タップされたかが数字で残る</li>
-            <li>どの時間帯・どこから来たかがわかる</li>
-            <li>訪ねてきた人の個人情報は記録しない</li>
+            <li><span class="brk">いま何人が</span><span class="brk">あなたのページを見ているか、</span><span class="brk">スマホでわかる</span></li>
+            <li><span class="brk">電話が何回タップされたかが</span><span class="brk">数字で残る</span></li>
+            <li><span class="brk">どの時間帯・どこから来たかが</span><span class="brk">わかる</span></li>
+            <li><span class="brk">訪ねてきた人の個人情報は</span><span class="brk">記録しない</span></li>
           </ul>
         </div>
         <div class="watcher-visual" data-reveal>
@@ -471,7 +828,7 @@
       <p class="section-lead">求人を出している会社向け</p>
 
       <div class="hiring-card" data-reveal>
-        <p class="hiring-copy">求人の応募者の多くが応募前に会社のホームページを見ます。その「最初に見られる1枚」と採用ページを用意し、毎月の数字まで届けます。</p>
+        <p class="hiring-copy"><span class="brk">求人の応募者の多くが</span><span class="brk">応募前に会社のホームページを見ます。</span><span class="brk">その「最初に見られる1枚」と</span><span class="brk">採用ページを用意し、</span><span class="brk">毎月の数字まで届けます。</span></p>
         <p class="hiring-price">初期 50,000円 ＋ 月 15,000円（税込）</p>
 
         <ul class="hiring-list">
@@ -577,6 +934,252 @@
   <script src="assets/home.js"></script>
   <script src="assets/zt-ambient.js"></script>
   <script src="assets/chat.js"></script>
+  <script>
+  (() => {
+    "use strict";
+
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const hero = document.getElementById("hero");
+    const canvas = document.getElementById("immersive-field");
+    const build = document.getElementById("ai-build");
+    const buildStatus = document.getElementById("build-status");
+    const progress = build ? build.querySelector("[role='progressbar']") : null;
+    const clamp = (value, min = 0, max = 1) => Math.min(max, Math.max(min, value));
+
+    /* スクロール量を0〜1へ変換し、骨組み→配色→文章の順に組み立てる。 */
+    if (build && buildStatus && progress) {
+      let scrollFrame = 0;
+      const renderBuild = () => {
+        scrollFrame = 0;
+        if (reduceMotion.matches) {
+          build.style.setProperty("--build-progress", "1");
+          build.style.setProperty("--build-wire", "1");
+          build.style.setProperty("--build-color", "1");
+          build.style.setProperty("--build-copy", "1");
+          build.dataset.buildPhase = "2";
+          buildStatus.textContent = "COMPLETE";
+          progress.setAttribute("aria-valuenow", "100");
+          return;
+        }
+
+        const rect = build.getBoundingClientRect();
+        const headerHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--header-h")) || 64;
+        const distance = Math.max(1, build.offsetHeight - window.innerHeight);
+        const amount = clamp((headerHeight - rect.top) / distance);
+        const wire = clamp(amount / .34);
+        const color = clamp((amount - .28) / .34);
+        const copy = clamp((amount - .62) / .3);
+        const phase = amount < .34 ? 0 : amount < .68 ? 1 : 2;
+        const labels = ["WIREFRAME", "COLOR SYSTEM", "COPYWRITING"];
+
+        build.style.setProperty("--build-progress", amount.toFixed(4));
+        build.style.setProperty("--build-wire", wire.toFixed(4));
+        build.style.setProperty("--build-color", color.toFixed(4));
+        build.style.setProperty("--build-copy", copy.toFixed(4));
+        build.dataset.buildPhase = String(phase);
+        buildStatus.textContent = amount > .965 ? "COMPLETE" : labels[phase];
+        progress.setAttribute("aria-valuenow", String(Math.round(amount * 100)));
+      };
+      const requestBuildRender = () => {
+        if (!scrollFrame) scrollFrame = requestAnimationFrame(renderBuild);
+      };
+      window.addEventListener("scroll", requestBuildRender, { passive: true });
+      window.addEventListener("resize", requestBuildRender, { passive: true });
+      reduceMotion.addEventListener("change", requestBuildRender);
+      renderBuild();
+    }
+
+    /* ファーストビューの粒子。Canvas 2Dだけで描画し、端末性能と実測fpsで数を調整する。 */
+    if (!hero || !canvas) return;
+    const ctx = canvas.getContext("2d", { alpha: true });
+    if (!ctx) return;
+
+    const cores = navigator.hardwareConcurrency || 4;
+    const memory = navigator.deviceMemory || 4;
+    const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    const lowPower = cores <= 4 || memory <= 4 || Boolean(connection && connection.saveData);
+    const pointer = { x: .5, y: .42, tx: .5, ty: .42, active: false };
+    let width = 1;
+    let height = 1;
+    let dpr = 1;
+    let particles = [];
+    let frame = 0;
+    let running = false;
+    let visible = true;
+    let lastTime = 0;
+    let frameAverage = 16.7;
+    let sampleCount = 0;
+    let lastScroll = window.scrollY;
+    let scrollEnergy = 0;
+
+    const desiredCount = () => {
+      if (reduceMotion.matches) return Math.min(24, Math.max(14, Math.round(width / 32)));
+      if (width < 560) return lowPower ? 22 : 34;
+      return lowPower ? 38 : 72;
+    };
+    const makeParticle = (index = 0) => ({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      vx: (Math.random() - .5) * .16,
+      vy: -.05 - Math.random() * .16,
+      size: .55 + Math.random() * 1.65,
+      alpha: .25 + Math.random() * .65,
+      depth: .25 + Math.random() * .75,
+      phase: Math.random() * Math.PI * 2 + index * .07
+    });
+    const syncParticles = () => {
+      const target = desiredCount();
+      while (particles.length < target) particles.push(makeParticle(particles.length));
+      if (particles.length > target) particles.length = target;
+    };
+    const resize = () => {
+      const rect = hero.getBoundingClientRect();
+      width = Math.max(1, Math.round(rect.width));
+      height = Math.max(1, Math.round(hero.offsetHeight));
+      dpr = Math.min(window.devicePixelRatio || 1, lowPower ? 1.25 : 1.75);
+      canvas.width = Math.round(width * dpr);
+      canvas.height = Math.round(height * dpr);
+      canvas.style.width = width + "px";
+      canvas.style.height = height + "px";
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      syncParticles();
+      if (reduceMotion.matches) draw(performance.now(), true);
+    };
+    const draw = (time, still = false) => {
+      const dt = lastTime ? Math.min(32, time - lastTime) : 16.7;
+      lastTime = time;
+      frameAverage = frameAverage * .94 + dt * .06;
+      sampleCount += 1;
+      pointer.x += (pointer.tx - pointer.x) * .075;
+      pointer.y += (pointer.ty - pointer.y) * .075;
+      scrollEnergy *= .91;
+
+      ctx.clearRect(0, 0, width, height);
+      const glowX = pointer.x * width;
+      const glowY = pointer.y * height;
+      const glow = ctx.createRadialGradient(glowX, glowY, 0, glowX, glowY, Math.max(180, width * .28));
+      glow.addColorStop(0, "rgba(91, 186, 255, .12)");
+      glow.addColorStop(.35, "rgba(64, 126, 255, .055)");
+      glow.addColorStop(1, "rgba(20, 54, 112, 0)");
+      ctx.fillStyle = glow;
+      ctx.fillRect(0, 0, width, height);
+
+      for (let i = 0; i < particles.length; i += 1) {
+        const p = particles[i];
+        if (!still) {
+          const dx = p.x - glowX;
+          const dy = p.y - glowY;
+          const distanceSq = dx * dx + dy * dy;
+          if (pointer.active && distanceSq < 42000 && distanceSq > 4) {
+            const force = (1 - distanceSq / 42000) * .017;
+            p.vx += dx * force / Math.sqrt(distanceSq);
+            p.vy += dy * force / Math.sqrt(distanceSq);
+          }
+          p.vx *= .992;
+          p.vy = p.vy * .995 - scrollEnergy * .0009 * p.depth;
+          p.x += p.vx * dt * p.depth;
+          p.y += p.vy * dt * p.depth;
+          if (p.x < -12) p.x = width + 12;
+          if (p.x > width + 12) p.x = -12;
+          if (p.y < -14) p.y = height + 14;
+          if (p.y > height + 14) p.y = -14;
+        }
+
+        const pulse = still ? 1 : .72 + Math.sin(time * .0012 + p.phase) * .28;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size * pulse, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${i % 5 === 0 ? "245,197,77" : "137,207,255"},${p.alpha * pulse})`;
+        ctx.shadowColor = i % 5 === 0 ? "rgba(245,197,77,.7)" : "rgba(90,180,255,.7)";
+        ctx.shadowBlur = 8 * p.depth;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        if (i > 0 && i % 3 === 0) {
+          const other = particles[i - 1];
+          const linkX = other.x - p.x;
+          const linkY = other.y - p.y;
+          const linkDistance = Math.hypot(linkX, linkY);
+          if (linkDistance < 112) {
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(other.x, other.y);
+            ctx.strokeStyle = `rgba(121,190,255,${(1 - linkDistance / 112) * .13})`;
+            ctx.lineWidth = .6;
+            ctx.stroke();
+          }
+        }
+      }
+
+      if (!still && sampleCount > 120 && frameAverage > 21 && particles.length > 24) {
+        particles.length = Math.max(24, Math.floor(particles.length * .82));
+        sampleCount = 0;
+      }
+    };
+    const animate = (time) => {
+      if (!running) return;
+      const interval = lowPower ? 1000 / 40 : 1000 / 60;
+      if (!lastTime || time - lastTime >= interval - 1) draw(time);
+      frame = requestAnimationFrame(animate);
+    };
+    const start = () => {
+      if (running || !visible || document.hidden || reduceMotion.matches) return;
+      running = true;
+      lastTime = 0;
+      frame = requestAnimationFrame(animate);
+    };
+    const stop = () => {
+      running = false;
+      if (frame) cancelAnimationFrame(frame);
+      frame = 0;
+    };
+    const onMotionChange = () => {
+      stop();
+      resize();
+      if (reduceMotion.matches) {
+        pointer.x = pointer.tx = .5;
+        pointer.y = pointer.ty = .42;
+        draw(performance.now(), true);
+      } else {
+        start();
+      }
+    };
+
+    hero.addEventListener("pointermove", (event) => {
+      if (reduceMotion.matches) return;
+      const rect = hero.getBoundingClientRect();
+      pointer.tx = clamp((event.clientX - rect.left) / Math.max(1, rect.width));
+      pointer.ty = clamp((event.clientY - rect.top) / Math.max(1, rect.height));
+      pointer.active = true;
+      hero.style.setProperty("--immersive-x", (pointer.tx * 100).toFixed(1) + "%");
+      hero.style.setProperty("--immersive-y", (pointer.ty * 100).toFixed(1) + "%");
+    }, { passive: true });
+    hero.addEventListener("pointerleave", () => {
+      pointer.tx = .5;
+      pointer.ty = .42;
+      pointer.active = false;
+    }, { passive: true });
+    window.addEventListener("scroll", () => {
+      const nextScroll = window.scrollY;
+      scrollEnergy = Math.min(32, scrollEnergy + Math.abs(nextScroll - lastScroll));
+      lastScroll = nextScroll;
+    }, { passive: true });
+    document.addEventListener("visibilitychange", () => document.hidden ? stop() : start());
+    reduceMotion.addEventListener("change", onMotionChange);
+
+    if ("ResizeObserver" in window) new ResizeObserver(resize).observe(hero);
+    else window.addEventListener("resize", resize, { passive: true });
+    if ("IntersectionObserver" in window) {
+      new IntersectionObserver(([entry]) => {
+        visible = entry.isIntersecting;
+        if (visible) start(); else stop();
+      }, { rootMargin: "120px 0px" }).observe(hero);
+    }
+
+    resize();
+    if (reduceMotion.matches) draw(performance.now(), true);
+    else start();
+  })();
+  </script>
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
