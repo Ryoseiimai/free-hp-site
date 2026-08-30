@@ -340,6 +340,280 @@
       .build-browser, .build-content, .build-progress-bar { transform: none !important; transition: none !important; }
       .build-progress-bar { width: 100%; }
     }
+
+    /* teamLab型の没入導線。情報を一行の黒帯へ集約し、アートそのものを主役にする。 */
+    html { overflow-x: clip; }
+    body { overflow-x: clip; background: #050508; }
+    .site-header {
+      position: fixed;
+      z-index: 80;
+      color: #fff;
+      background: linear-gradient(to bottom, rgba(0,0,0,.55), transparent);
+      border: 0;
+      box-shadow: none;
+    }
+    .site-header .brand-name, .site-header .header-count { color: #fff; }
+    .site-header .header-cta { color: #090909; background: rgba(255,255,255,.94); border-color: transparent; }
+    .page-main { padding-top: 0; }
+    .immersive-section {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      height: 100svh;
+      min-height: 560px;
+      overflow: hidden;
+      isolation: isolate;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      background: #050508;
+    }
+    .immersive-section::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      pointer-events: none;
+      box-shadow: inset 0 0 120px rgba(0,0,0,.36);
+    }
+    .immersive-label {
+      position: absolute;
+      z-index: 12;
+      left: 50%;
+      top: 50%;
+      max-width: calc(100% - 32px);
+      width: max-content;
+      box-sizing: border-box;
+      margin: 0;
+      padding: .72em 1.3em .78em;
+      color: #fff;
+      background: rgba(0,0,0,.88);
+      box-shadow: 0 10px 40px rgba(0,0,0,.24);
+      font-size: clamp(15px, 1.5vw, 23px);
+      font-weight: 500;
+      line-height: 1;
+      letter-spacing: .025em;
+      text-align: center;
+      text-wrap: nowrap;
+      white-space: nowrap;
+      transform: translate(-50%, -50%);
+    }
+
+    .hero {
+      height: 100vh;
+      height: 100svh;
+      min-height: 560px;
+      padding: 0;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(circle at 50% 46%, rgba(120,25,76,.28), transparent 31%),
+        radial-gradient(circle at 16% 72%, rgba(14,92,80,.25), transparent 37%),
+        #050307;
+    }
+    .hero::before { display: none; }
+    .hero-veil {
+      z-index: 2;
+      opacity: 1;
+      background: radial-gradient(circle at center, transparent 10%, rgba(0,0,0,.14) 62%, rgba(0,0,0,.5));
+    }
+    .hero-strip, .hero-readout { display: none !important; }
+    .hero-inner {
+      position: absolute;
+      inset: 0;
+      z-index: 10;
+      width: auto;
+      max-width: none;
+      padding: 0 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(22px, 4vh, 42px);
+      text-align: center;
+      text-shadow: 0 4px 34px rgba(0,0,0,.72);
+    }
+    .hero .kicker, .hero-lead, .hero-price { display: none; }
+    .hero-title {
+      margin: 0;
+      color: #fff;
+      font-family: var(--sans);
+      font-size: clamp(62px, 12vw, 174px);
+      font-weight: 900;
+      line-height: .8;
+      letter-spacing: -.08em;
+      text-transform: lowercase;
+    }
+    .hero-title .accent { color: inherit; }
+    .hero-title .accent::after { display: none; }
+    .hero .immersive-label { position: static; transform: none; }
+    .hero-scroll-cue {
+      position: absolute;
+      z-index: 14;
+      left: 50%;
+      right: auto;
+      bottom: max(22px, env(safe-area-inset-bottom));
+      color: #fff;
+      transform: translateX(-50%);
+    }
+    .hero-scroll-line { background: rgba(255,255,255,.68); }
+
+    .ai-build {
+      height: 100vh;
+      height: 100svh;
+      min-height: 560px;
+      border: 0;
+      background:
+        radial-gradient(circle at 70% 45%, rgba(47,148,255,.22), transparent 35%),
+        radial-gradient(circle at 18% 72%, rgba(111,39,190,.22), transparent 34%),
+        #030711;
+    }
+    .ai-build-sticky {
+      position: relative;
+      top: auto;
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      padding: clamp(78px, 10vh, 110px) clamp(22px, 7vw, 100px) clamp(44px, 7vh, 72px);
+      display: grid;
+      grid-template-columns: 1fr;
+      place-items: center;
+    }
+    .ai-build-sticky::before {
+      background:
+        repeating-linear-gradient(90deg, rgba(125,192,255,.028) 0 1px, transparent 1px 72px),
+        repeating-linear-gradient(0deg, rgba(125,192,255,.024) 0 1px, transparent 1px 72px);
+    }
+    .ai-build-copy, .build-progress { display: none; }
+    .build-browser-wrap { width: min(82vw, 880px); justify-self: center; }
+    .build-browser {
+      min-height: min(61vh, 570px);
+      opacity: .86;
+      filter: saturate(1.18);
+      animation: build-float 8s ease-in-out infinite;
+    }
+    .build-site { min-height: min(55vh, 528px); }
+    .ai-build .immersive-label { top: 50%; }
+
+    .signal-section {
+      background:
+        radial-gradient(circle at 50% 44%, rgba(69,255,189,.17), transparent 31%),
+        radial-gradient(circle at 16% 20%, rgba(15,110,134,.3), transparent 38%),
+        linear-gradient(145deg, #021612, #031c24 52%, #080a1b);
+    }
+    .signal-orbits { position: absolute; inset: -18%; z-index: -1; }
+    .signal-orbit {
+      position: absolute;
+      left: 50%; top: 50%;
+      width: var(--size); height: var(--size);
+      border: 1px solid rgba(103,255,211,.18);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      animation: orbit-pulse 7s ease-in-out infinite var(--delay);
+    }
+    .signal-orbit::before {
+      content: "";
+      position: absolute;
+      left: 50%; top: -4px;
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: #77ffcf;
+      box-shadow: 0 0 22px #42ffc0;
+    }
+    .watcher-float {
+      position: relative;
+      z-index: 4;
+      width: min(74vw, 760px);
+      opacity: .84;
+      transform: perspective(1000px) rotateX(5deg);
+      animation: dashboard-float 9s ease-in-out infinite;
+    }
+    .watcher-float .watcher-browser { box-shadow: 0 42px 100px rgba(0,0,0,.48), 0 0 80px rgba(68,255,198,.1); }
+    .signal-section .immersive-label { z-index: 12; }
+
+    .delivery-section {
+      background:
+        radial-gradient(circle at 50% 52%, rgba(255,213,107,.2), transparent 24%),
+        radial-gradient(circle at 12% 74%, rgba(255,82,90,.2), transparent 36%),
+        radial-gradient(circle at 88% 24%, rgba(138,64,255,.22), transparent 34%),
+        #12070d;
+    }
+    .delivery-bloom {
+      position: absolute;
+      left: 50%; top: 50%;
+      width: min(72vw, 720px); aspect-ratio: 1;
+      border-radius: 50%;
+      background: repeating-conic-gradient(from 8deg, rgba(255,219,122,.28) 0 5deg, transparent 5deg 15deg);
+      filter: blur(.2px) drop-shadow(0 0 34px rgba(255,173,79,.2));
+      transform: translate(-50%, -50%);
+      animation: bloom-turn 50s linear infinite;
+    }
+    .delivery-bloom::before, .delivery-bloom::after {
+      content: "";
+      position: absolute;
+      inset: 15%;
+      border: 1px solid rgba(255,228,162,.3);
+      border-radius: 42% 58% 47% 53%;
+      box-shadow: 0 0 60px rgba(255,109,89,.25), inset 0 0 60px rgba(255,211,112,.12);
+    }
+    .delivery-bloom::after { inset: 32%; border-radius: 50%; background: rgba(255,237,182,.09); }
+
+    .landing {
+      position: relative;
+      z-index: 2;
+      overflow: clip;
+      color: #121212;
+      background: #fff;
+    }
+    .landing-intro {
+      min-height: 36vh;
+      padding: clamp(90px, 15vh, 170px) var(--side) clamp(42px, 8vh, 90px);
+      display: grid;
+      place-items: center;
+      text-align: center;
+      background: #fff;
+    }
+    .landing-title { margin: 0; font-size: clamp(34px, 5.2vw, 74px); line-height: 1.15; letter-spacing: -.04em; }
+    .landing .workspace { padding-top: clamp(42px, 7vw, 90px); }
+
+    @keyframes build-float { 0%,100% { transform: translateY(12px) rotateY(-2deg); } 50% { transform: translateY(-10px) rotateY(2deg); } }
+    @keyframes dashboard-float { 0%,100% { transform: perspective(1000px) rotateX(5deg) translateY(10px); } 50% { transform: perspective(1000px) rotateX(2deg) translateY(-12px); } }
+    @keyframes orbit-pulse { 0%,100% { opacity: .28; transform: translate(-50%,-50%) scale(.94) rotate(0); } 50% { opacity: .9; transform: translate(-50%,-50%) scale(1.04) rotate(18deg); } }
+    @keyframes bloom-turn { to { transform: translate(-50%, -50%) rotate(360deg); } }
+
+    @media (max-width: 820px) {
+      .site-header .header-count, .site-header .header-live { display: none; }
+      .ai-build { height: 100svh; min-height: 560px; }
+      .ai-build-sticky { min-height: 0; padding: 86px 16px 42px; grid-template-rows: 1fr; }
+      .build-browser-wrap { width: min(92vw, 640px); align-self: center; }
+      .build-browser { min-height: 48vh; border-radius: 8px; }
+      .build-site { min-height: calc(48vh - 42px); padding: 24px; }
+      .build-site-content { padding: 32px 0 20px; }
+      .watcher-float { width: min(90vw, 620px); }
+      .delivery-bloom { width: min(118vw, 620px); }
+    }
+    @media (max-width: 390px) {
+      .site-header-inner { padding-inline: 14px; }
+      .site-header .brand-name { font-size: 12px; }
+      .site-header .header-cta { padding-inline: 12px; font-size: 12px; }
+      .immersive-section, .hero, .ai-build { min-height: 520px; }
+      .immersive-label { max-width: calc(100% - 20px); padding: .75em .8em .8em; font-size: 14px; letter-spacing: 0; }
+      .delivery-section .immersive-label { font-size: 11px; }
+      .hero-title { font-size: clamp(64px, 24vw, 94px); }
+      .build-browser-wrap { width: calc(100vw - 24px); }
+      .build-browser { min-height: 43vh; }
+      .build-site { min-height: calc(43vh - 42px); padding: 18px; }
+      .build-site-content { padding: 26px 0 14px; }
+      .build-site-title { min-height: 44px; }
+      .build-site-title .build-content { font-size: 25px; }
+      .build-card, .build-card .build-content { min-height: 46px; }
+      .watcher-float { width: calc(100vw - 24px); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .build-browser, .watcher-float, .signal-orbit, .delivery-bloom { animation: none !important; }
+      .ai-build { height: 100svh; min-height: 560px; }
+      .ai-build-sticky { height: 100%; min-height: 0; }
+    }
   </style>
   <script>document.documentElement.classList.replace("no-js","js");</script>
   <!-- Google tag (gtag.js) -->
@@ -388,12 +662,10 @@
       </div>
       <div class="hero-readout" id="zt-readout" aria-hidden="true"></div>
       <div class="hero-inner">
-        <p class="kicker" data-reveal>AIで作って、人が整える</p>
-        <h1 class="hero-title" id="hero-title" data-split-title><span class="brk">ホームページは、</span><span class="accent brk">翌日に届く。</span></h1>
-        <p class="hero-lead" data-reveal><span class="brk">AIで作って、</span><span class="brk">人が最後に整えます。</span><span class="brk">名刺代わりに、</span><span class="brk">そのまま使えます。</span></p>
-        <p class="hero-price" data-reveal><span class="brk">制作 10,000円 ＋ 管理費 月5,000円</span><span class="hero-price-dot" aria-hidden="true">・</span><span class="brk">起業応援は初期0円＋月3,000円</span></p>
+        <h1 class="hero-title" id="hero-title">freehp</h1>
+        <p class="immersive-label"><span class="brk">AIが作る、</span><span class="brk">あなたのお店のホームページ</span></p>
       </div>
-      <a class="hero-scroll-cue" href="#apply" aria-label="申し込みフォームまでスクロール">
+      <a class="hero-scroll-cue" href="#ai-build" aria-label="次の作品へスクロール">
         <span class="hero-scroll-line" aria-hidden="true"></span>
         <span class="hero-scroll-word">SCROLL</span>
       </a>
@@ -440,10 +712,50 @@
         <div class="build-progress" role="progressbar" aria-label="ホームページ生成の進捗" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
           <span class="build-progress-bar"></span>
         </div>
+        <h2 class="immersive-label" id="ai-build-title-label"><span class="brk">見ている間に、</span><span class="brk">できていく。</span></h2>
       </div>
     </section>
 
-    <section class="workspace" id="apply" aria-labelledby="workspace-title">
+    <section class="immersive-section signal-section" id="watcher" aria-labelledby="watcher-title">
+      <div class="signal-orbits" aria-hidden="true">
+        <span class="signal-orbit" style="--size:34%;--delay:-1s"></span>
+        <span class="signal-orbit" style="--size:55%;--delay:-3s"></span>
+        <span class="signal-orbit" style="--size:78%;--delay:-5s"></span>
+        <span class="signal-orbit" style="--size:101%;--delay:-7s"></span>
+      </div>
+      <div class="watcher-float" aria-hidden="true">
+        <div class="mini-browser watcher-browser">
+          <div class="browser-topbar">
+            <span class="window-dot"></span><span class="window-dot"></span><span class="window-dot"></span>
+            <span class="browser-address">あなたのページ/stats</span>
+          </div>
+          <div class="watcher-dashboard">
+            <div class="watcher-live">
+              <span class="watcher-live-dot"></span>
+              <span class="watcher-live-num">3</span>
+              <span class="watcher-live-label">いま見ている人</span>
+            </div>
+            <div class="watcher-cards">
+              <div class="watcher-card"><span class="watcher-card-label">今日</span><span class="watcher-card-value">42</span></div>
+              <div class="watcher-card"><span class="watcher-card-label">電話タップ</span><span class="watcher-card-value">5</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <h2 class="immersive-label" id="watcher-title"><span class="brk">きてる人が、</span><span class="brk">見える。</span></h2>
+    </section>
+
+    <section class="immersive-section delivery-section" id="delivery" aria-labelledby="delivery-title">
+      <div class="delivery-bloom" aria-hidden="true"></div>
+      <h2 class="immersive-label" id="delivery-title"><span class="brk">翌日に、届く。</span><span class="brk">制作10,000円・管理費 月5,000円</span></h2>
+    </section>
+
+    <div class="landing" id="apply">
+      <div class="landing-intro">
+        <h2 class="landing-title"><span class="brk">あなたのお店を、</span><span class="brk">聞かせてください。</span></h2>
+      </div>
+
+    <section class="workspace" aria-labelledby="workspace-title">
       <div class="workspace-inner">
 
         <div class="form-col">
@@ -781,47 +1093,6 @@
       <p class="pricing-footnote">途中でやめても、作ったページのデータはお渡しします。</p>
     </section>
 
-    <section class="watcher" id="watcher" aria-labelledby="watcher-title">
-      <div class="watcher-inner">
-        <div class="watcher-text">
-          <p class="kicker">DASHBOARD</p>
-          <h2 id="watcher-title" class="section-title-lg"><span class="brk">きてる人が、</span><span class="brk">見える。</span></h2>
-          <p class="section-lead"><span class="brk">作ったホームページには、</span><span class="brk">見守る画面がついてきます。</span><span class="brk">鍵付きのURLを</span><span class="brk">スマホで開くだけです。</span></p>
-          <ul class="watcher-list">
-            <li><span class="brk">いま何人が</span><span class="brk">あなたのページを見ているか、</span><span class="brk">スマホでわかる</span></li>
-            <li><span class="brk">電話が何回タップされたかが</span><span class="brk">数字で残る</span></li>
-            <li><span class="brk">どの時間帯・どこから来たかが</span><span class="brk">わかる</span></li>
-            <li><span class="brk">訪ねてきた人の個人情報は</span><span class="brk">記録しない</span></li>
-          </ul>
-        </div>
-        <div class="watcher-visual" data-reveal>
-          <div class="mini-browser watcher-browser">
-            <div class="browser-topbar">
-              <span class="window-dot"></span><span class="window-dot"></span><span class="window-dot"></span>
-              <span class="browser-address">あなたのページ/stats</span>
-            </div>
-            <div class="watcher-dashboard" aria-hidden="true">
-              <div class="watcher-live">
-                <span class="watcher-live-dot"></span>
-                <span class="watcher-live-num">3</span>
-                <span class="watcher-live-label">いま見ている人</span>
-              </div>
-              <div class="watcher-cards">
-                <div class="watcher-card">
-                  <span class="watcher-card-label">今日</span>
-                  <span class="watcher-card-value">42</span>
-                </div>
-                <div class="watcher-card">
-                  <span class="watcher-card-label">電話タップ</span>
-                  <span class="watcher-card-value">5</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
     <section class="hiring" id="hiring" aria-labelledby="hiring-title">
       <p class="kicker">HIRING</p>
       <h2 id="hiring-title" class="section-title-lg">採用装置プラン</h2>
@@ -898,6 +1169,8 @@
       </div>
     </nav>
 
+    </div>
+
   </main>
 
   <script type="application/ld+json">
@@ -946,47 +1219,41 @@
     const progress = build ? build.querySelector("[role='progressbar']") : null;
     const clamp = (value, min = 0, max = 1) => Math.min(max, Math.max(min, value));
 
-    /* スクロール量を0〜1へ変換し、骨組み→配色→文章の順に組み立てる。 */
+    /* 画面に入ると、骨組み→配色→文章の順に自動で組み立てる。 */
     if (build && buildStatus && progress) {
-      let scrollFrame = 0;
-      const renderBuild = () => {
-        scrollFrame = 0;
-        if (reduceMotion.matches) {
-          build.style.setProperty("--build-progress", "1");
-          build.style.setProperty("--build-wire", "1");
-          build.style.setProperty("--build-color", "1");
-          build.style.setProperty("--build-copy", "1");
-          build.dataset.buildPhase = "2";
-          buildStatus.textContent = "COMPLETE";
-          progress.setAttribute("aria-valuenow", "100");
-          return;
-        }
-
-        const rect = build.getBoundingClientRect();
-        const headerHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--header-h")) || 64;
-        const distance = Math.max(1, build.offsetHeight - window.innerHeight);
-        const amount = clamp((headerHeight - rect.top) / distance);
+      let buildTimer = 0;
+      const setBuild = (amount) => {
         const wire = clamp(amount / .34);
-        const color = clamp((amount - .28) / .34);
-        const copy = clamp((amount - .62) / .3);
+        const color = clamp((amount - .24) / .36);
+        const copy = clamp((amount - .58) / .34);
         const phase = amount < .34 ? 0 : amount < .68 ? 1 : 2;
         const labels = ["WIREFRAME", "COLOR SYSTEM", "COPYWRITING"];
-
-        build.style.setProperty("--build-progress", amount.toFixed(4));
-        build.style.setProperty("--build-wire", wire.toFixed(4));
-        build.style.setProperty("--build-color", color.toFixed(4));
-        build.style.setProperty("--build-copy", copy.toFixed(4));
+        build.style.setProperty("--build-progress", amount.toFixed(3));
+        build.style.setProperty("--build-wire", wire.toFixed(3));
+        build.style.setProperty("--build-color", color.toFixed(3));
+        build.style.setProperty("--build-copy", copy.toFixed(3));
         build.dataset.buildPhase = String(phase);
-        buildStatus.textContent = amount > .965 ? "COMPLETE" : labels[phase];
+        buildStatus.textContent = amount >= 1 ? "COMPLETE" : labels[phase];
         progress.setAttribute("aria-valuenow", String(Math.round(amount * 100)));
       };
-      const requestBuildRender = () => {
-        if (!scrollFrame) scrollFrame = requestAnimationFrame(renderBuild);
+      const playBuild = () => {
+        cancelAnimationFrame(buildTimer);
+        if (reduceMotion.matches) { setBuild(1); return; }
+        const started = performance.now();
+        const tick = (now) => {
+          const amount = clamp((now - started) / 3400);
+          setBuild(amount);
+          if (amount < 1) buildTimer = requestAnimationFrame(tick);
+        };
+        buildTimer = requestAnimationFrame(tick);
       };
-      window.addEventListener("scroll", requestBuildRender, { passive: true });
-      window.addEventListener("resize", requestBuildRender, { passive: true });
-      reduceMotion.addEventListener("change", requestBuildRender);
-      renderBuild();
+      if ("IntersectionObserver" in window) {
+        new IntersectionObserver(([entry]) => {
+          if (entry.isIntersecting) playBuild();
+          else cancelAnimationFrame(buildTimer);
+        }, { threshold: .38 }).observe(build);
+      } else playBuild();
+      reduceMotion.addEventListener("change", playBuild);
     }
 
     /* ファーストビューの粒子。Canvas 2Dだけで描画し、端末性能と実測fpsで数を調整する。 */
@@ -1013,19 +1280,22 @@
     let scrollEnergy = 0;
 
     const desiredCount = () => {
-      if (reduceMotion.matches) return Math.min(24, Math.max(14, Math.round(width / 32)));
-      if (width < 560) return lowPower ? 22 : 34;
-      return lowPower ? 38 : 72;
+      if (reduceMotion.matches) return Math.min(40, Math.max(24, Math.round(width / 18)));
+      if (width < 560) return lowPower ? 52 : 74;
+      return lowPower ? 96 : 156;
     };
     const makeParticle = (index = 0) => ({
       x: Math.random() * width,
       y: Math.random() * height,
-      vx: (Math.random() - .5) * .16,
-      vy: -.05 - Math.random() * .16,
-      size: .55 + Math.random() * 1.65,
-      alpha: .25 + Math.random() * .65,
+      vx: (Math.random() - .5) * .09,
+      vy: -.018 - Math.random() * .07,
+      size: 3.2 + Math.random() * 9.8,
+      alpha: .34 + Math.random() * .58,
       depth: .25 + Math.random() * .75,
-      phase: Math.random() * Math.PI * 2 + index * .07
+      phase: Math.random() * Math.PI * 2 + index * .07,
+      petals: 4 + Math.floor(Math.random() * 5),
+      hue: [332, 348, 18, 45, 176, 204][index % 6],
+      bloom: .3 + Math.random() * .55
     });
     const syncParticles = () => {
       const target = desiredCount();
@@ -1085,33 +1355,47 @@
           if (p.y > height + 14) p.y = -14;
         }
 
-        const pulse = still ? 1 : .72 + Math.sin(time * .0012 + p.phase) * .28;
+        const nearPointer = Math.hypot(p.x - glowX, p.y - glowY) < Math.max(110, width * .16);
+        if (!still) p.bloom += ((nearPointer && pointer.active ? 1.45 : .62) - p.bloom) * .035;
+        const pulse = (still ? .82 : .82 + Math.sin(time * .0014 + p.phase) * .18) * p.bloom;
+        const petalLength = p.size * (1.2 + p.depth) * pulse;
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.phase + (still ? 0 : time * .000035 * (i % 2 ? 1 : -1)));
+        ctx.globalCompositeOperation = "lighter";
+        ctx.shadowColor = `hsla(${p.hue},90%,70%,.7)`;
+        ctx.shadowBlur = 10 + 13 * p.depth;
+        for (let petal = 0; petal < p.petals; petal += 1) {
+          ctx.rotate((Math.PI * 2) / p.petals);
+          ctx.beginPath();
+          ctx.ellipse(0, -petalLength * .58, p.size * .34 * pulse, petalLength * .7, 0, 0, Math.PI * 2);
+          ctx.fillStyle = `hsla(${p.hue + petal * 2},88%,68%,${p.alpha * .24})`;
+          ctx.fill();
+        }
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size * pulse, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${i % 5 === 0 ? "245,197,77" : "137,207,255"},${p.alpha * pulse})`;
-        ctx.shadowColor = i % 5 === 0 ? "rgba(245,197,77,.7)" : "rgba(90,180,255,.7)";
-        ctx.shadowBlur = 8 * p.depth;
+        ctx.arc(0, 0, Math.max(1, p.size * .28 * pulse), 0, Math.PI * 2);
+        ctx.fillStyle = `hsla(${p.hue + 28},100%,82%,${p.alpha})`;
         ctx.fill();
-        ctx.shadowBlur = 0;
+        ctx.restore();
 
-        if (i > 0 && i % 3 === 0) {
+        if (i > 0 && i % 4 === 0) {
           const other = particles[i - 1];
           const linkX = other.x - p.x;
           const linkY = other.y - p.y;
           const linkDistance = Math.hypot(linkX, linkY);
-          if (linkDistance < 112) {
+          if (linkDistance < 135) {
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);
-            ctx.lineTo(other.x, other.y);
-            ctx.strokeStyle = `rgba(121,190,255,${(1 - linkDistance / 112) * .13})`;
-            ctx.lineWidth = .6;
+            ctx.quadraticCurveTo((p.x + other.x) / 2 + Math.sin(p.phase) * 13, (p.y + other.y) / 2, other.x, other.y);
+            ctx.strokeStyle = `hsla(${p.hue},70%,60%,${(1 - linkDistance / 135) * .16})`;
+            ctx.lineWidth = .7;
             ctx.stroke();
           }
         }
       }
 
-      if (!still && sampleCount > 120 && frameAverage > 21 && particles.length > 24) {
-        particles.length = Math.max(24, Math.floor(particles.length * .82));
+      if (!still && sampleCount > 120 && frameAverage > 21 && particles.length > 36) {
+        particles.length = Math.max(36, Math.floor(particles.length * .82));
         sampleCount = 0;
       }
     };
