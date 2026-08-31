@@ -4,10 +4,9 @@
   担当:
     1. ヘッダー右上の LIVE + 経過時間（このページを開いてからの時間。偽の稼働日数は出さない）
     2. ヒーロー背景のデータ空間 canvas（ノード網・走る信号・マウス反応・時々バースト）
-    3. ヒーロー上端の稼働ストリップ（今の工程・店名・tokens/s 等）と右下の readout
-    4. 「いまの見本」のデモリール（架空店の見本が組み上がって→完成→次の店、を静かにループ）
-    5. セクションのスキャン出現・見出しのデコード・料金のカウントアップ・ダッシュボードの微動
-    6. ページ全体を時々走る光（DOMを置くだけ。動きは CSS）
+    3. 「いまの見本」のデモリール（架空店の見本が組み上がって→完成→次の店、を静かにループ）
+    4. セクションのスキャン出現・見出しのデコード・料金のカウントアップ・ダッシュボードの微動
+    5. ページ全体を時々走る光（DOMを置くだけ。動きは CSS）
 
   見た目だけ。実データは一切持たない。店名は index.html「つくった見本」の架空店のみ。
   手渡し: 店名を入力し始めたらデモリールを止めて通常のLIVE PREVIEWへ、生成開始（ztConsole.start）で
@@ -20,7 +19,6 @@
 
   const REDUCED_MOTION = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const MOBILE_MAX_WIDTH = 560;
-  const READOUT_MIN_WIDTH = 900;
   const DPR_MAX = 2;
 
   // ---------- 架空店（index.html「つくった見本」と同じ店名。実在店・実データは使わない） ----------
@@ -89,9 +87,9 @@
   const NET_SCAN_PERIOD_MS = 9000;
   const NET_MAX_DT = 50;
   const NET_MOBILE_MIN_DT = 30;          // スマホは約30fpsに落とす
-
-  const READOUT_MS = 160;
-  const READOUT_HEX_BYTES = 10;
+  const NET_ADAPT_SAMPLE_FRAMES = 90;
+  const NET_SLOW_FRAME_MS = 19.2;
+  const NET_MIN_NODE_SCALE = 0.55;
 
   const COUNT_MS = 1100;
   const DECODE_STEP_MS = 22;
@@ -103,12 +101,6 @@
   const WATCHER_LIVE_RANGE = [1, 6];
   const WATCHER_SPARK_BARS = 28;
   const WATCHER_SPARK_MS = 900;
-
-  const TICKER_ITEMS = [
-    "hero-section.html ✓", "menu-section.html ✓", "photo → webp q=82 ✓", "fonts/ZenKaku.woff2 HIT",
-    "contrast 6.2:1 ✓", "mobile 375px ✓", "tel: link ✓", "map link ✓", "og:image 1200×630 ✓",
-    "sitemap.xml ✓", "deploy → edge ✓", "cache warming…", "見本URLを発行", "次の店へ →"
-  ];
 
   const rand = ([min, max]) => min + Math.random() * (max - min);
   const randInt = (range) => Math.round(rand(range));
@@ -170,10 +162,18 @@
      ==================================================================== */
   const hero = document.querySelector("#hero");
   const canvas = document.querySelector("#zt-hero-net");
-  const net = { nodes: [], edges: [], signals: [], w: 0, h: 0, dpr: 1, last: 0, spawnAt: 0, burstAt: 0, burst: -1, burstX: 0, burstY: 0, mx: -1, my: -1, mouseSpawnAt: 0, rafId: 0, inView: true, running: false };
+  const net = {
+    nodes: [], edges: [], signals: [], w: 0, h: 0, dpr: 1, last: 0,
+    spawnAt: 0, burstAt: 0, burst: -1, burstX: 0, burstY: 0,
+    mx: -1, my: -1, mouseSpawnAt: 0, rafId: 0,
+    inView: !("IntersectionObserver" in window), running: false,
+    frameAverage: 16.7, sampleFrames: 0, nodeScale: 1,
+    scanSprite: null, signalSprite: null
+  };
 
   const buildNodes = () => {
-    const count = isMobile() ? NET_NODES_MOBILE : NET_NODES_DESKTOP;
+    const baseCount = isMobile() ? NET_NODES_MOBILE : NET_NODES_DESKTOP;
+    const count = Math.max(16, Math.round(baseCount * net.nodeScale));
     const linkDist = isMobile() ? NET_LINK_DIST_MOBILE : NET_LINK_DIST_DESKTOP;
     net.nodes = [];
     net.edges = [];
@@ -203,6 +203,38 @@
     });
   };
 
+  const buildNetSprites = () => {
+    const scan = document.createElement("canvas");
+    scan.width = 1;
+    scan.height = 60;
+    const scanCtx = scan.getContext("2d");
+    if (scanCtx) {
+      const gradient = scanCtx.createLinearGradient(0, 0, 0, scan.height);
+      gradient.addColorStop(0, "rgba(79, 209, 232, 0)");
+      gradient.addColorStop(1, "rgba(79, 209, 232, .07)");
+      scanCtx.fillStyle = gradient;
+      scanCtx.fillRect(0, 0, scan.width, scan.height);
+      net.scanSprite = scan;
+    }
+
+    const signal = document.createElement("canvas");
+    signal.width = 128;
+    signal.height = 8;
+    const signalCtx = signal.getContext("2d");
+    if (signalCtx) {
+      const gradient = signalCtx.createLinearGradient(0, 0, signal.width, 0);
+      gradient.addColorStop(0, "rgba(79, 209, 232, 0)");
+      gradient.addColorStop(1, "rgba(79, 209, 232, .8)");
+      signalCtx.strokeStyle = gradient;
+      signalCtx.lineWidth = 1.4;
+      signalCtx.beginPath();
+      signalCtx.moveTo(0, signal.height / 2);
+      signalCtx.lineTo(signal.width, signal.height / 2);
+      signalCtx.stroke();
+      net.signalSprite = signal;
+    }
+  };
+
   const resizeNet = () => {
     if (!canvas || !hero) return;
     const rect = hero.getBoundingClientRect();
@@ -212,6 +244,7 @@
     net.h = rect.height;
     canvas.width = Math.round(net.w * net.dpr);
     canvas.height = Math.round(net.h * net.dpr);
+    if (!net.scanSprite || !net.signalSprite) buildNetSprites();
     buildNodes();
     if (REDUCED_MOTION) {
       net.nodes.forEach((n) => { n.energy = Math.random() < 0.2 ? 0.6 : 0; });
@@ -220,7 +253,7 @@
   };
 
   const spawnSignal = (from) => {
-    if (net.signals.length >= NET_MAX_SIGNALS) return;
+    if (net.signals.length >= Math.max(12, Math.round(NET_MAX_SIGNALS * net.nodeScale))) return;
     const source = from || pick(net.nodes);
     if (!source || !source.edges.length) return;
     const edge = pick(source.edges);
@@ -302,11 +335,7 @@
 
     // ゆっくり降りる走査線
     const scanY = ((ts % NET_SCAN_PERIOD_MS) / NET_SCAN_PERIOD_MS) * net.h;
-    const scan = ctx.createLinearGradient(0, scanY - 60, 0, scanY);
-    scan.addColorStop(0, "rgba(79, 209, 232, 0)");
-    scan.addColorStop(1, "rgba(79, 209, 232, .07)");
-    ctx.fillStyle = scan;
-    ctx.fillRect(0, scanY - 60, net.w, 60);
+    if (net.scanSprite) ctx.drawImage(net.scanSprite, 0, scanY - 60, net.w, 60);
 
     ctx.lineWidth = 1;
     ctx.strokeStyle = "rgba(245, 241, 228, .09)";
@@ -325,14 +354,16 @@
       const y = from.y + (to.y - from.y) * t;
       const x0 = from.x + (to.x - from.x) * t0;
       const y0 = from.y + (to.y - from.y) * t0;
-      const grad = ctx.createLinearGradient(x0, y0, x, y);
-      grad.addColorStop(0, "rgba(79, 209, 232, 0)");
-      grad.addColorStop(1, "rgba(79, 209, 232, .8)");
-      ctx.strokeStyle = grad;
-      ctx.beginPath();
-      ctx.moveTo(x0, y0);
-      ctx.lineTo(x, y);
-      ctx.stroke();
+      const dx = x - x0;
+      const dy = y - y0;
+      const length = Math.hypot(dx, dy);
+      if (net.signalSprite && length > 0) {
+        ctx.save();
+        ctx.translate(x0, y0);
+        ctx.rotate(Math.atan2(dy, dx));
+        ctx.drawImage(net.signalSprite, 0, -4, length, 8);
+        ctx.restore();
+      }
       ctx.fillStyle = "rgba(79, 209, 232, .22)";
       ctx.beginPath();
       ctx.arc(x, y, 4, 0, Math.PI * 2);
@@ -383,6 +414,7 @@
     if (!net.running) return;
     if (!net.last) net.last = ts;
     const elapsed = ts - net.last;
+    net.frameAverage = net.frameAverage * 0.94 + elapsed * 0.06;
     if (isMobile() && elapsed > 0 && elapsed < NET_MOBILE_MIN_DT) { // スマホは描画を間引く（約30fps）
       net.rafId = requestAnimationFrame(frame);
       return;
@@ -394,6 +426,14 @@
     drawNet(ts);
     stats.frames += 1;
     stats.costMs += performance.now() - t0;
+    net.sampleFrames += 1;
+    if (net.sampleFrames >= NET_ADAPT_SAMPLE_FRAMES) {
+      if (net.frameAverage > NET_SLOW_FRAME_MS && net.nodeScale > NET_MIN_NODE_SCALE) {
+        net.nodeScale = Math.max(NET_MIN_NODE_SCALE, net.nodeScale * 0.84);
+        buildNodes();
+      }
+      net.sampleFrames = 0;
+    }
     net.rafId = requestAnimationFrame(frame);
   };
 
@@ -427,46 +467,19 @@
       new IntersectionObserver((entries) => {
         net.inView = entries.some((e) => e.isIntersecting);
         if (net.inView) startNet(); else stopNet();
-      }).observe(hero);
+      }, { rootMargin: "0px", threshold: 0 }).observe(hero);
+    } else {
+      net.inView = true;
+      startNet();
     }
     document.addEventListener("visibilitychange", () => {
       if (document.hidden) stopNet(); else startNet();
     });
-    startNet();
   }
 
   /* ====================================================================
-     3. 稼働ストリップ + readout
+     3. 生成デモ用の共有エンジン状態
      ==================================================================== */
-  const strip = {
-    phase: document.querySelector("#zt-strip-phase"),
-    name: document.querySelector("#zt-strip-name"),
-    pct: document.querySelector("#zt-strip-pct"),
-    tps: document.querySelector("#zt-strip-tps"),
-    agents: document.querySelector("#zt-strip-agents"),
-    lat: document.querySelector("#zt-strip-lat"),
-    ticker: document.querySelector("#zt-strip-ticker")
-  };
-  const readout = document.querySelector("#zt-readout");
-  const readoutLines = [];
-
-  if (strip.ticker) {
-    const text = TICKER_ITEMS.join("   ·   ");
-    strip.ticker.textContent = `${text}   ·   ${text}   ·   `;
-  }
-
-  if (readout) {
-    for (let i = 0; i < 6; i += 1) {
-      const line = el("span", "hero-readout-line");
-      readout.appendChild(line);
-      readoutLines.push(line);
-    }
-  }
-
-  const bar = (fill, len) => "▮".repeat(Math.round(fill * len)) + "▯".repeat(len - Math.round(fill * len));
-  const hexRow = () => Array.from({ length: READOUT_HEX_BYTES }, () => Math.floor(Math.random() * 256).toString(16).toUpperCase().padStart(2, "0")).join(" ");
-
-  let readoutSkip = 0;
   const tickEngine = () => {
     const phase = PHASES[engine.phase] || PHASES.standby;
     engine.tps += (rand(phase.tps) - engine.tps) * TPS_EASE;
@@ -481,26 +494,6 @@
     }
     engine.pct += (engine.pctTarget - engine.pct) * PCT_EASE;
     if (engine.pctTarget === 0) engine.pct = 0;
-    const pct = Math.round(engine.pct);
-
-    if (strip.phase) strip.phase.textContent = engine.phase;
-    if (strip.name) strip.name.textContent = engine.name || "—";
-    if (strip.pct) strip.pct.textContent = `${pct}%`;
-    if (strip.tps) strip.tps.textContent = fmtInt(engine.tps);
-    if (strip.agents) strip.agents.textContent = String(engine.agents);
-    if (strip.lat) strip.lat.textContent = `${Math.round(engine.latency)}ms`;
-
-    if (!readoutLines.length || !net.inView || window.innerWidth < READOUT_MIN_WIDTH) return;
-    readoutSkip = (readoutSkip + 1) % Math.max(1, Math.round(READOUT_MS / ENGINE_TICK_MS));
-    if (readoutSkip !== 0) return;
-    const ctxK = engine.ctx >= 1000 ? `${(engine.ctx / 1000).toFixed(1)}k` : String(Math.round(engine.ctx));
-    const hot = engine.tps / 2600;
-    readoutLines[0].textContent = `engine demo · job ${engine.name} · ${engine.phase} ${pct}%`;
-    readoutLines[1].textContent = `tok    ${fmtInt(engine.tps)}/s   ctx ${ctxK}`;
-    readoutLines[2].textContent = `agent  main ${bar(Math.min(1, hot + 0.2), 6)}  sub·1 ${bar(Math.random() * hot, 4)}  sub·2 ${bar(Math.random() * hot, 4)}`;
-    readoutLines[3].textContent = `lat    ${Math.round(engine.latency)}ms   cache ${Math.random() < 0.85 ? "HIT" : "MISS"}`;
-    readoutLines[4].textContent = `mem    ${hexRow()}`;
-    readoutLines[5].textContent = `check  html ✓  375px ✓  contrast ✓  tel: ✓`;
   };
   tickEngine();
   if (!REDUCED_MOTION) setInterval(tickEngine, ENGINE_TICK_MS);
