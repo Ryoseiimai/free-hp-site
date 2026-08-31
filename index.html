@@ -71,9 +71,6 @@
 
     .ai-build {
       --build-progress: 0;
-      --build-wire: 0;
-      --build-color: 0;
-      --build-copy: 0;
       position: relative;
       height: 300vh;
       min-height: 1800px;
@@ -101,7 +98,7 @@
       inset: 0;
       z-index: -1;
       background:
-        radial-gradient(circle at 76% 48%, rgba(36, 124, 210, calc(.06 + var(--build-color) * .14)), transparent 35%),
+        radial-gradient(circle at 76% 48%, rgba(36, 124, 210, calc(.06 + clamp(0, (var(--build-progress) - .24) / .36, 1) * .14)), transparent 35%),
         linear-gradient(115deg, rgba(5, 10, 24, .96), rgba(4, 7, 16, .98));
     }
     .ai-build-copy { max-width: 520px; }
@@ -193,7 +190,7 @@
       content: "";
       position: absolute;
       inset: 10% 4% -8%;
-      background: rgba(44, 142, 230, calc(.05 + var(--build-color) * .2));
+      background: rgba(44, 142, 230, calc(.05 + clamp(0, (var(--build-progress) - .24) / .36, 1) * .2));
       filter: blur(64px);
       transform: translateZ(-1px);
     }
@@ -201,7 +198,7 @@
       position: relative;
       overflow: hidden;
       min-height: 510px;
-      border: 1px solid rgba(155, 205, 255, calc(.2 + var(--build-wire) * .38));
+      border: 1px solid rgba(155, 205, 255, calc(.2 + clamp(0, var(--build-progress) / .34, 1) * .38));
       border-radius: 16px;
       background: rgba(8, 16, 31, .9);
       box-shadow: 0 36px 90px rgba(0, 0, 0, .52);
@@ -230,7 +227,7 @@
       min-height: 468px;
       padding: clamp(28px, 4.5vw, 58px);
       background:
-        linear-gradient(rgba(45, 83, 67, calc(var(--build-color) * .97)), rgba(45, 83, 67, calc(var(--build-color) * .97))),
+        linear-gradient(rgba(45, 83, 67, calc(clamp(0, (var(--build-progress) - .24) / .36, 1) * .97)), rgba(45, 83, 67, calc(clamp(0, (var(--build-progress) - .24) / .36, 1) * .97))),
         #f5f0e4;
       color: #15271f;
       transition: background-color .2s linear;
@@ -241,7 +238,7 @@
       justify-content: space-between;
       gap: 16px;
       padding-bottom: 20px;
-      border-bottom: 1px solid rgba(235, 244, 238, calc(var(--build-color) * .35));
+      border-bottom: 1px solid rgba(235, 244, 238, calc(clamp(0, (var(--build-progress) - .24) / .36, 1) * .35));
     }
     .build-logo, .build-nav-links, .build-eyebrow, .build-site-title, .build-site-text, .build-site-button, .build-card {
       position: relative;
@@ -260,11 +257,11 @@
       content: "";
       position: absolute;
       inset: 0;
-      border: 1px solid rgba(124, 170, 215, calc(.14 + var(--build-wire) * .7));
+      border: 1px solid rgba(124, 170, 215, calc(.14 + clamp(0, var(--build-progress) / .34, 1) * .7));
       background:
-        linear-gradient(90deg, rgba(90, 149, 205, calc(var(--build-wire) * .13)), transparent 70%);
-      opacity: calc(.18 + var(--build-wire) * .82);
-      transform: scaleX(max(.04, var(--build-wire)));
+        linear-gradient(90deg, rgba(90, 149, 205, calc(clamp(0, var(--build-progress) / .34, 1) * .13)), transparent 70%);
+      opacity: calc(.18 + clamp(0, var(--build-progress) / .34, 1) * .82);
+      transform: scaleX(max(.04, clamp(0, var(--build-progress) / .34, 1)));
       transform-origin: left;
     }
     .build-card:nth-child(2)::before { transition-delay: .05s; }
@@ -272,8 +269,8 @@
     .build-content {
       position: relative;
       z-index: 1;
-      opacity: var(--build-copy);
-      transform: translateY(calc((1 - var(--build-copy)) * 10px));
+      opacity: clamp(0, calc((var(--build-progress) - .58) / .34), 1);
+      transform: translateY(calc((1 - clamp(0, (var(--build-progress) - .58) / .34, 1)) * 10px));
     }
     .build-logo .build-content { color: #fff; font-size: 13px; font-weight: 700; letter-spacing: .08em; }
     .build-nav-links .build-content { color: rgba(255,255,255,.72); font: 9px/1.4 var(--mono); text-align: right; }
@@ -335,7 +332,7 @@
     }
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
-      .ai-build { height: auto; min-height: 0; --build-progress: 1; --build-wire: 1; --build-color: 1; --build-copy: 1; }
+      .ai-build { height: auto; min-height: 0; --build-progress: 1; }
       .ai-build-sticky { position: relative; top: auto; height: auto; min-height: 720px; }
       .build-browser, .build-content, .build-progress-bar { transform: none !important; transition: none !important; }
       .build-progress-bar { width: 100%; }
@@ -417,7 +414,6 @@
       opacity: 1;
       background: radial-gradient(circle at center, transparent 10%, rgba(0,0,0,.14) 62%, rgba(0,0,0,.5));
     }
-    .hero-strip, .hero-readout { display: none !important; }
     .hero-inner {
       position: absolute;
       inset: 0;
@@ -648,19 +644,6 @@
       <canvas class="hero-net" id="zt-hero-net" aria-hidden="true"></canvas>
       <div class="hero-veil" aria-hidden="true"></div>
       <canvas class="immersive-field" id="immersive-field" aria-hidden="true"></canvas>
-      <div class="hero-strip" id="zt-strip" aria-hidden="true">
-        <span class="hero-strip-live"><i class="hero-strip-dot"></i>LIVE</span>
-        <span class="hero-strip-engine">freehp-engine</span>
-        <span class="hero-strip-demo" title="数値は演出用のデモ表示です">DEMO</span>
-        <span class="hero-strip-job"><span class="hero-strip-phase" id="zt-strip-phase">building</span><b id="zt-strip-name">喫茶みなも</b><span class="hero-strip-pct" id="zt-strip-pct">0%</span></span>
-        <span class="hero-strip-meters">
-          <span class="hero-strip-meter"><small>tokens/s</small><b id="zt-strip-tps">—</b></span>
-          <span class="hero-strip-meter"><small>agents</small><b id="zt-strip-agents">—</b></span>
-          <span class="hero-strip-meter"><small>latency</small><b id="zt-strip-lat">—</b></span>
-        </span>
-        <span class="hero-strip-ticker"><span class="hero-strip-ticker-inner" id="zt-strip-ticker"></span></span>
-      </div>
-      <div class="hero-readout" id="zt-readout" aria-hidden="true"></div>
       <div class="hero-inner">
         <h1 class="hero-title" id="hero-title">freehp</h1>
         <p class="immersive-label"><span class="brk">AIが作る、</span><span class="brk">あなたのお店のホームページ</span></p>
@@ -1016,6 +999,8 @@
       </div>
     </section>
 
+    <!-- Q1で差し替え -->
+    <!--
     <section class="gallery" id="examples" aria-labelledby="gallery-title">
       <p class="kicker">EXAMPLES</p>
       <h2 id="gallery-title" class="section-title-lg">つくった見本</h2>
@@ -1047,6 +1032,7 @@
         </figure>
       </div>
     </section>
+    -->
 
     <section class="steps" aria-labelledby="steps-title">
       <p class="kicker">FLOW</p>
@@ -1222,19 +1208,23 @@
     /* 画面に入ると、骨組み→配色→文章の順に自動で組み立てる。 */
     if (build && buildStatus && progress) {
       let buildTimer = 0;
+      let buildPhase = -1;
+      let buildPercent = -1;
       const setBuild = (amount) => {
-        const wire = clamp(amount / .34);
-        const color = clamp((amount - .24) / .36);
-        const copy = clamp((amount - .58) / .34);
         const phase = amount < .34 ? 0 : amount < .68 ? 1 : 2;
+        const percent = Math.round(amount * 100);
         const labels = ["WIREFRAME", "COLOR SYSTEM", "COPYWRITING"];
         build.style.setProperty("--build-progress", amount.toFixed(3));
-        build.style.setProperty("--build-wire", wire.toFixed(3));
-        build.style.setProperty("--build-color", color.toFixed(3));
-        build.style.setProperty("--build-copy", copy.toFixed(3));
-        build.dataset.buildPhase = String(phase);
-        buildStatus.textContent = amount >= 1 ? "COMPLETE" : labels[phase];
-        progress.setAttribute("aria-valuenow", String(Math.round(amount * 100)));
+        if (phase !== buildPhase) {
+          buildPhase = phase;
+          build.dataset.buildPhase = String(phase);
+          buildStatus.textContent = labels[phase];
+        }
+        if (amount >= 1 && buildStatus.textContent !== "COMPLETE") buildStatus.textContent = "COMPLETE";
+        if (percent !== buildPercent) {
+          buildPercent = percent;
+          progress.setAttribute("aria-valuenow", String(percent));
+        }
       };
       const playBuild = () => {
         cancelAnimationFrame(buildTimer);
@@ -1251,7 +1241,7 @@
         new IntersectionObserver(([entry]) => {
           if (entry.isIntersecting) playBuild();
           else cancelAnimationFrame(buildTimer);
-        }, { threshold: .38 }).observe(build);
+        }, { rootMargin: "0px", threshold: 0 }).observe(build);
       } else playBuild();
       reduceMotion.addEventListener("change", playBuild);
     }
@@ -1265,6 +1255,7 @@
     const memory = navigator.deviceMemory || 4;
     const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
     const lowPower = cores <= 4 || memory <= 4 || Boolean(connection && connection.saveData);
+    const particleHues = [332, 348, 18, 45, 176, 204];
     const pointer = { x: .5, y: .42, tx: .5, ty: .42, active: false };
     let width = 1;
     let height = 1;
@@ -1272,12 +1263,45 @@
     let particles = [];
     let frame = 0;
     let running = false;
-    let visible = true;
+    let visible = !("IntersectionObserver" in window);
     let lastTime = 0;
     let frameAverage = 16.7;
     let sampleCount = 0;
     let lastScroll = window.scrollY;
     let scrollEnergy = 0;
+    let fieldGlowSprite = null;
+    const particleGlowSprites = new Map();
+
+    const makeGlowSprite = (size, stops) => {
+      const sprite = document.createElement("canvas");
+      sprite.width = size;
+      sprite.height = size;
+      const spriteCtx = sprite.getContext("2d");
+      if (!spriteCtx) return sprite;
+      const radius = size / 2;
+      const gradient = spriteCtx.createRadialGradient(radius, radius, 0, radius, radius, radius);
+      stops.forEach(([offset, color]) => gradient.addColorStop(offset, color));
+      spriteCtx.fillStyle = gradient;
+      spriteCtx.fillRect(0, 0, size, size);
+      return sprite;
+    };
+    const prepareGlowSprites = () => {
+      if (!fieldGlowSprite) {
+        fieldGlowSprite = makeGlowSprite(512, [
+          [0, "rgba(91, 186, 255, .12)"],
+          [.35, "rgba(64, 126, 255, .055)"],
+          [1, "rgba(20, 54, 112, 0)"]
+        ]);
+      }
+      particleHues.forEach((hue) => {
+        if (particleGlowSprites.has(hue)) return;
+        particleGlowSprites.set(hue, makeGlowSprite(96, [
+          [0, `hsla(${hue}, 100%, 80%, .58)`],
+          [.2, `hsla(${hue}, 94%, 70%, .28)`],
+          [1, `hsla(${hue}, 90%, 60%, 0)`]
+        ]));
+      });
+    };
 
     const desiredCount = () => {
       if (reduceMotion.matches) return Math.min(40, Math.max(24, Math.round(width / 18)));
@@ -1294,7 +1318,7 @@
       depth: .25 + Math.random() * .75,
       phase: Math.random() * Math.PI * 2 + index * .07,
       petals: 4 + Math.floor(Math.random() * 5),
-      hue: [332, 348, 18, 45, 176, 204][index % 6],
+      hue: particleHues[index % particleHues.length],
       bloom: .3 + Math.random() * .55
     });
     const syncParticles = () => {
@@ -1312,6 +1336,7 @@
       canvas.style.width = width + "px";
       canvas.style.height = height + "px";
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      prepareGlowSprites();
       syncParticles();
       if (reduceMotion.matches) draw(performance.now(), true);
     };
@@ -1327,12 +1352,10 @@
       ctx.clearRect(0, 0, width, height);
       const glowX = pointer.x * width;
       const glowY = pointer.y * height;
-      const glow = ctx.createRadialGradient(glowX, glowY, 0, glowX, glowY, Math.max(180, width * .28));
-      glow.addColorStop(0, "rgba(91, 186, 255, .12)");
-      glow.addColorStop(.35, "rgba(64, 126, 255, .055)");
-      glow.addColorStop(1, "rgba(20, 54, 112, 0)");
-      ctx.fillStyle = glow;
-      ctx.fillRect(0, 0, width, height);
+      const fieldGlowRadius = Math.max(180, width * .28);
+      if (fieldGlowSprite) {
+        ctx.drawImage(fieldGlowSprite, glowX - fieldGlowRadius, glowY - fieldGlowRadius, fieldGlowRadius * 2, fieldGlowRadius * 2);
+      }
 
       for (let i = 0; i < particles.length; i += 1) {
         const p = particles[i];
@@ -1363,8 +1386,9 @@
         ctx.translate(p.x, p.y);
         ctx.rotate(p.phase + (still ? 0 : time * .000035 * (i % 2 ? 1 : -1)));
         ctx.globalCompositeOperation = "lighter";
-        ctx.shadowColor = `hsla(${p.hue},90%,70%,.7)`;
-        ctx.shadowBlur = 10 + 13 * p.depth;
+        const glowSprite = particleGlowSprites.get(p.hue);
+        const particleGlowSize = Math.max(12, p.size * (3.2 + p.depth * 2.3) * pulse);
+        if (glowSprite) ctx.drawImage(glowSprite, -particleGlowSize, -particleGlowSize, particleGlowSize * 2, particleGlowSize * 2);
         for (let petal = 0; petal < p.petals; petal += 1) {
           ctx.rotate((Math.PI * 2) / p.petals);
           ctx.beginPath();
@@ -1456,12 +1480,12 @@
       new IntersectionObserver(([entry]) => {
         visible = entry.isIntersecting;
         if (visible) start(); else stop();
-      }, { rootMargin: "120px 0px" }).observe(hero);
+      }, { rootMargin: "0px", threshold: 0 }).observe(hero);
     }
 
     resize();
     if (reduceMotion.matches) draw(performance.now(), true);
-    else start();
+    else if (visible) start();
   })();
   </script>
   <script type="application/ld+json">
