@@ -1363,29 +1363,47 @@ details[open] > summary::after { content: "–"; }
 .made-with-badge a { font-size: 10px; color: var(--paper-faint); text-decoration: none; }
 
 /* ---------- 実例ギャラリー ---------- */
+/* 見本5件。PC(1180px〜)は5枚を1列、タブレットは3枚＋2枚を中央寄せ、スマホは横にめくる列にする
+   （5件を2列・3列の格子に入れると、最後の1枚だけが浮いて見えるため）。
+   サムネはスマホで開いた最初の画面をそのまま縦長で見せる。 */
 .gallery { padding: var(--gap-y) var(--side); max-width: 1320px; margin: 0 auto; }
 .gallery-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 20px;
 }
-@media (max-width: 900px) {
-  .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+.gallery-item { flex: 0 0 calc((100% - 40px) / 3); margin: 0; border: 1px solid var(--paper-hair); overflow: hidden; }
+@media (min-width: 1180px) {
+  .gallery-item { flex-basis: calc((100% - 80px) / 5); }
 }
-@media (max-width: 560px) {
-  .gallery-grid { grid-template-columns: 1fr; }
+@media (max-width: 640px) {
+  .gallery-grid {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    margin: 0 calc(var(--side) * -1);
+    padding: 0 var(--side) 14px;
+    scroll-padding-inline: var(--side);
+  }
+  .gallery-item { flex: 0 0 min(64%, 260px); scroll-snap-align: start; }
 }
-.gallery-item { margin: 0; border: 1px solid var(--paper-hair); overflow: hidden; }
+.gallery-link { display: block; color: inherit; text-decoration: none; }
+.gallery-link:focus-visible { outline: 2px solid var(--yamabuki); outline-offset: -2px; }
 .gallery-item img {
   width: 100%;
   height: auto;
-  aspect-ratio: 780 / 620;
+  aspect-ratio: 780 / 1688;
   object-fit: cover;
   object-position: top;
 }
-.gallery-item figcaption { padding: 12px 14px 16px; display: flex; flex-direction: column; gap: 4px; }
+.gallery-caption { padding: 12px 14px 16px; display: flex; flex-direction: column; gap: 4px; }
 .gallery-name { font-weight: 700; font-size: 14px; }
-.gallery-meta { font-family: var(--mono); font-size: 11px; color: var(--paper-faint); letter-spacing: .02em; }
+.gallery-meta { font-family: var(--mono); font-size: 12px; color: var(--paper-faint); letter-spacing: .02em; }
 
 /* ---------- 3ステップ ---------- */
 .steps { padding: var(--gap-y) var(--side); max-width: 1000px; margin: 0 auto; }
