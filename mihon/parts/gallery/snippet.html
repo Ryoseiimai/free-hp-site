@@ -1,0 +1,40 @@
+<!--
+  部品: 写真ギャラリー（AIホームページ製作所 freehp.jp の見本用）
+  動いている見本と使い方: https://freehp.jp/mihon/parts/#gallery
+  このファイルはカタログから自動で書き出したもの。直すときはカタログ（mihon/parts/index.html）を直して
+  tools/mihon_parts_snippets.py を流し直す。
+  見本（mihon/<slug>/index.html）に差し込むとき:
+    <head> に  <link rel="stylesheet" href="../parts/tokens.css">
+               <link rel="stylesheet" href="../parts/gallery/gallery.css">
+    </body> の前に <script src="../parts/gallery/gallery.js"></script>
+    <body> に data-fhp-tone="aoba" などトーンを付ける（または tokens.css の変数を見本の :root に書く）
+-->
+<div class="fhp fhp-gallery" data-fhp-gallery>
+  <ul class="fhp-gallery-grid">
+    <li><button type="button" class="fhp-gallery-item" data-large="../parts/img/soda-l.jpg" data-caption="いちばん人気のメロンのクリームソーダ。">
+      <img src="../parts/img/soda-s.jpg" width="427" height="640" loading="lazy" decoding="async" alt="木のテーブルに置かれたメロンのクリームソーダ。奥にランプの灯りが見える。"></button></li>
+    <li><button type="button" class="fhp-gallery-item" data-large="../parts/img/soda-ice-l.jpg" data-caption="バニラアイスとさくらんぼをのせています。">
+      <img src="../parts/img/soda-ice-s.jpg" width="450" height="446" loading="lazy" decoding="async" alt="緑のソーダの上に丸いバニラアイスと赤いさくらんぼ。"></button></li>
+    <li><button type="button" class="fhp-gallery-item" data-large="../parts/img/beans-l.jpg" data-caption="店で焼いた豆は、袋に焙煎日を書いてお渡しします。">
+      <img src="../parts/img/beans-s.jpg" width="640" height="427" loading="lazy" decoding="async" alt="クラフト紙の袋に丸いラベルが貼られ、手前にコーヒー豆がこぼれている。"></button></li>
+    <li><button type="button" class="fhp-gallery-item" data-large="../parts/img/soda-lamp-l.jpg" data-caption="夕方からはランプを灯します。">
+      <img src="../parts/img/soda-lamp-s.jpg" width="430" height="461" loading="lazy" decoding="async" alt="暗い木の壁の前で灯る、布の笠のランプ。"></button></li>
+    <li><button type="button" class="fhp-gallery-item" data-large="../parts/img/beans-label-l.jpg" data-caption="ラベルの焙煎度は手書きです。">
+      <img src="../parts/img/beans-label-s.jpg" width="492" height="512" loading="lazy" decoding="async" alt="豆の袋の丸いラベル。産地と焙煎日、手書きの「中深煎り」の文字。"></button></li>
+    <li><button type="button" class="fhp-gallery-item" data-large="../parts/img/room-l.jpg" data-caption="奥の個室は、すりガラスの窓で外から見えません。">
+      <img src="../parts/img/room-s.jpg" width="640" height="427" loading="lazy" decoding="async" alt="すりガラスの窓と壁掛け時計のある、明るい小部屋。手前に施術用のベッド。"></button></li>
+    <li><button type="button" class="fhp-gallery-item" data-large="../parts/img/soda-spoon-l.jpg" data-caption="受け皿とスプーンは開店のころから同じものです。">
+      <img src="../parts/img/soda-spoon-s.jpg" width="640" height="411" loading="lazy" decoding="async" alt="クリームソーダのグラスの足もとに、白い受け皿と銀のスプーン。"></button></li>
+    <li><button type="button" class="fhp-gallery-item" data-large="../parts/img/beans-pile-l.jpg" data-caption="中深煎りの豆。量り売りもしています。">
+      <img src="../parts/img/beans-pile-s.jpg" width="640" height="366" loading="lazy" decoding="async" alt="木の台の上に寄せて置かれた、つやのある焙煎豆。"></button></li>
+    <li><button type="button" class="fhp-gallery-item" data-large="../parts/img/room-window-l.jpg" data-caption="窓は草木の模様のすりガラスです。">
+      <img src="../parts/img/room-window-s.jpg" width="614" height="430" loading="lazy" decoding="async" alt="草木の模様が入ったすりガラスの窓。"></button></li>
+    <li><button type="button" class="fhp-gallery-item" data-large="../parts/img/salon-l.jpg" data-caption="道具はお客さまごとに消毒しています。">
+      <img src="../parts/img/salon-s.jpg" width="640" height="427" loading="lazy" decoding="async" alt="白いタオルの上に置かれた、すきばさみとカットばさみと黒いコーム。"></button></li>
+    <li><button type="button" class="fhp-gallery-item" data-large="../parts/img/room-towel-l.jpg" data-caption="タオルはおひとりずつ取り替えます。">
+      <img src="../parts/img/room-towel-s.jpg" width="522" height="287" loading="lazy" decoding="async" alt="ベッドの上に畳んで重ねた、茶色と白のタオル。"></button></li>
+    <li><button type="button" class="fhp-gallery-item" data-large="../parts/img/salon-scissors-l.jpg" data-caption="よく研いだはさみで、毛先を整えます。">
+      <img src="../parts/img/salon-scissors-s.jpg" width="640" height="355" loading="lazy" decoding="async" alt="タオルの上のカットばさみの刃先。"></button></li>
+  </ul>
+  <p class="fhp-gallery-hint">写真を押すと大きく見られます。</p>
+</div>

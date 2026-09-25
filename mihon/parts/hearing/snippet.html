@@ -1,0 +1,66 @@
+<!--
+  部品: 聞き返し（AIホームページ製作所 freehp.jp の見本用）
+  動いている見本と使い方: https://freehp.jp/mihon/parts/#hearing
+  このファイルはカタログから自動で書き出したもの。直すときはカタログ（mihon/parts/index.html）を直して
+  tools/mihon_parts_snippets.py を流し直す。
+  見本（mihon/<slug>/index.html）に差し込むとき:
+    <head> に  <link rel="stylesheet" href="../parts/tokens.css">
+               <link rel="stylesheet" href="../parts/hearing/hearing.css">
+    </body> の前に <script src="../parts/hearing/hearing.js"></script>
+    <body> に data-fhp-tone="aoba" などトーンを付ける（または tokens.css の変数を見本の :root に書く）
+-->
+<!-- data-catalog は部品の説明ページ（このカタログ）の場所。snippet.html では見本から見た ../parts/ になる -->
+<div class="fhp fhp-hear" data-fhp-hearing data-catalog="../parts/">
+  <form novalidate>
+    <fieldset data-required data-short="お仕事">
+      <legend><span>どんなお仕事ですか</span></legend>
+      <ul class="fhp-hear-options">
+        <li><label class="fhp-hear-option"><input type="radio" name="work" value="food"><span class="fhp-hear-label">飲食店・カフェ</span></label></li>
+        <li><label class="fhp-hear-option"><input type="radio" name="work" value="booking"><span class="fhp-hear-label">美容室・整体など予約制のお店</span></label></li>
+        <li><label class="fhp-hear-option"><input type="radio" name="work" value="shop"><span class="fhp-hear-label">物販・教室・工房</span></label></li>
+        <li><label class="fhp-hear-option"><input type="radio" name="work" value="creator"><span class="fhp-hear-label">声・音楽・作品の活動</span></label></li>
+      </ul>
+    </fieldset>
+    <fieldset data-short="見てほしいもの">
+      <legend><span>ホームページで、いちばん見てほしいものは</span></legend>
+      <p class="fhp-hear-help">当てはまるものをすべて選んでください。</p>
+      <ul class="fhp-hear-options">
+        <li><label class="fhp-hear-option"><input type="checkbox" name="look" value="photos"><span class="fhp-hear-label">写真（料理・店内・作品）</span></label></li>
+        <li><label class="fhp-hear-option"><input type="checkbox" name="look" value="prices"><span class="fhp-hear-label">メニューと料金</span></label></li>
+        <li><label class="fhp-hear-option"><input type="checkbox" name="look" value="place"><span class="fhp-hear-label">場所と行き方</span></label></li>
+        <li><label class="fhp-hear-option"><input type="checkbox" name="look" value="sound"><span class="fhp-hear-label">声や音</span></label></li>
+      </ul>
+    </fieldset>
+    <fieldset data-required data-short="連絡の受け方">
+      <legend><span>お客さんからの連絡は、どう受けたいですか</span></legend>
+      <ul class="fhp-hear-options">
+        <li><label class="fhp-hear-option"><input type="radio" name="contact" value="tel"><span class="fhp-hear-label">電話で受けたい</span></label></li>
+        <li><label class="fhp-hear-option"><input type="radio" name="contact" value="line"><span class="fhp-hear-label">LINEで受けたい</span></label></li>
+        <li><label class="fhp-hear-option"><input type="radio" name="contact" value="reserve"><span class="fhp-hear-label">予約サイトを使っている</span></label></li>
+        <li><label class="fhp-hear-option"><input type="radio" name="contact" value="mail"><span class="fhp-hear-label">メールだけでいい</span></label></li>
+      </ul>
+    </fieldset>
+    <fieldset data-required data-short="更新">
+      <legend><span>お知らせは、よく出しますか</span></legend>
+      <ul class="fhp-hear-options">
+        <li><label class="fhp-hear-option"><input type="radio" name="update" value="often"><span class="fhp-hear-label">よく出したい（休み・新作など）</span></label></li>
+        <li><label class="fhp-hear-option"><input type="radio" name="update" value="rarely"><span class="fhp-hear-label">あまり変えない</span></label></li>
+      </ul>
+    </fieldset>
+    <div class="fhp-hear-actions">
+      <button type="submit" class="fhp-btn">組み合わせを見る</button>
+      <button type="reset" class="fhp-btn fhp-btn--sub">答えを消す</button>
+      <p class="fhp-hear-error" role="alert" hidden></p>
+    </div>
+  </form>
+  <div class="fhp-hear-result" hidden>
+    <h3 class="fhp-hear-result-title">この組み合わせがおすすめです</h3>
+    <ul class="fhp-hear-primary"></ul>
+    <div class="fhp-hear-secondary-wrap">
+      <p class="fhp-hear-secondary-title">あわせて入れると便利</p>
+      <ul class="fhp-hear-secondary"></ul>
+    </div>
+    <p class="fhp-hear-cta"><a class="fhp-btn fhp-hear-mail" href="mailto:info@freehp.jp">この内容でご相談ください</a></p>
+    <p class="fhp-hear-cta-note">メールのアプリが開き、答えと組み合わせが本文に入ります。送るかどうかは、中身を見てから決められます。宛先は info@freehp.jp です。</p>
+  </div>
+</div>

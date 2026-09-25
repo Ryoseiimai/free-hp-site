@@ -1,0 +1,70 @@
+/*
+  音声・ボイスサンプル
+  1曲 = 再生ボタン／題名と説明／波形の棒と時間。再生した分だけ棒が差し色に変わる。
+  波形の上には透明な range を重ねてあり、押した位置から再生できる。
+*/
+.fhp-voice { container-type: inline-size; }
+.fhp-voice-list { margin: 0; padding: 0; list-style: none; }
+.fhp-voice-track {
+  --fhp-voice-progress: 0%;
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr);
+  column-gap: 16px;
+  row-gap: .7rem;
+  padding: 1.2rem 0;
+  border-top: 1px solid var(--fhp-line);
+}
+.fhp-voice-track:last-child { border-bottom: 1px solid var(--fhp-line); }
+.fhp-voice-play {
+  grid-row: span 2;
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  padding: 0;
+  border: 1px solid var(--fhp-accent);
+  border-radius: var(--fhp-radius-s);
+  background: var(--fhp-accent);
+  color: var(--fhp-on-accent);
+  cursor: pointer;
+}
+.fhp-voice-play svg { width: 22px; height: 22px; }
+.fhp-voice-play .is-pause, .fhp-voice-track.is-playing .fhp-voice-play .is-play { display: none; }
+.fhp-voice-track.is-playing .fhp-voice-play .is-pause { display: block; }
+.fhp-voice-head { min-width: 0; }
+.fhp-voice-title { margin: 0; font-family: var(--fhp-display); font-size: 1.15rem; font-weight: 700; line-height: 1.45; }
+.fhp-voice-time { margin: 0; color: var(--fhp-muted); font-size: .92rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.fhp-voice-track.is-playing .fhp-voice-time { color: var(--fhp-fg); }
+.fhp-voice-desc { margin: .15rem 0 0; color: var(--fhp-muted); font-size: .92rem; line-height: 1.7; }
+
+.fhp-voice-row { grid-column: 2; display: flex; align-items: center; gap: 14px; }
+.fhp-voice-wave { position: relative; flex: 1 1 auto; min-width: 0; height: 40px; }
+.fhp-voice-bars {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  pointer-events: none;
+}
+.fhp-voice-bars span { flex: 1 1 0; min-width: 1px; border-radius: 1px; background: var(--fhp-edge); }
+.fhp-voice-bars.is-played { clip-path: inset(0 calc(100% - var(--fhp-voice-progress)) 0 0); }
+.fhp-voice-bars.is-played span { background: var(--fhp-accent); }
+.fhp-voice-seek {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.fhp-voice-wave:has(.fhp-voice-seek:focus-visible) { outline: 2px solid var(--fhp-accent); outline-offset: 4px; }
+.fhp-voice-note { margin: .9rem 0 0; color: var(--fhp-muted); font-size: .88rem; line-height: 1.7; }
+
+/* とても狭い幅（320px の画面など）: ボタンを少し小さくし、題名が途中で折れないようにする */
+@container (max-width: 300px) {
+  .fhp-voice-track { grid-template-columns: 44px minmax(0, 1fr); column-gap: 12px; }
+  .fhp-voice-play { width: 44px; height: 44px; }
+  .fhp-voice-title { font-size: 1rem; }
+}

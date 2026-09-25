@@ -1,0 +1,49 @@
+<!--
+  部品: メニュー・料金表（AIホームページ製作所 freehp.jp の見本用）
+  動いている見本と使い方: https://freehp.jp/mihon/parts/#menu
+  このファイルはカタログから自動で書き出したもの。直すときはカタログ（mihon/parts/index.html）を直して
+  tools/mihon_parts_snippets.py を流し直す。
+  見本（mihon/<slug>/index.html）に差し込むとき:
+    <head> に  <link rel="stylesheet" href="../parts/tokens.css">
+               <link rel="stylesheet" href="../parts/menu/menu.css">
+    </body> の前に <script src="../parts/menu/menu.js"></script>
+    <body> に data-fhp-tone="aoba" などトーンを付ける（または tokens.css の変数を見本の :root に書く）
+-->
+<div class="fhp fhp-menu fhp-menu--photo" data-fhp-menu>
+  <div class="fhp-menu-head">
+    <div class="fhp-menu-tabs" role="tablist" aria-label="メニューの分類">
+      <button type="button" class="fhp-menu-tab" role="tab" id="fhp-menu-tab-drink" aria-controls="fhp-menu-drink" aria-selected="true">飲みもの</button>
+      <button type="button" class="fhp-menu-tab" role="tab" id="fhp-menu-tab-food" aria-controls="fhp-menu-food" aria-selected="false">お食事</button>
+      <button type="button" class="fhp-menu-tab" role="tab" id="fhp-menu-tab-sweet" aria-controls="fhp-menu-sweet" aria-selected="false">甘いもの</button>
+    </div>
+    <p class="fhp-menu-tax">価格はすべて税込です</p>
+  </div>
+  <div class="fhp-menu-panel" role="tabpanel" id="fhp-menu-drink" aria-labelledby="fhp-menu-tab-drink" tabindex="0">
+    <ul class="fhp-menu-list">
+      <li class="fhp-menu-item">
+        <img src="../parts/img/soda-ice-s.jpg" width="450" height="446" loading="lazy" decoding="async" alt="緑のソーダにバニラアイスとさくらんぼをのせたクリームソーダ。">
+        <div class="fhp-menu-body"><p class="fhp-menu-name">クリームソーダ</p><p class="fhp-menu-price">650円</p><p class="fhp-menu-desc">メロン・いちご・ブルーの3色から選べます。</p></div>
+      </li>
+      <li class="fhp-menu-item">
+        <img src="../parts/img/beans-pile-s.jpg" width="640" height="366" loading="lazy" decoding="async" alt="つやのある中深煎りのコーヒー豆。">
+        <div class="fhp-menu-body"><p class="fhp-menu-name">ブレンド珈琲</p><p class="fhp-menu-price">500円</p><p class="fhp-menu-desc">中深煎りの豆を、一杯ずつネルで淹れます。</p></div>
+      </li>
+      <li class="fhp-menu-item"><div class="fhp-menu-body"><p class="fhp-menu-name">紅茶</p><p class="fhp-menu-price">500円</p><p class="fhp-menu-desc">ストレート・レモン・ミルク</p></div></li>
+      <li class="fhp-menu-item"><div class="fhp-menu-body"><p class="fhp-menu-name">カフェオレ</p><p class="fhp-menu-price">600円</p></div></li>
+      <li class="fhp-menu-item"><div class="fhp-menu-body"><p class="fhp-menu-name">オレンジジュース</p><p class="fhp-menu-price">550円</p></div></li>
+    </ul>
+  </div>
+  <div class="fhp-menu-panel" role="tabpanel" id="fhp-menu-food" aria-labelledby="fhp-menu-tab-food" tabindex="0" hidden>
+    <ul class="fhp-menu-list">
+      <li class="fhp-menu-item"><div class="fhp-menu-body"><p class="fhp-menu-name">ナポリタン</p><p class="fhp-menu-price">850円</p><p class="fhp-menu-desc">太めの麺を、ケチャップでしっかり炒めています。</p></div></li>
+      <li class="fhp-menu-item"><div class="fhp-menu-body"><p class="fhp-menu-name">たまごサンド</p><p class="fhp-menu-price">750円</p></div></li>
+      <li class="fhp-menu-item"><div class="fhp-menu-body"><p class="fhp-menu-name">ピザトースト</p><p class="fhp-menu-price">700円</p></div></li>
+    </ul>
+  </div>
+  <div class="fhp-menu-panel" role="tabpanel" id="fhp-menu-sweet" aria-labelledby="fhp-menu-tab-sweet" tabindex="0" hidden>
+    <ul class="fhp-menu-list">
+      <li class="fhp-menu-item"><div class="fhp-menu-body"><p class="fhp-menu-name">厚焼きホットケーキ</p><p class="fhp-menu-price">700円</p><p class="fhp-menu-desc">焼き上がりまで20分ほどいただきます。</p></div></li>
+      <li class="fhp-menu-item"><div class="fhp-menu-body"><p class="fhp-menu-name">固めのプリン</p><p class="fhp-menu-price">450円</p></div></li>
+    </ul>
+  </div>
+</div>

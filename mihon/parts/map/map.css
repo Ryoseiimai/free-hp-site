@@ -1,0 +1,36 @@
+/*
+  地図
+  読み込む前は、枠線と一言だけ（塗り箱にしない）。読み込んだら iframe が枠いっぱいに入る。
+*/
+.fhp-map { container-type: inline-size; }
+.fhp-map-frame {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  max-height: 480px;
+  border: 1px solid var(--fhp-line);
+  border-radius: var(--fhp-radius);
+  overflow: hidden;
+}
+.fhp-map-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.fhp-map-wait {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: .9rem;
+  margin: 0;
+  padding: 1rem;
+  color: var(--fhp-muted);
+  text-align: center;
+}
+.fhp-map-wait[hidden] { display: none; }
+.fhp-map-place { margin: 1rem 0 0; font-weight: 700; line-height: 1.6; }
+.fhp-map-access { margin: .2rem 0 0; color: var(--fhp-muted); line-height: 1.7; }
+.fhp-map-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 1.1rem; }
+
+@container (min-width: 620px) {
+  .fhp-map-frame { aspect-ratio: 16 / 9; }
+  .fhp-map-actions { flex-direction: row; flex-wrap: wrap; }
+}

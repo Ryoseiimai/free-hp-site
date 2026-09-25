@@ -1,0 +1,54 @@
+/*
+  よくある質問
+  <details>/<summary> をそのまま使う（JS なし。キーボード・読み上げ・ページ内検索がはじめから効く）。
+  一度に1つだけ開かせたいときは、同じ組の <details> に同じ name="…" を付ける（対応ブラウザのみ。未対応でも普通に開閉できる）。
+  開閉のアニメーションは ::details-content に対応したブラウザだけ。動きを減らす設定の人には付けない。
+*/
+.fhp-faq { border-top: 1px solid var(--fhp-line); }
+.fhp-faq-item { border-bottom: 1px solid var(--fhp-line); }
+.fhp-faq-item > summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 20px;
+  align-items: center;
+  gap: 16px;
+  min-height: 56px;
+  padding: .85rem 0;
+  font-weight: 700;
+  line-height: 1.6;
+  list-style: none;
+  cursor: pointer;
+}
+.fhp-faq-item > summary::-webkit-details-marker { display: none; }
+.fhp-faq-item > summary:hover .fhp-faq-q { text-decoration: underline; text-underline-offset: .25em; }
+.fhp-faq-item > summary:focus-visible { outline-offset: 2px; }
+/* 開閉の印: 閉じているとき「＋」、開いているとき「－」 */
+.fhp-faq-mark { position: relative; width: 20px; height: 20px; }
+.fhp-faq-mark::before, .fhp-faq-mark::after {
+  content: "";
+  position: absolute;
+  top: 9px;
+  left: 2px;
+  width: 16px;
+  height: 2px;
+  background: var(--fhp-accent);
+}
+.fhp-faq-mark::after { transform: rotate(90deg); }
+.fhp-faq-item[open] .fhp-faq-mark::after { transform: rotate(0deg); }
+.fhp-faq-a { padding: 0 36px 1.1rem 0; color: var(--fhp-fg); line-height: 1.85; }
+.fhp-faq-a p { margin: 0; }
+.fhp-faq-a p + p { margin-top: .6em; }
+.fhp-faq-a .fhp-faq-note { color: var(--fhp-muted); font-size: .92rem; }
+
+@supports selector(::details-content) {
+  .fhp-faq { interpolate-size: allow-keywords; }
+  .fhp-faq-item::details-content {
+    block-size: 0;
+    overflow: clip;
+    transition: block-size .22s ease, content-visibility .22s allow-discrete;
+  }
+  .fhp-faq-item[open]::details-content { block-size: auto; }
+  .fhp-faq-mark::after { transition: transform .22s ease; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fhp-faq-item::details-content, .fhp-faq-mark::after { transition: none !important; }
+}

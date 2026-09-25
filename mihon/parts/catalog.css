@@ -1,0 +1,161 @@
+/*
+  カタログのページそのものの見た目（部品の見た目は tokens.css と各部品の CSS）
+  freehp.jp の紺と白で組み、部品を動かす「舞台」だけを見本のトーンの地にする。
+*/
+:root {
+  --paper: #FFFFFF;
+  --ink: #1E2A44;
+  --sub: #5A6275;
+  --line: #E5E1D8;
+  --edge: #878D9C;
+  --cpad: clamp(20px, 5vw, 64px);
+  --cfont: "Zen Kaku Gothic New", "Hiragino Sans", "Hiragino Kaku Gothic ProN", sans-serif;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-padding-top: 76px; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--cfont);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.85;
+  font-feature-settings: "palt" 1;
+  -webkit-font-smoothing: antialiased;
+}
+img { max-width: 100%; }
+a { color: var(--ink); font-weight: 700; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .3em; }
+a:hover { text-decoration-thickness: 2px; }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+code { font-family: ui-monospace, "SFMono-Regular", Menlo, monospace; font-size: .92em; }
+
+.notice { max-width: 1200px; margin: 0 auto; padding: 14px var(--cpad) 0; color: var(--sub); font-size: 13px; line-height: 1.7; }
+
+.masthead { max-width: 1200px; margin: 0 auto; padding: 36px var(--cpad) 32px; }
+.masthead h1 { margin: 0; font-size: clamp(2.1rem, 7.5vw, 3.6rem); font-weight: 900; line-height: 1.25; letter-spacing: .02em; }
+.lead { max-width: 36em; margin: 1rem 0 0; color: var(--sub); font-size: 1.05rem; }
+
+/* トーンの切り替え。画面の上に貼りついて、どこからでも替えられる */
+.tonebar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  background: var(--paper);
+}
+.tonebar-inner { display: flex; align-items: center; gap: 8px 18px; max-width: 1200px; margin: 0 auto; padding: 8px var(--cpad); }
+.tonebar-label { margin: 0; font-size: .92rem; font-weight: 700; white-space: nowrap; }
+.tonebar-options { display: flex; flex-wrap: wrap; gap: 6px; }
+.tone { position: relative; display: inline-flex; cursor: pointer; }
+.tone input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+.tone > span {
+  display: inline-flex;
+  align-items: center;
+  gap: .5em;
+  min-height: 44px;
+  padding: .3rem .85rem .3rem .6rem;
+  border: 1px solid var(--edge);
+  font-size: .92rem;
+  font-weight: 700;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+.tone > span::before {
+  content: "";
+  flex: none;
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--sub);
+  border-right: 9px solid var(--swatch-accent);
+  background: var(--swatch-bg);
+}
+.tone:has(input[value="aoba"]) { --swatch-bg: #221812; --swatch-accent: #E4B96A; }
+.tone:has(input[value="genkido"]) { --swatch-bg: #FFFFFF; --swatch-accent: #1B6B44; }
+.tone:has(input[value="soramame"]) { --swatch-bg: #FFFFFF; --swatch-accent: #7A5230; }
+.tone small { color: var(--sub); font-size: .8rem; font-weight: 500; }
+.tone:hover > span { border-color: var(--sub); }
+.tone input:checked + span { padding: calc(.3rem - 1px) calc(.85rem - 1px) calc(.3rem - 1px) calc(.6rem - 1px); border: 2px solid var(--ink); }
+.tone input:focus-visible + span { outline: 2px solid var(--ink); outline-offset: 3px; }
+
+main { max-width: 1200px; margin: 0 auto; padding: 0 var(--cpad); }
+
+/* 要望から選ぶ（早見表） */
+.quick { padding-top: 48px; }
+.quick h2, .part h2 { margin: 0; }
+.quick h2 { font-size: 1.3rem; font-weight: 900; line-height: 1.4; }
+.quick-list { display: grid; margin: 1rem 0 0; padding: 0; list-style: none; border-top: 1px solid var(--line); }
+.quick-list li { border-bottom: 1px solid var(--line); }
+.quick-list a { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0 1rem; padding: .8rem 0; text-decoration: none; }
+.quick-list a:hover .quick-q { text-decoration: underline; text-underline-offset: .3em; }
+.quick-q { font-size: 1.08rem; font-weight: 700; }
+.quick-part { color: var(--sub); font-size: .92rem; font-weight: 500; }
+
+/* 部品1つぶん: 左に要望と使い方、右に実物 */
+.part { display: grid; gap: 24px; padding-top: 88px; }
+.part-q, .quick-q { text-indent: -.3em; }
+.part-q { display: block; font-size: clamp(1.4rem, 4.4vw, 1.8rem); font-weight: 900; line-height: 1.45; }
+.part-name { display: block; margin-top: .45rem; color: var(--sub); font-size: 1rem; font-weight: 700; line-height: 1.5; }
+.part-use { margin: .9rem 0 0; }
+.part-spec { display: grid; grid-template-columns: 5em minmax(0, 1fr); gap: .45rem 1rem; margin: 1.1rem 0 0; font-size: .92rem; line-height: 1.7; }
+.part-spec dt { color: var(--sub); font-weight: 700; }
+.part-spec dd { margin: 0; }
+
+.demo-ctl { margin: 1.4rem 0 0; padding: 0; border: 0; min-width: 0; }
+.demo-ctl legend { padding: 0; font-size: .92rem; font-weight: 700; }
+.demo-ctl label {
+  display: inline-flex;
+  align-items: center;
+  gap: .45em;
+  min-height: 44px;
+  margin: .35rem .35rem 0 0;
+  padding: 0 .8rem 0 .6rem;
+  border: 1px solid var(--edge);
+  font-size: .92rem;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.demo-ctl label:has(input:checked) { border-color: var(--ink); font-weight: 700; }
+.demo-ctl input { width: 18px; height: 18px; margin: 0; accent-color: var(--ink); }
+
+/* 舞台: 見本のトーンの地で部品を動かす */
+.stage {
+  min-width: 0;
+  padding: clamp(20px, 4vw, 44px);
+  border: 1px solid var(--line);
+  background: var(--fhp-bg);
+  color: var(--fhp-fg);
+  font-family: var(--fhp-body);
+  line-height: 1.8;
+}
+.stage-note, .stage-msg { margin: 1.4rem 0 0; color: var(--fhp-muted); font-size: .88rem; line-height: 1.7; }
+.stage-msg:empty { display: none; }
+.stage-msg { color: var(--fhp-fg); font-weight: 700; }
+
+.credit { max-width: 1200px; margin: 96px auto 0; padding: 0 var(--cpad) 56px; color: var(--sub); font-size: 13px; line-height: 1.8; }
+.credit p { margin: 0; padding-top: 22px; border-top: 1px solid var(--line); }
+
+@media (max-width: 599px) {
+  .tonebar-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .tone small, .tone .tone-long { display: none; }
+  .tone > span { padding-right: .7rem; }
+  .tone input:checked + span { padding-right: calc(.7rem - 1px); }
+}
+@media (max-width: 359px) {
+  .tonebar-options { gap: 4px; }
+  .tone > span { gap: .3em; padding-left: .4rem; padding-right: .45rem; font-size: .86rem; }
+  .tone > span::before { width: 14px; height: 14px; border-right-width: 7px; }
+  .tone input:checked + span { padding-left: calc(.4rem - 1px); padding-right: calc(.45rem - 1px); }
+}
+@media (min-width: 768px) {
+  .quick-list { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 40px; }
+}
+@media (min-width: 1024px) {
+  .part { grid-template-columns: 330px minmax(0, 1fr); column-gap: 56px; align-items: start; }
+  .part-info { position: sticky; top: 84px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}

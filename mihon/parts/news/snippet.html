@@ -1,0 +1,41 @@
+<!--
+  部品: お知らせ（AIホームページ製作所 freehp.jp の見本用）
+  動いている見本と使い方: https://freehp.jp/mihon/parts/#news
+  このファイルはカタログから自動で書き出したもの。直すときはカタログ（mihon/parts/index.html）を直して
+  tools/mihon_parts_snippets.py を流し直す。
+  見本（mihon/<slug>/index.html）に差し込むとき:
+    <head> に  <link rel="stylesheet" href="../parts/tokens.css">
+               <link rel="stylesheet" href="../parts/news/news.css">
+    </body> の前に <script src="../parts/news/news.js"></script>
+    <body> に data-fhp-tone="aoba" などトーンを付ける（または tokens.css の変数を見本の :root に書く）
+-->
+<div class="fhp fhp-news" data-fhp-news data-new-days="14" data-show="4">
+  <ol class="fhp-news-list">
+    <li class="fhp-news-item">
+      <p class="fhp-news-meta"><time datetime="2026-09-23">2026年9月23日</time><span class="fhp-news-kind">新しいメニュー</span></p>
+      <p class="fhp-news-title">秋のクリームソーダ「ぶどう」を始めました</p>
+      <p class="fhp-news-body">巨峰のシロップで作る、紫のクリームソーダです。</p>
+    </li>
+    <li class="fhp-news-item">
+      <p class="fhp-news-meta"><time datetime="2026-09-16">2026年9月16日</time><span class="fhp-news-kind">お休み</span></p>
+      <p class="fhp-news-title">店内の点検のため、臨時でお休みをいただきます</p>
+    </li>
+    <li class="fhp-news-item">
+      <p class="fhp-news-meta"><time datetime="2026-09-01">2026年9月1日</time><span class="fhp-news-kind">お知らせ</span></p>
+      <p class="fhp-news-title">モーニングを11時まで延ばしました</p>
+    </li>
+    <li class="fhp-news-item">
+      <p class="fhp-news-meta"><time datetime="2026-08-04">2026年8月4日</time><span class="fhp-news-kind">お知らせ</span></p>
+      <p class="fhp-news-title">コーヒー豆の量り売りを始めました</p>
+    </li>
+    <li class="fhp-news-item">
+      <p class="fhp-news-meta"><time datetime="2026-07-07">2026年7月7日</time><span class="fhp-news-kind">お知らせ</span></p>
+      <p class="fhp-news-title">店内を全席禁煙にしました</p>
+    </li>
+    <li class="fhp-news-item">
+      <p class="fhp-news-meta"><time datetime="2026-05-18">2026年5月18日</time><span class="fhp-news-kind">お知らせ</span></p>
+      <p class="fhp-news-title">ホームページを新しくしました</p>
+    </li>
+  </ol>
+  <button type="button" class="fhp-btn fhp-btn--sub fhp-news-more" hidden>過去のお知らせを見る</button>
+</div>

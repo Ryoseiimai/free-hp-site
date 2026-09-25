@@ -1,0 +1,57 @@
+/*
+  聞き返し
+  1問ずつ枠で囲まず、問いの文字の大きさと余白で区切る。選択肢は押しやすい大きさの札（ラベル全体が押せる）。
+  提案は「まず入れる部品」2つを大きく、残りを文字だけで軽く並べる。
+*/
+.fhp-hear { container-type: inline-size; }
+.fhp-hear form { margin: 0; }
+.fhp-hear fieldset { margin: 0 0 1.8rem; padding: 0; border: 0; min-width: 0; }
+.fhp-hear legend { padding: 0; font-family: var(--fhp-display); font-size: 1.15rem; font-weight: 700; line-height: 1.5; }
+/* 答えていない問い: 左に差し色の線と「選んでください」 */
+.fhp-hear fieldset.is-missing { padding-left: 14px; border-left: 3px solid var(--fhp-accent); }
+.fhp-hear fieldset.is-missing legend::after { content: "　選んでください"; color: var(--fhp-accent); font-family: var(--fhp-body); font-size: .88rem; }
+.fhp-hear-help { margin: .15rem 0 0; color: var(--fhp-muted); font-size: .9rem; }
+.fhp-hear-options { display: grid; gap: 8px; margin: .8rem 0 0; padding: 0; list-style: none; }
+.fhp-hear-option {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  min-height: 52px;
+  padding: .6rem 1rem;
+  border: 1px solid var(--fhp-edge);
+  border-radius: var(--fhp-radius-s);
+  line-height: 1.5;
+  cursor: pointer;
+}
+.fhp-hear-option:hover { border-color: var(--fhp-fg); }
+.fhp-hear-option:has(input:checked) { padding: calc(.6rem - 1px) calc(1rem - 1px); border: 2px solid var(--fhp-accent); font-weight: 700; }
+.fhp-hear-option:has(input:focus-visible) { outline: 2px solid var(--fhp-accent); outline-offset: 2px; }
+.fhp-hear-option input { width: 20px; height: 20px; margin: 0; accent-color: var(--fhp-accent); }
+.fhp-hear-option input:focus-visible { outline: none; }
+.fhp-hear-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }
+.fhp-hear-error { flex-basis: 100%; margin: 0; color: var(--fhp-fg); font-weight: 700; }
+.fhp-hear-error::before { content: "！"; margin-right: .3em; color: var(--fhp-accent); }
+.fhp-hear-error[hidden] { display: none; }
+
+.fhp-hear-result { margin-top: 2.2rem; padding-top: 1.6rem; border-top: 2px solid var(--fhp-fg); }
+.fhp-hear-result[hidden] { display: none; }
+.fhp-hear-result-title { margin: 0; font-family: var(--fhp-display); font-size: 1.4rem; font-weight: 700; line-height: 1.45; }
+.fhp-hear-result-title:focus { outline: none; }
+.fhp-hear-result-title:focus-visible { outline: 2px solid var(--fhp-accent); outline-offset: 4px; }
+.fhp-hear-primary, .fhp-hear-secondary { margin: 0; padding: 0; list-style: none; }
+.fhp-hear-primary { display: grid; gap: 1.2rem; margin-top: 1.1rem; }
+.fhp-hear-pick p { margin: 0; }
+.fhp-hear-pick-name a { color: var(--fhp-fg); font-weight: 700; text-decoration-color: var(--fhp-accent); text-decoration-thickness: 2px; text-underline-offset: .3em; }
+.fhp-hear-pick.is-primary .fhp-hear-pick-name { font-family: var(--fhp-display); font-size: 1.3rem; line-height: 1.5; }
+.fhp-hear-pick-reason { margin-top: .2rem !important; color: var(--fhp-muted); line-height: 1.75; }
+.fhp-hear-secondary-title { margin: 1.8rem 0 0; font-weight: 700; }
+.fhp-hear-secondary .fhp-hear-pick { padding: .7rem 0; border-bottom: 1px solid var(--fhp-line); }
+.fhp-hear-secondary .fhp-hear-pick-reason { font-size: .92rem; }
+.fhp-hear-cta { margin: 1.8rem 0 0; }
+.fhp-hear-cta-note { margin: .6rem 0 0; color: var(--fhp-muted); font-size: .88rem; line-height: 1.7; }
+
+@container (min-width: 520px) {
+  .fhp-hear-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .fhp-hear-primary { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 2rem; }
+}

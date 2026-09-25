@@ -1,0 +1,73 @@
+<!--
+  部品: 音声・ボイスサンプル（AIホームページ製作所 freehp.jp の見本用）
+  動いている見本と使い方: https://freehp.jp/mihon/parts/#voice
+  このファイルはカタログから自動で書き出したもの。直すときはカタログ（mihon/parts/index.html）を直して
+  tools/mihon_parts_snippets.py を流し直す。
+  見本（mihon/<slug>/index.html）に差し込むとき:
+    <head> に  <link rel="stylesheet" href="../parts/tokens.css">
+               <link rel="stylesheet" href="../parts/voice/voice.css">
+    </body> の前に <script src="../parts/voice/voice.js"></script>
+    <body> に data-fhp-tone="aoba" などトーンを付ける（または tokens.css の変数を見本の :root に書く）
+-->
+<div class="fhp fhp-voice" data-fhp-voice>
+  <ul class="fhp-voice-list">
+    <li class="fhp-voice-track" data-duration="3.1" data-peaks="0.96,0.99,0.88,0.77,0.58,0.4,0.26,0.14,0.05,0.94,0.99,0.88,0.77,0.58,0.41,0.26,0.14,0.05,0.92,1.0,0.89,0.77,0.6,0.41,0.27,0.15,0.05,0.9,1.0,0.88,0.79,0.69,0.62,0.55,0.48,0.43,0.38,0.34,0.3,0.26,0.23,0.21,0.18,0.16,0.14,0.12,0.1,0.08,0.06,0.05,0.04,0.03,0.02,0.01,0.01,0.0">
+      <button type="button" class="fhp-voice-play" aria-label="再生: 自己紹介ボイス">
+        <svg class="is-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z" fill="currentColor"/></svg>
+        <svg class="is-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 4.5h4v15h-4zM13.5 4.5h4v15h-4z" fill="currentColor"/></svg>
+      </button>
+      <div class="fhp-voice-head">
+        <p class="fhp-voice-title">自己紹介ボイス</p>
+        <p class="fhp-voice-desc">はじめましての方へ。短い自己紹介です。</p>
+      </div>
+      <div class="fhp-voice-row">
+        <div class="fhp-voice-wave">
+          <div class="fhp-voice-bars" aria-hidden="true"></div>
+          <div class="fhp-voice-bars is-played" aria-hidden="true"></div>
+          <input class="fhp-voice-seek" type="range" min="0" max="1000" step="10" value="0" aria-label="再生位置: 自己紹介ボイス">
+        </div>
+        <p class="fhp-voice-time"><span class="fhp-voice-cur">0:00</span> / <span class="fhp-voice-dur">0:03</span></p>
+      </div>
+      <audio preload="metadata" src="../parts/voice/intro.mp3"></audio>
+    </li>
+    <li class="fhp-voice-track" data-duration="6.0" data-peaks="0.05,0.15,0.25,0.41,0.58,0.69,0.88,0.83,0.86,0.93,0.78,0.67,0.62,0.61,0.42,0.33,0.28,0.17,0.11,0.1,0.12,0.13,0.19,0.25,0.33,0.44,0.49,0.6,0.68,0.8,0.95,1.0,0.88,0.94,0.93,0.87,0.85,0.82,0.67,0.6,0.44,0.35,0.29,0.24,0.16,0.1,0.08,0.1,0.09,0.12,0.13,0.13,0.13,0.12,0.08,0.04">
+      <button type="button" class="fhp-voice-play" aria-label="再生: シチュエーションボイス">
+        <svg class="is-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z" fill="currentColor"/></svg>
+        <svg class="is-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 4.5h4v15h-4zM13.5 4.5h4v15h-4z" fill="currentColor"/></svg>
+      </button>
+      <div class="fhp-voice-head">
+        <p class="fhp-voice-title">シチュエーションボイス</p>
+        <p class="fhp-voice-desc">雨の日の帰り道、という設定の一場面です。</p>
+      </div>
+      <div class="fhp-voice-row">
+        <div class="fhp-voice-wave">
+          <div class="fhp-voice-bars" aria-hidden="true"></div>
+          <div class="fhp-voice-bars is-played" aria-hidden="true"></div>
+          <input class="fhp-voice-seek" type="range" min="0" max="1000" step="10" value="0" aria-label="再生位置: シチュエーションボイス">
+        </div>
+        <p class="fhp-voice-time"><span class="fhp-voice-cur">0:00</span> / <span class="fhp-voice-dur">0:06</span></p>
+      </div>
+      <audio preload="metadata" src="../parts/voice/scene.mp3"></audio>
+    </li>
+    <li class="fhp-voice-track" data-duration="6.4" data-peaks="1.0,0.78,0.33,0.7,0.95,0.55,0.17,1.0,0.84,0.65,0.43,0.24,0.11,0.04,1.0,0.78,0.34,0.7,0.95,0.55,0.17,1.0,0.84,0.65,0.43,0.24,0.11,0.03,1.0,0.78,0.34,0.7,0.95,0.55,0.17,1.0,0.78,0.33,0.7,0.95,0.55,0.17,1.0,0.84,0.65,0.51,0.4,0.31,0.24,0.19,0.14,0.1,0.06,0.03,0.02,0.0">
+      <button type="button" class="fhp-voice-play" aria-label="再生: 歌ってみた（抜粋）">
+        <svg class="is-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z" fill="currentColor"/></svg>
+        <svg class="is-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 4.5h4v15h-4zM13.5 4.5h4v15h-4z" fill="currentColor"/></svg>
+      </button>
+      <div class="fhp-voice-head">
+        <p class="fhp-voice-title">歌ってみた（抜粋）</p>
+        <p class="fhp-voice-desc">サビの部分だけを抜き出しています。</p>
+      </div>
+      <div class="fhp-voice-row">
+        <div class="fhp-voice-wave">
+          <div class="fhp-voice-bars" aria-hidden="true"></div>
+          <div class="fhp-voice-bars is-played" aria-hidden="true"></div>
+          <input class="fhp-voice-seek" type="range" min="0" max="1000" step="10" value="0" aria-label="再生位置: 歌ってみた（抜粋）">
+        </div>
+        <p class="fhp-voice-time"><span class="fhp-voice-cur">0:00</span> / <span class="fhp-voice-dur">0:06</span></p>
+      </div>
+      <audio preload="metadata" src="../parts/voice/song.mp3"></audio>
+    </li>
+  </ul>
+  <p class="fhp-voice-note">見本のため、声の代わりに合成した音を入れています。</p>
+</div>

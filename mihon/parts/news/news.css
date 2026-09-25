@@ -1,0 +1,34 @@
+/*
+  お知らせ
+  日付（数字をそろえる）と種類を1行目に、題名を2行目に。広い幅では日付を左の列に出す。
+  「新着」は色だけに頼らず文字で出す。
+*/
+.fhp-news { container-type: inline-size; }
+.fhp-news-list { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--fhp-line); }
+.fhp-news-item { display: grid; gap: .2rem; padding: 1rem 0; border-bottom: 1px solid var(--fhp-line); }
+.fhp-news-item:focus { outline: none; }
+.fhp-news-item:focus-visible { outline: 2px solid var(--fhp-accent); outline-offset: 2px; }
+.fhp-news-meta { display: flex; flex-wrap: wrap; align-items: center; gap: .3rem .8rem; margin: 0; color: var(--fhp-muted); font-size: .9rem; }
+.fhp-news-meta time { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.fhp-news-kind { white-space: nowrap; }
+.fhp-news-new {
+  padding: 0 .55em;
+  border: 1px solid var(--fhp-accent);
+  border-radius: var(--fhp-radius-s);
+  color: var(--fhp-fg);
+  font-size: .82rem;
+  font-weight: 700;
+  line-height: 1.7;
+  white-space: nowrap;
+}
+.fhp-news-title { margin: 0; font-family: var(--fhp-display); font-size: 1.08rem; font-weight: 700; line-height: 1.6; }
+.fhp-news-title a { color: inherit; text-decoration: underline; text-decoration-color: var(--fhp-edge); text-underline-offset: .28em; }
+.fhp-news-title a:hover { text-decoration-color: currentColor; }
+.fhp-news-body { margin: .15rem 0 0; color: var(--fhp-muted); font-size: .94rem; line-height: 1.75; }
+.fhp-news-more { margin-top: 1.1rem; }
+
+@container (min-width: 600px) {
+  .fhp-news-item { grid-template-columns: 11.5rem minmax(0, 1fr); column-gap: 1.5rem; }
+  .fhp-news-meta { grid-row: span 2; align-content: start; align-self: start; padding-top: .2rem; }
+  .fhp-news-title, .fhp-news-body { grid-column: 2; }
+}

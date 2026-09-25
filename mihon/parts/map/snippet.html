@@ -1,0 +1,22 @@
+<!--
+  部品: 地図（AIホームページ製作所 freehp.jp の見本用）
+  動いている見本と使い方: https://freehp.jp/mihon/parts/#map
+  このファイルはカタログから自動で書き出したもの。直すときはカタログ（mihon/parts/index.html）を直して
+  tools/mihon_parts_snippets.py を流し直す。
+  見本（mihon/<slug>/index.html）に差し込むとき:
+    <head> に  <link rel="stylesheet" href="../parts/tokens.css">
+               <link rel="stylesheet" href="../parts/map/map.css">
+    </body> の前に <script src="../parts/map/map.js"></script>
+    <body> に data-fhp-tone="aoba" などトーンを付ける（または tokens.css の変数を見本の :root に書く）
+-->
+<div class="fhp fhp-map" data-fhp-map data-query="東京駅" data-title="純喫茶 あおばの地図（見本のため東京駅を表示）">
+  <div class="fhp-map-frame">
+    <p class="fhp-map-wait">地図はこの場所まで来たら読み込みます。<button type="button" class="fhp-btn fhp-btn--sub fhp-map-now">今すぐ地図を表示</button></p>
+  </div>
+  <p class="fhp-map-place">純喫茶 あおば（架空のお店）</p>
+  <p class="fhp-map-access">見本のため、地図は東京駅を指しています。</p>
+  <div class="fhp-map-actions">
+    <a class="fhp-btn" href="https://www.google.com/maps/search/?api=1&amp;query=%E6%9D%B1%E4%BA%AC%E9%A7%85" target="_blank" rel="noopener">地図アプリで開く</a>
+    <a class="fhp-btn fhp-btn--sub" href="https://www.google.com/maps/dir/?api=1&amp;destination=%E6%9D%B1%E4%BA%AC%E9%A7%85" target="_blank" rel="noopener">ここまでの道順を調べる</a>
+  </div>
+</div>

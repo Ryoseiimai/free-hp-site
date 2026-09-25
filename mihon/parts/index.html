@@ -1,0 +1,585 @@
+<!doctype html>
+<!--
+  見本に差し込む部品（カタログ）
+  ============================================================
+  ■ このページの役割
+    見込み客の要望（「写真をたくさん見せたい」「LINEで予約を受けたい」など）を聞いたら、
+    ここから合う部品を選んで、見本（mihon/<slug>/）にそのまま差し込む。全部品をこのページで実際に動かしている。
+
+  ■ 部品の差し込み方（どの部品も同じ）
+    1. tokens.css と、部品のフォルダの ○○.css を <head> で読み込む
+    2. 部品のフォルダの snippet.html の中身を、見本の入れたい場所に貼る（文言・写真・リンク先を差し替える）
+    3. 部品のフォルダの ○○.js を </body> の直前で読み込む（よくある質問だけは JS なし）
+    4. 見本の <body> に data-fhp-tone="aoba" のようにトーンを付けるか、tokens.css の変数を見本の :root に書く
+    snippet.html は tools/mihon_parts_snippets.py が、このページの「part:名前」の印の間から書き出す。
+    直すときはこのページを直してから、スクリプトを流し直す。
+
+  ■ カタログの見た目（トークン）
+    --paper #FFFFFF  地
+    --ink   #1E2A44  文字（14.3:1）。freehp.jp の紺
+    --sub   #5A6275  補助の文字（6.1:1）
+    --line  #E5E1D8  区切り線
+    --edge  #878D9C  押せる札の枠（3.3:1。WCAG 1.4.11）
+    書体 = Zen Kaku Gothic New（freehp.jp と同じ）
+  ■ signature
+    各部品の見出しを「お客さんの一言」にする。部品の名前より先に、どんな要望で使うかが目に入る。
+    部品そのものは、見本のトーン（あおば／元気堂／そらまめ）の地の上で動かす。
+  ■ 自己批評
+    - 最初の案は部品名を見出しにしたカード一覧だった。SaaS のカード見本帳（定番ルック④）に寄るのでやめ、
+      左に要望と使い方、右に実物の2段組みにして、カードの枠は実物の舞台（トーンの地）だけにした。
+    - 早見表に番号を振る案はやめた（順序のない一覧なので）。
+-->
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>見本に差し込む部品（架空のお店の見本）</title>
+<meta name="description" content="AIホームページ製作所（freehp.jp）が、架空のお店の見本に差し込むために作った部品の一覧です。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kaisei+Decol:wght@700&amp;family=Zen+Kaku+Gothic+Antique:wght@400;500;700&amp;family=Zen+Kaku+Gothic+New:wght@400;500;700;900&amp;family=Zen+Old+Mincho:wght@700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="gallery/gallery.css">
+<link rel="stylesheet" href="contact/contact.css">
+<link rel="stylesheet" href="map/map.css">
+<link rel="stylesheet" href="menu/menu.css">
+<link rel="stylesheet" href="voice/voice.css">
+<link rel="stylesheet" href="faq/faq.css">
+<link rel="stylesheet" href="news/news.css">
+<link rel="stylesheet" href="hearing/hearing.css">
+<link rel="stylesheet" href="catalog.css">
+</head>
+<body>
+<p class="notice">これはAIホームページ製作所（freehp.jp）が見本づくりのために作った部品の一覧です。中に出てくるお店・電話番号・予約先はすべて架空です。</p>
+
+<header class="masthead">
+  <h1>見本に差し込む部品</h1>
+  <p class="lead">お客さんの一言を聞いたら、合う部品を選んで見本にそのまま差し込めます。どれも外部のライブラリを使わず、HTML・CSS・JSのまとまりだけで動きます。迷ったら、いちばん下の<a href="#hearing">聞き返し</a>から。</p>
+</header>
+
+<div class="tonebar" role="group" aria-labelledby="tone-label">
+  <div class="tonebar-inner">
+    <p class="tonebar-label" id="tone-label">見本のトーン</p>
+    <div class="tonebar-options">
+      <label class="tone"><input type="radio" name="tone" value="aoba" checked><span><b class="tone-name"><span class="tone-long">純喫茶&nbsp;</span>あおば</b><small>暗い木地</small></span></label>
+      <label class="tone"><input type="radio" name="tone" value="genkido"><span><b class="tone-name"><span class="tone-long">からだ</span>元気堂</b><small>白地・角丸</small></span></label>
+      <label class="tone"><input type="radio" name="tone" value="soramame"><span><b class="tone-name">そらまめ<span class="tone-long">焙煎所</span></b><small>白地・明朝</small></span></label>
+    </div>
+  </div>
+</div>
+
+<main>
+  <section class="quick" aria-labelledby="quick-title">
+    <h2 id="quick-title">要望から選ぶ</h2>
+    <ul class="quick-list">
+      <li><a href="#gallery"><span class="quick-q">「写真をたくさん見せたい」</span><span class="quick-part">写真ギャラリー</span></a></li>
+      <li><a href="#contact"><span class="quick-q">「電話やLINEで予約を受けたい」</span><span class="quick-part">予約・問い合わせ</span></a></li>
+      <li><a href="#map"><span class="quick-q">「場所が分かりにくいと言われる」</span><span class="quick-part">地図</span></a></li>
+      <li><a href="#menu"><span class="quick-q">「メニューと料金を載せたい」</span><span class="quick-part">メニュー・料金表</span></a></li>
+      <li><a href="#voice"><span class="quick-q">「ボイスサンプルを聞けるようにしたい」</span><span class="quick-part">音声・ボイスサンプル</span></a></li>
+      <li><a href="#faq"><span class="quick-q">「同じ質問を何度もされる」</span><span class="quick-part">よくある質問</span></a></li>
+      <li><a href="#news"><span class="quick-q">「休みや新作を知らせたい」</span><span class="quick-part">お知らせ</span></a></li>
+      <li><a href="#hearing"><span class="quick-q">「何を載せればいいか分からない」</span><span class="quick-part">聞き返し</span></a></li>
+    </ul>
+  </section>
+
+  <!-- ============ 1. 写真ギャラリー ============ -->
+  <section class="part" id="gallery" aria-labelledby="gallery-title">
+    <div class="part-info">
+      <h2 id="gallery-title"><span class="part-q">「写真をたくさん見せたい」</span><span class="part-name">写真ギャラリー</span></h2>
+      <p class="part-use">料理・店内・施術例・作品など、写真が多いお店に。1枚目を大きく見せ、押すと画面いっぱいに拡大します。</p>
+      <dl class="part-spec">
+        <dt>操作</dt><dd>押して拡大。左右の矢印キーで送り、Escで閉じる。スマホは左右にスワイプ</dd>
+        <dt>枚数</dt><dd>3〜12枚。枚数に合わせて並びが変わり、最後の行に穴が空かない</dd>
+        <dt>ファイル</dt><dd><code>gallery/</code> snippet.html・gallery.css・gallery.js</dd>
+      </dl>
+      <fieldset class="demo-ctl">
+        <legend><span>枚数を変えて試す</span></legend>
+        <label><input type="radio" name="gallery-count" value="3">3枚</label>
+        <label><input type="radio" name="gallery-count" value="5">5枚</label>
+        <label><input type="radio" name="gallery-count" value="8" checked>8枚</label>
+        <label><input type="radio" name="gallery-count" value="12">12枚</label>
+      </fieldset>
+    </div>
+    <div class="stage" data-fhp-tone="aoba">
+<!-- part:gallery -->
+<div class="fhp fhp-gallery" data-fhp-gallery>
+  <ul class="fhp-gallery-grid">
+    <li><button type="button" class="fhp-gallery-item" data-large="img/soda-l.jpg" data-caption="いちばん人気のメロンのクリームソーダ。">
+      <img src="img/soda-s.jpg" width="427" height="640" loading="lazy" decoding="async" alt="木のテーブルに置かれたメロンのクリームソーダ。奥にランプの灯りが見える。"></button></li>
+    <li><button type="button" class="fhp-gallery-item" data-large="img/soda-ice-l.jpg" data-caption="バニラアイスとさくらんぼをのせています。">
+      <img src="img/soda-ice-s.jpg" width="450" height="446" loading="lazy" decoding="async" alt="緑のソーダの上に丸いバニラアイスと赤いさくらんぼ。"></button></li>
+    <li><button type="button" class="fhp-gallery-item" data-large="img/beans-l.jpg" data-caption="店で焼いた豆は、袋に焙煎日を書いてお渡しします。">
+      <img src="img/beans-s.jpg" width="640" height="427" loading="lazy" decoding="async" alt="クラフト紙の袋に丸いラベルが貼られ、手前にコーヒー豆がこぼれている。"></button></li>
+    <li><button type="button" class="fhp-gallery-item" data-large="img/soda-lamp-l.jpg" data-caption="夕方からはランプを灯します。">
+      <img src="img/soda-lamp-s.jpg" width="430" height="461" loading="lazy" decoding="async" alt="暗い木の壁の前で灯る、布の笠のランプ。"></button></li>
+    <li><button type="button" class="fhp-gallery-item" data-large="img/beans-label-l.jpg" data-caption="ラベルの焙煎度は手書きです。">
+      <img src="img/beans-label-s.jpg" width="492" height="512" loading="lazy" decoding="async" alt="豆の袋の丸いラベル。産地と焙煎日、手書きの「中深煎り」の文字。"></button></li>
+    <li><button type="button" class="fhp-gallery-item" data-large="img/room-l.jpg" data-caption="奥の個室は、すりガラスの窓で外から見えません。">
+      <img src="img/room-s.jpg" width="640" height="427" loading="lazy" decoding="async" alt="すりガラスの窓と壁掛け時計のある、明るい小部屋。手前に施術用のベッド。"></button></li>
+    <li><button type="button" class="fhp-gallery-item" data-large="img/soda-spoon-l.jpg" data-caption="受け皿とスプーンは開店のころから同じものです。">
+      <img src="img/soda-spoon-s.jpg" width="640" height="411" loading="lazy" decoding="async" alt="クリームソーダのグラスの足もとに、白い受け皿と銀のスプーン。"></button></li>
+    <li><button type="button" class="fhp-gallery-item" data-large="img/beans-pile-l.jpg" data-caption="中深煎りの豆。量り売りもしています。">
+      <img src="img/beans-pile-s.jpg" width="640" height="366" loading="lazy" decoding="async" alt="木の台の上に寄せて置かれた、つやのある焙煎豆。"></button></li>
+    <li><button type="button" class="fhp-gallery-item" data-large="img/room-window-l.jpg" data-caption="窓は草木の模様のすりガラスです。">
+      <img src="img/room-window-s.jpg" width="614" height="430" loading="lazy" decoding="async" alt="草木の模様が入ったすりガラスの窓。"></button></li>
+    <li><button type="button" class="fhp-gallery-item" data-large="img/salon-l.jpg" data-caption="道具はお客さまごとに消毒しています。">
+      <img src="img/salon-s.jpg" width="640" height="427" loading="lazy" decoding="async" alt="白いタオルの上に置かれた、すきばさみとカットばさみと黒いコーム。"></button></li>
+    <li><button type="button" class="fhp-gallery-item" data-large="img/room-towel-l.jpg" data-caption="タオルはおひとりずつ取り替えます。">
+      <img src="img/room-towel-s.jpg" width="522" height="287" loading="lazy" decoding="async" alt="ベッドの上に畳んで重ねた、茶色と白のタオル。"></button></li>
+    <li><button type="button" class="fhp-gallery-item" data-large="img/salon-scissors-l.jpg" data-caption="よく研いだはさみで、毛先を整えます。">
+      <img src="img/salon-scissors-s.jpg" width="640" height="355" loading="lazy" decoding="async" alt="タオルの上のカットばさみの刃先。"></button></li>
+  </ul>
+  <p class="fhp-gallery-hint">写真を押すと大きく見られます。</p>
+</div>
+<!-- /part:gallery -->
+      <p class="stage-note">写真はAIで作成したイメージです（見本5件の写真と、その一部を切り出したもの）。</p>
+    </div>
+  </section>
+
+  <!-- ============ 2. 予約・問い合わせ ============ -->
+  <section class="part" id="contact" aria-labelledby="contact-title">
+    <div class="part-info">
+      <h2 id="contact-title"><span class="part-q">「電話やLINEで予約を受けたい」</span><span class="part-name">予約・問い合わせ</span></h2>
+      <p class="part-use">電話・LINE・予約サイトのある店に。いま営業中かをページが計算し、営業中は電話、時間外は予約とLINEを先に出します。</p>
+      <dl class="part-spec">
+        <dt>時刻</dt><dd>日本時間で計算。曜日ごとの営業時間・昼休み・定休日を書ける</dd>
+        <dt>送信</dt><dd>フォームは持たない。外の予約ページ・LINE・電話へつなぐだけ</dd>
+        <dt>ファイル</dt><dd><code>contact/</code> snippet.html・contact.css・contact.js</dd>
+      </dl>
+      <fieldset class="demo-ctl">
+        <legend><span>時刻を変えて試す</span></legend>
+        <label><input type="radio" name="contact-now" value="" checked>いま</label>
+        <label><input type="radio" name="contact-now" value="2026-09-24T12:00">木曜 12:00</label>
+        <label><input type="radio" name="contact-now" value="2026-09-24T18:40">木曜 18:40</label>
+        <label><input type="radio" name="contact-now" value="2026-09-24T21:00">木曜 21:00</label>
+        <label><input type="radio" name="contact-now" value="2026-09-23T12:00">水曜（定休日）</label>
+      </fieldset>
+    </div>
+    <div class="stage" data-fhp-tone="aoba">
+<!-- part:contact -->
+<!-- 営業時間は data-hours に曜日ごと。昼休みは "11:00-14:00,17:00-22:00"、定休日は ""。
+     使わない連絡手段は href を空にするか、その <a> を消す。 -->
+<div class="fhp fhp-contact" data-fhp-contact data-last-call="30"
+     data-hours='{"月":"9:00-19:00","火":"9:00-19:00","水":"","木":"9:00-19:00","金":"9:00-19:00","土":"9:00-19:00","日":"10:00-17:00"}'>
+  <p class="fhp-contact-status" aria-live="polite">
+    <span class="fhp-contact-dot" aria-hidden="true"></span>
+    <span class="fhp-contact-title">営業時間を確かめています</span>
+    <span class="fhp-contact-detail"></span>
+  </p>
+  <div class="fhp-contact-actions">
+    <a class="fhp-btn" data-channel="tel" href="tel:000-0000-0000" data-demo>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 3.5l2.6 3.7-1.7 2.1a12.4 12.4 0 0 0 7.2 7.2l2.1-1.7 3.7 2.6-1.3 3.1c-.4.9-1.3 1.4-2.3 1.2C9.6 20.5 3.5 14.4 2.3 7.1c-.2-1 .3-1.9 1.2-2.3z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+      <span class="fhp-btn-label">電話する</span><small>000-0000-0000</small></a>
+    <a class="fhp-btn fhp-btn--sub" data-channel="reserve" href="https://example.com/reserve" data-demo>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 10h17M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.8"/></svg>
+      <span class="fhp-btn-label">ネットで予約する</span><small>24時間</small></a>
+    <a class="fhp-btn fhp-btn--sub" data-channel="line" href="https://line.me/" data-demo>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4C7 4 3 7.2 3 11.2c0 3.5 3.1 6.5 7.3 7.1l-.6 2.7 3.6-2.6c4.6-.3 7.7-3.4 7.7-7.2C21 7.2 17 4 12 4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+      <span class="fhp-btn-label">LINEで問い合わせる</span><small>返信は営業時間内</small></a>
+  </div>
+  <p class="fhp-contact-note" hidden><span></span></p>
+  <table class="fhp-contact-week">
+    <caption>営業時間</caption>
+    <tbody></tbody>
+  </table>
+</div>
+<!-- /part:contact -->
+      <p class="stage-msg" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <!-- ============ 3. 地図 ============ -->
+  <section class="part" id="map" aria-labelledby="map-title">
+    <div class="part-info">
+      <h2 id="map-title"><span class="part-q">「場所が分かりにくいと言われる」</span><span class="part-name">地図</span></h2>
+      <p class="part-use">来てもらう店すべてに。Google マップを埋め込み、スマホの地図アプリで開くボタンと道順のボタンを添えます。</p>
+      <dl class="part-spec">
+        <dt>読み込み</dt><dd>画面に近づいてから地図を読み込む。APIキーは要らない</dd>
+        <dt>差し替え</dt><dd><code>data-query</code> とリンクの <code>query=</code> に住所か店名を書く</dd>
+        <dt>ファイル</dt><dd><code>map/</code> snippet.html・map.css・map.js</dd>
+      </dl>
+    </div>
+    <div class="stage" data-fhp-tone="aoba">
+<!-- part:map -->
+<div class="fhp fhp-map" data-fhp-map data-query="東京駅" data-title="純喫茶 あおばの地図（見本のため東京駅を表示）">
+  <div class="fhp-map-frame">
+    <p class="fhp-map-wait">地図はこの場所まで来たら読み込みます。<button type="button" class="fhp-btn fhp-btn--sub fhp-map-now">今すぐ地図を表示</button></p>
+  </div>
+  <p class="fhp-map-place">純喫茶 あおば（架空のお店）</p>
+  <p class="fhp-map-access">見本のため、地図は東京駅を指しています。</p>
+  <div class="fhp-map-actions">
+    <a class="fhp-btn" href="https://www.google.com/maps/search/?api=1&amp;query=%E6%9D%B1%E4%BA%AC%E9%A7%85" target="_blank" rel="noopener">地図アプリで開く</a>
+    <a class="fhp-btn fhp-btn--sub" href="https://www.google.com/maps/dir/?api=1&amp;destination=%E6%9D%B1%E4%BA%AC%E9%A7%85" target="_blank" rel="noopener">ここまでの道順を調べる</a>
+  </div>
+</div>
+<!-- /part:map -->
+    </div>
+  </section>
+
+  <!-- ============ 4. メニュー・料金表 ============ -->
+  <section class="part" id="menu" aria-labelledby="menu-title">
+    <div class="part-info">
+      <h2 id="menu-title"><span class="part-q">「メニューと料金を載せたい」</span><span class="part-name">メニュー・料金表</span></h2>
+      <p class="part-use">飲食店の品書き、美容室・整体の料金に。分類をタブで切り替えます。写真のある品だけ大きく見せる形と、文字だけの形があります。</p>
+      <dl class="part-spec">
+        <dt>形</dt><dd>外側のクラスを <code>fhp-menu--photo</code> か <code>fhp-menu--text</code> にする</dd>
+        <dt>税</dt><dd>価格は税込で書き、分類の横に「税込」と出す</dd>
+        <dt>ファイル</dt><dd><code>menu/</code> snippet.html・menu.css・menu.js</dd>
+      </dl>
+      <fieldset class="demo-ctl">
+        <legend><span>形を変えて試す</span></legend>
+        <label><input type="radio" name="menu-format" value="photo" checked>写真つき</label>
+        <label><input type="radio" name="menu-format" value="text">文字だけ</label>
+      </fieldset>
+    </div>
+    <div class="stage" data-fhp-tone="aoba">
+<!-- part:menu -->
+<div class="fhp fhp-menu fhp-menu--photo" data-fhp-menu>
+  <div class="fhp-menu-head">
+    <div class="fhp-menu-tabs" role="tablist" aria-label="メニューの分類">
+      <button type="button" class="fhp-menu-tab" role="tab" id="fhp-menu-tab-drink" aria-controls="fhp-menu-drink" aria-selected="true">飲みもの</button>
+      <button type="button" class="fhp-menu-tab" role="tab" id="fhp-menu-tab-food" aria-controls="fhp-menu-food" aria-selected="false">お食事</button>
+      <button type="button" class="fhp-menu-tab" role="tab" id="fhp-menu-tab-sweet" aria-controls="fhp-menu-sweet" aria-selected="false">甘いもの</button>
+    </div>
+    <p class="fhp-menu-tax">価格はすべて税込です</p>
+  </div>
+  <div class="fhp-menu-panel" role="tabpanel" id="fhp-menu-drink" aria-labelledby="fhp-menu-tab-drink" tabindex="0">
+    <ul class="fhp-menu-list">
+      <li class="fhp-menu-item">
+        <img src="img/soda-ice-s.jpg" width="450" height="446" loading="lazy" decoding="async" alt="緑のソーダにバニラアイスとさくらんぼをのせたクリームソーダ。">
+        <div class="fhp-menu-body"><p class="fhp-menu-name">クリームソーダ</p><p class="fhp-menu-price">650円</p><p class="fhp-menu-desc">メロン・いちご・ブルーの3色から選べます。</p></div>
+      </li>
+      <li class="fhp-menu-item">
+        <img src="img/beans-pile-s.jpg" width="640" height="366" loading="lazy" decoding="async" alt="つやのある中深煎りのコーヒー豆。">
+        <div class="fhp-menu-body"><p class="fhp-menu-name">ブレンド珈琲</p><p class="fhp-menu-price">500円</p><p class="fhp-menu-desc">中深煎りの豆を、一杯ずつネルで淹れます。</p></div>
+      </li>
+      <li class="fhp-menu-item"><div class="fhp-menu-body"><p class="fhp-menu-name">紅茶</p><p class="fhp-menu-price">500円</p><p class="fhp-menu-desc">ストレート・レモン・ミルク</p></div></li>
+      <li class="fhp-menu-item"><div class="fhp-menu-body"><p class="fhp-menu-name">カフェオレ</p><p class="fhp-menu-price">600円</p></div></li>
+      <li class="fhp-menu-item"><div class="fhp-menu-body"><p class="fhp-menu-name">オレンジジュース</p><p class="fhp-menu-price">550円</p></div></li>
+    </ul>
+  </div>
+  <div class="fhp-menu-panel" role="tabpanel" id="fhp-menu-food" aria-labelledby="fhp-menu-tab-food" tabindex="0" hidden>
+    <ul class="fhp-menu-list">
+      <li class="fhp-menu-item"><div class="fhp-menu-body"><p class="fhp-menu-name">ナポリタン</p><p class="fhp-menu-price">850円</p><p class="fhp-menu-desc">太めの麺を、ケチャップでしっかり炒めています。</p></div></li>
+      <li class="fhp-menu-item"><div class="fhp-menu-body"><p class="fhp-menu-name">たまごサンド</p><p class="fhp-menu-price">750円</p></div></li>
+      <li class="fhp-menu-item"><div class="fhp-menu-body"><p class="fhp-menu-name">ピザトースト</p><p class="fhp-menu-price">700円</p></div></li>
+    </ul>
+  </div>
+  <div class="fhp-menu-panel" role="tabpanel" id="fhp-menu-sweet" aria-labelledby="fhp-menu-tab-sweet" tabindex="0" hidden>
+    <ul class="fhp-menu-list">
+      <li class="fhp-menu-item"><div class="fhp-menu-body"><p class="fhp-menu-name">厚焼きホットケーキ</p><p class="fhp-menu-price">700円</p><p class="fhp-menu-desc">焼き上がりまで20分ほどいただきます。</p></div></li>
+      <li class="fhp-menu-item"><div class="fhp-menu-body"><p class="fhp-menu-name">固めのプリン</p><p class="fhp-menu-price">450円</p></div></li>
+    </ul>
+  </div>
+</div>
+<!-- /part:menu -->
+    </div>
+  </section>
+
+  <!-- ============ 5. 音声・ボイスサンプル ============ -->
+  <section class="part" id="voice" aria-labelledby="voice-title">
+    <div class="part-info">
+      <h2 id="voice-title"><span class="part-q">「ボイスサンプルを聞けるようにしたい」</span><span class="part-name">音声・ボイスサンプル</span></h2>
+      <p class="part-use">声優・VTuber・歌い手・音楽教室に。ページの中で再生でき、1つ再生すると他は止まります。波形を押すと、その位置から聞けます。</p>
+      <dl class="part-spec">
+        <dt>音声</dt><dd>mp3 を <code>&lt;audio&gt;</code> に入れる。波形の形は <code>data-peaks</code>（無ければ一定の高さ）</dd>
+        <dt>操作</dt><dd>ボタンで再生と一時停止。波形にフォーカスして左右キーで位置を変える</dd>
+        <dt>ファイル</dt><dd><code>voice/</code> snippet.html・voice.css・voice.js</dd>
+      </dl>
+    </div>
+    <div class="stage" data-fhp-tone="aoba">
+<!-- part:voice -->
+<div class="fhp fhp-voice" data-fhp-voice>
+  <ul class="fhp-voice-list">
+    <li class="fhp-voice-track" data-duration="3.1" data-peaks="0.96,0.99,0.88,0.77,0.58,0.4,0.26,0.14,0.05,0.94,0.99,0.88,0.77,0.58,0.41,0.26,0.14,0.05,0.92,1.0,0.89,0.77,0.6,0.41,0.27,0.15,0.05,0.9,1.0,0.88,0.79,0.69,0.62,0.55,0.48,0.43,0.38,0.34,0.3,0.26,0.23,0.21,0.18,0.16,0.14,0.12,0.1,0.08,0.06,0.05,0.04,0.03,0.02,0.01,0.01,0.0">
+      <button type="button" class="fhp-voice-play" aria-label="再生: 自己紹介ボイス">
+        <svg class="is-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z" fill="currentColor"/></svg>
+        <svg class="is-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 4.5h4v15h-4zM13.5 4.5h4v15h-4z" fill="currentColor"/></svg>
+      </button>
+      <div class="fhp-voice-head">
+        <p class="fhp-voice-title">自己紹介ボイス</p>
+        <p class="fhp-voice-desc">はじめましての方へ。短い自己紹介です。</p>
+      </div>
+      <div class="fhp-voice-row">
+        <div class="fhp-voice-wave">
+          <div class="fhp-voice-bars" aria-hidden="true"></div>
+          <div class="fhp-voice-bars is-played" aria-hidden="true"></div>
+          <input class="fhp-voice-seek" type="range" min="0" max="1000" step="10" value="0" aria-label="再生位置: 自己紹介ボイス">
+        </div>
+        <p class="fhp-voice-time"><span class="fhp-voice-cur">0:00</span> / <span class="fhp-voice-dur">0:03</span></p>
+      </div>
+      <audio preload="metadata" src="voice/intro.mp3"></audio>
+    </li>
+    <li class="fhp-voice-track" data-duration="6.0" data-peaks="0.05,0.15,0.25,0.41,0.58,0.69,0.88,0.83,0.86,0.93,0.78,0.67,0.62,0.61,0.42,0.33,0.28,0.17,0.11,0.1,0.12,0.13,0.19,0.25,0.33,0.44,0.49,0.6,0.68,0.8,0.95,1.0,0.88,0.94,0.93,0.87,0.85,0.82,0.67,0.6,0.44,0.35,0.29,0.24,0.16,0.1,0.08,0.1,0.09,0.12,0.13,0.13,0.13,0.12,0.08,0.04">
+      <button type="button" class="fhp-voice-play" aria-label="再生: シチュエーションボイス">
+        <svg class="is-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z" fill="currentColor"/></svg>
+        <svg class="is-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 4.5h4v15h-4zM13.5 4.5h4v15h-4z" fill="currentColor"/></svg>
+      </button>
+      <div class="fhp-voice-head">
+        <p class="fhp-voice-title">シチュエーションボイス</p>
+        <p class="fhp-voice-desc">雨の日の帰り道、という設定の一場面です。</p>
+      </div>
+      <div class="fhp-voice-row">
+        <div class="fhp-voice-wave">
+          <div class="fhp-voice-bars" aria-hidden="true"></div>
+          <div class="fhp-voice-bars is-played" aria-hidden="true"></div>
+          <input class="fhp-voice-seek" type="range" min="0" max="1000" step="10" value="0" aria-label="再生位置: シチュエーションボイス">
+        </div>
+        <p class="fhp-voice-time"><span class="fhp-voice-cur">0:00</span> / <span class="fhp-voice-dur">0:06</span></p>
+      </div>
+      <audio preload="metadata" src="voice/scene.mp3"></audio>
+    </li>
+    <li class="fhp-voice-track" data-duration="6.4" data-peaks="1.0,0.78,0.33,0.7,0.95,0.55,0.17,1.0,0.84,0.65,0.43,0.24,0.11,0.04,1.0,0.78,0.34,0.7,0.95,0.55,0.17,1.0,0.84,0.65,0.43,0.24,0.11,0.03,1.0,0.78,0.34,0.7,0.95,0.55,0.17,1.0,0.78,0.33,0.7,0.95,0.55,0.17,1.0,0.84,0.65,0.51,0.4,0.31,0.24,0.19,0.14,0.1,0.06,0.03,0.02,0.0">
+      <button type="button" class="fhp-voice-play" aria-label="再生: 歌ってみた（抜粋）">
+        <svg class="is-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z" fill="currentColor"/></svg>
+        <svg class="is-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 4.5h4v15h-4zM13.5 4.5h4v15h-4z" fill="currentColor"/></svg>
+      </button>
+      <div class="fhp-voice-head">
+        <p class="fhp-voice-title">歌ってみた（抜粋）</p>
+        <p class="fhp-voice-desc">サビの部分だけを抜き出しています。</p>
+      </div>
+      <div class="fhp-voice-row">
+        <div class="fhp-voice-wave">
+          <div class="fhp-voice-bars" aria-hidden="true"></div>
+          <div class="fhp-voice-bars is-played" aria-hidden="true"></div>
+          <input class="fhp-voice-seek" type="range" min="0" max="1000" step="10" value="0" aria-label="再生位置: 歌ってみた（抜粋）">
+        </div>
+        <p class="fhp-voice-time"><span class="fhp-voice-cur">0:00</span> / <span class="fhp-voice-dur">0:06</span></p>
+      </div>
+      <audio preload="metadata" src="voice/song.mp3"></audio>
+    </li>
+  </ul>
+  <p class="fhp-voice-note">見本のため、声の代わりに合成した音を入れています。</p>
+</div>
+<!-- /part:voice -->
+    </div>
+  </section>
+
+  <!-- ============ 6. よくある質問 ============ -->
+  <section class="part" id="faq" aria-labelledby="faq-title">
+    <div class="part-info">
+      <h2 id="faq-title"><span class="part-q">「同じ質問を何度もされる」</span><span class="part-name">よくある質問</span></h2>
+      <p class="part-use">予約・支払い・駐車場など、電話でよく聞かれることがある店に。押すと答えが開きます。</p>
+      <dl class="part-spec">
+        <dt>仕組み</dt><dd><code>&lt;details&gt;</code> をそのまま使うので JS は要らない。ページ内検索でも答えが見つかる</dd>
+        <dt>ファイル</dt><dd><code>faq/</code> snippet.html・faq.css</dd>
+      </dl>
+    </div>
+    <div class="stage" data-fhp-tone="aoba">
+<!-- part:faq -->
+<div class="fhp fhp-faq">
+  <details class="fhp-faq-item">
+    <summary><span class="fhp-faq-q">席の予約はできますか？</span><span class="fhp-faq-mark" aria-hidden="true"></span></summary>
+    <div class="fhp-faq-a"><p>ふだんは予約を受けていません。6名以上でお越しのときは、前日までにお電話ください。</p></div>
+  </details>
+  <details class="fhp-faq-item">
+    <summary><span class="fhp-faq-q">カードや電子マネーは使えますか？</span><span class="fhp-faq-mark" aria-hidden="true"></span></summary>
+    <div class="fhp-faq-a"><p>現金のほか、交通系ICカードとQRコード決済が使えます。</p><p class="fhp-faq-note">クレジットカードは使えません。</p></div>
+  </details>
+  <details class="fhp-faq-item">
+    <summary><span class="fhp-faq-q">子ども連れでも入れますか？</span><span class="fhp-faq-mark" aria-hidden="true"></span></summary>
+    <div class="fhp-faq-a"><p>はい。子ども用の椅子が2脚あります。ベビーカーは入口の横に置けます。</p></div>
+  </details>
+  <details class="fhp-faq-item">
+    <summary><span class="fhp-faq-q">駐車場はありますか？</span><span class="fhp-faq-mark" aria-hidden="true"></span></summary>
+    <div class="fhp-faq-a"><p>店の駐車場はありません。近くのコインパーキングをご利用ください。</p></div>
+  </details>
+</div>
+<!-- /part:faq -->
+    </div>
+  </section>
+
+  <!-- ============ 7. お知らせ ============ -->
+  <section class="part" id="news" aria-labelledby="news-title">
+    <div class="part-info">
+      <h2 id="news-title"><span class="part-q">「休みや新作を知らせたい」</span><span class="part-name">お知らせ</span></h2>
+      <p class="part-use">臨時休業・新メニュー・イベントをよく出す店に。新しい順に並べ、2週間以内のものに「新着」を付けます。古いものは畳みます。</p>
+      <dl class="part-spec">
+        <dt>書き方</dt><dd>1件ずつ日付（<code>time</code> の <code>datetime</code>）を付けて足すだけ。順番は自動で並ぶ</dd>
+        <dt>ファイル</dt><dd><code>news/</code> snippet.html・news.css・news.js</dd>
+      </dl>
+    </div>
+    <div class="stage" data-fhp-tone="aoba">
+<!-- part:news -->
+<div class="fhp fhp-news" data-fhp-news data-new-days="14" data-show="4">
+  <ol class="fhp-news-list">
+    <li class="fhp-news-item" data-days-ago="2">
+      <p class="fhp-news-meta"><time datetime="2026-09-23">2026年9月23日</time><span class="fhp-news-kind">新しいメニュー</span></p>
+      <p class="fhp-news-title">秋のクリームソーダ「ぶどう」を始めました</p>
+      <p class="fhp-news-body">巨峰のシロップで作る、紫のクリームソーダです。</p>
+    </li>
+    <li class="fhp-news-item" data-days-ago="9">
+      <p class="fhp-news-meta"><time datetime="2026-09-16">2026年9月16日</time><span class="fhp-news-kind">お休み</span></p>
+      <p class="fhp-news-title">店内の点検のため、臨時でお休みをいただきます</p>
+    </li>
+    <li class="fhp-news-item" data-days-ago="24">
+      <p class="fhp-news-meta"><time datetime="2026-09-01">2026年9月1日</time><span class="fhp-news-kind">お知らせ</span></p>
+      <p class="fhp-news-title">モーニングを11時まで延ばしました</p>
+    </li>
+    <li class="fhp-news-item" data-days-ago="52">
+      <p class="fhp-news-meta"><time datetime="2026-08-04">2026年8月4日</time><span class="fhp-news-kind">お知らせ</span></p>
+      <p class="fhp-news-title">コーヒー豆の量り売りを始めました</p>
+    </li>
+    <li class="fhp-news-item" data-days-ago="80">
+      <p class="fhp-news-meta"><time datetime="2026-07-07">2026年7月7日</time><span class="fhp-news-kind">お知らせ</span></p>
+      <p class="fhp-news-title">店内を全席禁煙にしました</p>
+    </li>
+    <li class="fhp-news-item" data-days-ago="130">
+      <p class="fhp-news-meta"><time datetime="2026-05-18">2026年5月18日</time><span class="fhp-news-kind">お知らせ</span></p>
+      <p class="fhp-news-title">ホームページを新しくしました</p>
+    </li>
+  </ol>
+  <button type="button" class="fhp-btn fhp-btn--sub fhp-news-more" hidden>過去のお知らせを見る</button>
+</div>
+<!-- /part:news -->
+      <p class="stage-note">見本のため、日付は開いた日から数えて入れています。</p>
+    </div>
+  </section>
+
+  <!-- ============ 8. 聞き返し ============ -->
+  <section class="part" id="hearing" aria-labelledby="hearing-title">
+    <div class="part-info">
+      <h2 id="hearing-title"><span class="part-q">「何を載せればいいか分からない」</span><span class="part-name">聞き返し</span></h2>
+      <p class="part-use">要望がまだはっきりしない相手に。4つの質問に答えると、合う部品の組み合わせを理由つきで出します。送信はせず、相談のメールを開くリンクだけ出します。</p>
+      <dl class="part-spec">
+        <dt>提案</dt><dd>いちばん見てほしいものに合う部品を「まず入れる部品」として先に出す</dd>
+        <dt>ファイル</dt><dd><code>hearing/</code> snippet.html・hearing.css・hearing.js</dd>
+      </dl>
+    </div>
+    <div class="stage" data-fhp-tone="aoba">
+<!-- part:hearing -->
+<!-- data-catalog は部品の説明ページ（このカタログ）の場所。snippet.html では見本から見た ../parts/ になる -->
+<div class="fhp fhp-hear" data-fhp-hearing data-catalog="">
+  <form novalidate>
+    <fieldset data-required data-short="お仕事">
+      <legend><span>どんなお仕事ですか</span></legend>
+      <ul class="fhp-hear-options">
+        <li><label class="fhp-hear-option"><input type="radio" name="work" value="food"><span class="fhp-hear-label">飲食店・カフェ</span></label></li>
+        <li><label class="fhp-hear-option"><input type="radio" name="work" value="booking"><span class="fhp-hear-label">美容室・整体など予約制のお店</span></label></li>
+        <li><label class="fhp-hear-option"><input type="radio" name="work" value="shop"><span class="fhp-hear-label">物販・教室・工房</span></label></li>
+        <li><label class="fhp-hear-option"><input type="radio" name="work" value="creator"><span class="fhp-hear-label">声・音楽・作品の活動</span></label></li>
+      </ul>
+    </fieldset>
+    <fieldset data-short="見てほしいもの">
+      <legend><span>ホームページで、いちばん見てほしいものは</span></legend>
+      <p class="fhp-hear-help">当てはまるものをすべて選んでください。</p>
+      <ul class="fhp-hear-options">
+        <li><label class="fhp-hear-option"><input type="checkbox" name="look" value="photos"><span class="fhp-hear-label">写真（料理・店内・作品）</span></label></li>
+        <li><label class="fhp-hear-option"><input type="checkbox" name="look" value="prices"><span class="fhp-hear-label">メニューと料金</span></label></li>
+        <li><label class="fhp-hear-option"><input type="checkbox" name="look" value="place"><span class="fhp-hear-label">場所と行き方</span></label></li>
+        <li><label class="fhp-hear-option"><input type="checkbox" name="look" value="sound"><span class="fhp-hear-label">声や音</span></label></li>
+      </ul>
+    </fieldset>
+    <fieldset data-required data-short="連絡の受け方">
+      <legend><span>お客さんからの連絡は、どう受けたいですか</span></legend>
+      <ul class="fhp-hear-options">
+        <li><label class="fhp-hear-option"><input type="radio" name="contact" value="tel"><span class="fhp-hear-label">電話で受けたい</span></label></li>
+        <li><label class="fhp-hear-option"><input type="radio" name="contact" value="line"><span class="fhp-hear-label">LINEで受けたい</span></label></li>
+        <li><label class="fhp-hear-option"><input type="radio" name="contact" value="reserve"><span class="fhp-hear-label">予約サイトを使っている</span></label></li>
+        <li><label class="fhp-hear-option"><input type="radio" name="contact" value="mail"><span class="fhp-hear-label">メールだけでいい</span></label></li>
+      </ul>
+    </fieldset>
+    <fieldset data-required data-short="更新">
+      <legend><span>お知らせは、よく出しますか</span></legend>
+      <ul class="fhp-hear-options">
+        <li><label class="fhp-hear-option"><input type="radio" name="update" value="often"><span class="fhp-hear-label">よく出したい（休み・新作など）</span></label></li>
+        <li><label class="fhp-hear-option"><input type="radio" name="update" value="rarely"><span class="fhp-hear-label">あまり変えない</span></label></li>
+      </ul>
+    </fieldset>
+    <div class="fhp-hear-actions">
+      <button type="submit" class="fhp-btn">組み合わせを見る</button>
+      <button type="reset" class="fhp-btn fhp-btn--sub">答えを消す</button>
+      <p class="fhp-hear-error" role="alert" hidden></p>
+    </div>
+  </form>
+  <div class="fhp-hear-result" hidden>
+    <h3 class="fhp-hear-result-title">この組み合わせがおすすめです</h3>
+    <ul class="fhp-hear-primary"></ul>
+    <div class="fhp-hear-secondary-wrap">
+      <p class="fhp-hear-secondary-title">あわせて入れると便利</p>
+      <ul class="fhp-hear-secondary"></ul>
+    </div>
+    <p class="fhp-hear-cta"><a class="fhp-btn fhp-hear-mail" href="mailto:info@freehp.jp">この内容でご相談ください</a></p>
+    <p class="fhp-hear-cta-note">メールのアプリが開き、答えと組み合わせが本文に入ります。送るかどうかは、中身を見てから決められます。宛先は info@freehp.jp です。</p>
+  </div>
+</div>
+<!-- /part:hearing -->
+    </div>
+  </section>
+</main>
+
+<footer class="credit">
+  <p>この部品の一覧はAIホームページ製作所（<a href="https://freehp.jp/">freehp.jp</a>）が作りました。見本の一覧は<a href="https://freehp.jp/#examples">トップページ</a>にあります。</p>
+</footer>
+
+<script src="gallery/gallery.js"></script>
+<script src="contact/contact.js"></script>
+<script src="map/map.js"></script>
+<script src="menu/menu.js"></script>
+<script src="voice/voice.js"></script>
+<script src="news/news.js"></script>
+<script src="hearing/hearing.js"></script>
+<script src="catalog.js"></script>
+<!-- budoux:start -->
+<!--
+  budoux-wrap.html — 日本語テキストの「文節・単語の途中」での折り返しを防ぐ自己完結スニペット。
+  使い方: </body> 直前にこのファイルの中身をそのまま貼るだけ。
+  仕組み: Google BudouX（MIT License, Copyright 2021 Google LLC）の分かち書きモデルを
+  最小パーサーで実行し、DOMContentLoaded後に対象要素の文中に<wbr>（任意の改行可能位置）を挿入する。
+  MutationObserverは使わない（初期描画のみ・動的追加分は再実行が必要なら insertPhraseBreaks() を呼び直す）。
+  対象セレクタは BUDOUX_WRAP_SELECTOR で変更可（CSS側のセレクタも合わせて変える）。
+-->
+<style>
+h1,h2,h3,h4,h5,h6,p,li,td,th,dt,dd,blockquote,figcaption{
+  word-break:keep-all;
+  overflow-wrap:anywhere;
+  line-break:strict;
+}
+h1,h2,h3,h4,h5,h6{text-wrap:balance;}
+p,li,td,th,dt,dd,blockquote,figcaption{text-wrap:pretty;}
+</style>
+<script>
+(function(){
+'use strict';
+// BudouX (MIT License, Copyright 2021 Google LLC) - 日本語分かち書きモデル（ja）
+const BUDOUX_JA_MODEL={"UW3":{"。":7331,"の":4438,"、":5474,"に":4335,"を":6140,"が":4577,"は":4653,"と":3626,"る":3301,"も":3679,"で":3706,"た":2639,"な":2949,"て":2767,"う":2494,"く":2935,"い":2058,"ら":1690,"っ":-1794,"や":2604,"？":4334,"，":4119,"］":2440,"?":4664,"ば":2526,"ぐ":3001,"り":1280,"！":4003,"か":2214,"ん":1063,"．":2432,"]":3594,"ー":-197,"…":3125,"・":1048,"ど":1749,"お":-2026,"空":1563,"こ":183,"）":3330,"へ":2276,"つ":1371,"」":1822,"ッ":-2059,"方":888,"だ":1055,"☆":3592,"笑":3650,"ス":-861,"ン":-563,"「":-1977,"♪":2801,"ろ":1311,"イ":-908,"日":830,"ず":1808,"間":958,"々":2067,"部":542,"中":1200,"ゃ":1311,"今":1154,"ご":-1325,"京":-1379,"★":2952,"電":-1431,"分":1190,"す":1109,"ぬ":2615,"あ":1168,"感":738,"大":-1219,"人":341,"プ":-1102,"フ":-1375,"上":625,"せ":688,"ぁ":1694,"０":-805,"度":1238,"後":1303,"〜":956,"ア":-1107,"む":1491,"観":-957,"時":185,"１":-1318,"き":484,"都":-296,"以":-984,"ぶ":1284,"然":1170,"え":910,"わ":-220,"ラ":-281,"”":1246,"新":-866,"超":1609,"カ":-553,"夜":1518,"体":891,"ト":-93,"ロ":-757,"し":407,"変":779,"み":505,"[":-1045,"ド":-561,"択":970,"昔":1709,"シ":-735,"［":-768,"ジ":-176,"味":546,"光":-318,"ち":592,"『":-837,"タ":-162,"品":129,"さ":-84,"ま":-43,"年":339,"皆":969,"秋":1113,"的":430,"段":56,"水":342,"ぞ":1024,"果":361,"ぱ":723,"よ":608,"学":-397,"　":451,"じ":533,"自":-336,"ｏ":-464,"区":924,"題":809,"最":-519,"料":-412,"用":-416,"れ":190,"バ":-268,"ね":723,"機":-217,"：":381,"系":687,"け":117,"発":-399,"番":289,"色":486,"程":505,"行":-355,"意":-122,"技":209,"別":234,"デ":-279,"斤":509,"所":345,"場":-68,"】":480,"ニ":-140,"レ":-180,"子":-211,"入":-192,"台":499,"テ":-147,"ク":110,"素":-168,"前":192,"』":284,"週":143,"月":112,"不":-86,"開":-90,"モ":-107,"作":-90,"選":-102,"始":-93,"現":-76,"生":-55,"代":-63,"５":-59,"能":-29,"ビ":-4},"UW4":{"の":-4526,"。":-7835,"に":-4664,"が":-4054,"、":-8150,"て":-3970,"は":-3843,"で":-3133,"る":-5856,"と":-3243,"を":-5179,"っ":-4802,"か":-2915,"り":-4632,"ま":-1687,"な":-2126,"た":-2016,"う":-2712,"お":892,"し":-1935,"い":-1550,"ら":-5271,"そ":429,"だ":-2260,"れ":-4518,"す":-1699,"ん":-4492,"あ":255,"ち":-2389,"ー":-2954,"き":-1830,"」":-6475,"も":-2930,"よ":-1377,"「":2346,"け":-3754,"見":1092,"ご":293,"や":-1377,"く":-3063,"思":1144,"み":-907,"大":654,"私":1972,"一":569,"人":514,"？":-5720,"さ":-1760,"[":3554,"行":434,"め":-2463,"ン":-2274,"』":-5072,"こ":-507,"！":-5229,"ッ":-2340,"，":-4881,"わ":-1719,"・":-1475,"じ":-2491,"京":392,"今":1470,"?":-4390,"ぐ":-1842,"せ":-1969,"え":-2262,"１":1027,"言":351,"（":2718,"『":982,"使":851,"時":454,"合":-1661,"食":294,"日":280,"べ":-3191,"何":717,"デ":615,"ル":-1129,"ろ":-3124,"…":-3150,"．":-3345,"ば":-2646,"空":1226,"自":699,"笑":-3433,"２":820,"リ":-1047,"つ":-1268,"［":1713,"場":401,"効":71,"広":493,"）":-4245,"煙":2026,"ず":-2065,"来":130,"帯":-1165,"]":-1443,"ゃ":-2623,"最":996,"多":1189,"ど":-885,"ね":-2484,"び":-1816,"綺":2459,"エ":271,"携":168,"手":154,"］":-1515,"良":87,"ゆ":-825,"間":-755,"ぁ":-1624,"タ":-298,"ぶ":-1703,"ょ":-2028,"ぎ":-1605,"ひ":541,"方":-465,"”":-1348,"特":1097,"ト":-346,"ス":-149,"０":-431,"〜":-1764,"的":-991,"青":798,"♪":-2039,"僕":1126,"書":572,"イ":-143,"☆":-1767,"用":-630,"能":-732,"カ":231,"ュ":-807,"ぼ":-972,"ざ":-1085,"無":336,"む":-1336,"フ":-334,"公":376,"不":696,"ぜ":-1481,"バ":308,"へ":-1023,"　":-1382,"制":794,"回":-1175,"本":-124,"小":747,"水":329,"ぞ":-1226,"ロ":-279,"入":129,"続":-656,"物":-311,"返":-364,"新":311,"二":611,"美":260,"ほ":-328,"ｏ":-633,"足":704,"少":273,"取":-531,"機":-118,"臭":1197,"誰":1040,"街":558,"３":435,"げ":-906,"友":102,"づ":-795,"換":-690,"ク":-240,"ド":-300,"夏":522,"話":371,"祭":558,"気":95,"姿":158,"系":259,"コ":64,"楽":372,"服":869,"東":710,"込":-604,"年":-375,"(":654,"ニ":-238,"高":107,"切":-376,"他":181,"★":-844,"真":-503,"【":585,"表":166,"ビ":-158,"グ":-141,"有":295,"４":-215,"聞":199,"父":403,"代":-114,"買":225,"全":87,"通":-66,"品":-202,"度":-229,"四":276,"Ｓ":-143,"森":-428,"狭":264,"情":-106,"彼":83,"動":-34,"甘":151,"頑":176,"オ":68,"鞍":112,"ム":-77,"参":98,"実":60,"声":85,"秋":127,"例":106,"＾":-122,"ジ":-8,"ミ":-33,"心":12,"券":-37,"住":8,"ふ":-16,"春":8,"修":4,"ぃ":-4},"UW5":{"。":-2134,"、":-1080,"な":-632,"っ":1246,"は":-1048,"に":-767,"で":-961,"き":1101,"と":-894,"す":-696,"る":514,"を":-806,"い":360,"え":727,"の":-889,"べ":1996,"ま":-98,"じ":744,"こ":125,"た":-31,"し":-331,"ん":946,"そ":-665,"れ":462,"か":195,"動":1439,"ラ":547,"・":-945,"あ":-394,"め":528,"帯":334,"つ":1095,"う":444,"日":575,"京":78,"さ":-303,"能":88,"ル":-699,"」":-1096,"が":-597,"力":339,"せ":-438,"ぼ":1438,"ト":-388,"ず":812,"わ":588,"り":187,"ン":-260,"く":352,"年":968,"だ":-485,"思":-359,"も":-205,"ち":522,"］":-422,"使":-1252,"器":-220,"ざ":335,"ろ":-67,"よ":-284,"て":220,"！":-311,"利":781,"上":-402,"ス":-271,"体":-1449,"．":-224,"水":-443,"ぎ":320,"当":628,"ら":181,"び":609,"む":810,"イ":124,"バ":-71,"電":-205,"大":-275,"[":-434,"的":-264,"作":365,"言":-236,"ュ":-257,"先":-797,"景":340,"寺":-278,"…":-209,"？":-240,"本":178,"葉":186,"一":-197,"々":237,"顔":-329,"グ":-120,"丈":333,"越":-763,"Ｎ":786,"へ":-282,"ャ":51,"ど":-9,"回":193,"デ":-192,"見":-57,"１":-114,"開":78,"２":-134,"行":-34,"面":34,"要":33,"ロ":25,"オ":-25,"目":-46,"定":12},"UW2":{"。":-1584,"の":-942,"、":-1540,"を":-2488,"に":-1161,"し":200,"か":-9,"と":-1218,"も":-961,"が":-837,"な":-420,"っ":127,"で":-1025,"ま":338,"れ":-90,"て":-939,"そ":-483,"お":-1202,"以":2491,"す":413,"だ":372,"一":1244,"全":1268,"さ":708,"く":-729,"う":-611,"少":606,"は":-1052,"い":-145,"手":1408,"ん":250,"」":209,"け":159,"こ":-30,"見":-308,"め":65,"特":868,"結":2129,"あ":-194,"食":261,"つ":-595,"毎":1534,"法":1473,"場":274,"ゆ":805,"わ":317,"ラ":-534,"同":511,"ほ":708,"関":1438,"る":-407,"味":500,"人":75,"良":243,"ひ":-2178,"多":560,"選":185,"や":-625,"水":732,"知":-961,"ど":-234,"イ":-161,"「":-347,"た":-274,"ぱ":267,"随":1550,"？":-621,"ご":-501,"容":1349,"ぜ":931,"サ":-568,"ー":216,"グ":-454,"取":-414,"目":-759,"み":-120,"裏":-14,"能":348,"パ":668,"り":-229,"０":115,"本":556,"我":-831,"境":-297,"１":180,"ば":-327,"２":-241,"ろ":-200,"ね":354,"デ":-497,"ぐ":-455,"メ":-40,"和":646,"，":-526,"ノ":495,"大":152,"ぶ":85,"］":-262,"シ":-433,"立":-473,"世":-338,"先":378,"ケ":-522,"き":-115,"級":771,"＾":102,"?":-408,"４":326,"安":-94,"甘":11,"バ":426,"々":206,"電":268,"３":-291,"ら":-70,"是":440,"ル":47,"格":548,"Ｐ":-648,"団":696,"言":-5,"新":-139,"［":-89,"三":429,"家":142,"…":239,"落":-546,"作":-19,"下":296,"最":225,"ジ":-135,"素":-443,"文":116,"許":538,"早":222,"車":84,"★":-399,"如":479,"]":-173,"昔":260,"直":295,"奇":205,"『":-228,"百":-157,"Ｈ":-144,"レ":-113,"次":-183,"生":87,"残":151,"敗":159,"５":-128,"買":-17,"案":141,"空":-34,"鹿":-135,"ド":42,"介":97,"ア":-29,"用":-25,"げ":8},"UW1":{"い":-138,"に":-390,"で":-289,"つ":315,"と":124,"の":67,"が":-210,"は":-176,"よ":87,"そ":183,"り":-106,"見":231,"て":146,"な":-212,"す":202,"う":103,"ん":204,"知":91,"た":-112,"携":-314,"か":-187,"始":733,"バ":394,"十":-269,"上":-140,"く":165,"水":173,"、":18,"［":-544,"タ":247,"プ":-787,"明":905,"ッ":426,"き":-8,"ス":-209,"イ":-459,"０":234,"大":276,"。":-26,"リ":339,"っ":198,"ち":243,"安":-460,"３":-303,"日":25,"．":-438,"ど":197,"こ":160,"る":-82,"や":-248,"話":-147,"メ":422,"ろ":336,"自":371,"効":642,"小":284,"オ":507,"れ":118,"長":668,"行":-36,"壊":-428,"時":-212,"え":-105,"間":281,"機":118,"新":159,"『":-555,"・":52,"作":114,"ャ":280,"！":68,"認":-245,"個":-228,"撮":-122,"何":169,"し":-22,"京":-106,"苦":-506,"」":-119,"取":106,"も":13,"右":202,"少":-110,"人":-65,"豊":252,"ざ":100,"進":156,"２":69,"ン":17,"内":-171,"ね":-51,"積":-93,"議":34,"基":-37,"ｏ":-12,"]":-25,"ニ":20,"ケ":-8,"を":-4,"生":-4,"ク":-4},"UW6":{"。":-308,"が":369,"の":138,"で":160,"さ":944,"な":226,"に":327,"を":154,"は":202,"し":463,"や":638,"う":237,"っ":486,"り":513,"ぱ":1094,"か":312,"も":109,"」":-190,"い":346,"み":702,"せ":-301,"空":972,"め":913,"と":34,"る":182,"お":-401,"つ":696,"グ":789,"け":-219,"ー":-162,"ど":60,"コ":192,"場":-573,"こ":119,"そ":54,"ん":349,"く":131,"ま":413,"タ":331,"ン":-343,"０":693,"的":366,"ス":27,"ク":-300,"れ":167,"電":358,"人":-95,"ろ":464,"気":563,"送":-1624,"よ":267,"付":53,"・":-200,"画":407,"パ":-559,"わ":268,"見":-162,"返":1149,"１":119,"地":530,"ュ":224,"水":898,"出":534,"思":-178,"：":586,"ば":40,"遊":-497,"ル":188,"供":-427,"込":474,"て":-65,"過":246,"デ":-202,"］":-115,"最":-248,"ぎ":604,"学":-426,"カ":194,"寺":325,"制":372,"言":-223,"シ":-177,"た":27,"来":-111,"ょ":-238,"自":216,"じ":116,"日":36,"亭":407,"ず":-131,"だ":-42,"方":-77,"家":-115,"ブ":29,"び":59,"ピ":33,"新":-4},"TW1":{"よいよ":3595,"もはや":2606,"またま":3831,"ありが":-2684,"という":412,"おって":3070,"で見る":-2977,"こんに":-455,"ような":1127,"んどん":1519,"が良い":786,"・・・":1415,"ていく":997,"いとこ":-808,"ふだん":2004,"ました":-1069,"できる":396,"かなり":1990,"だんど":-1554,"すきと":-3102,"甘えが":-1234,"やはり":2033,"その時":2086,"、それ":675,"ながら":1161,"ひとつ":1367,"とんど":763,"ない、":-1607,"なんと":-1121,"かなか":752,"でかけ":-656,"ことも":-358,"持って":-1039,"十分に":-364,"ょうど":827,"たまた":-714,"しかし":752,"っかり":783,"に来て":667,"ょっと":-325,"る」と":-946,"困った":693,"として":267,"くらい":189,"ていて":254,"かった":-96,"は一つ":-707,"もなく":113,"なって":-94,"そして":174,"レベル":366,"は正直":339,"くさん":213,"入れる":260,"ろいろ":177,"すごく":312,"。夕方":161,"おけば":147,"んでも":128,"まるで":85,"のうち":148,"にして":-46,"と思う":16,"ういう":20,"のバス":20,"。ただ":16},"BW2":{"とこ":-1757,"とい":180,"せく":6048,"ない":-3413,"てい":-1546,"とお":-2638,"です":-2940,"たと":680,"であ":-3442,"ので":-1978,"のみ":-3030,"いよ":-3030,"てお":-2172,"にも":-1394,"うご":1924,"でき":-2187,"、と":-1273,"でも":-1946,"など":-2282,"たま":-1297,"たい":-2164,"くな":-1776,"には":-791,"帯電":-1412,"でし":-1822,"くだ":-2195,"のが":-1144,"のだ":-1038,"うど":-1919,"てき":-2092,"もし":-920,"いと":-940,"てみ":-2185,"はじ":-2168,"のは":-1264,"本イ":2005,"の前":-1526,"いも":784,"い合":-1523,"いた":-1271,"うや":-1100,"いい":-928,"らな":-254,"てく":-1211,"いま":-851,"やす":-1370,"がち":-83,"らゆ":-1056,"ると":-596,"てあ":-2151,"て行":-2250,"した":-768,"人い":1504,"なく":-852,"もあ":-595,"のも":-925,"のか":-634,"のい":303,"徴エ":1381,"どこ":-794,"ても":-606,"ただ":-1376,"を返":-1669,"とも":-606,"とき":-767,"び上":1661,"なか":-495,"とか":-1075,"はい":-834,"のご":-1134,"」と":-433,"るよ":-228,"とめ":-460,"にし":-486,"すご":-996,"なあ":-1506,"でな":-1219,"いな":-407,"。笑":-1204,"くし":-714,"こし":365,"の１":-1747,"係な":620,"い日":416,"ども":-531,"では":-618,"し…":1799,"」で":936,"う映":394,"とと":-657,"いし":-713,"しい":-305,"かな":-357,"にな":-75,"はあ":-507,"がっ":-488,"もな":-16,"が観":-950,"てこ":-172,"、な":-323,"なぁ":-494,"かし":-379,"よい":-566,"はず":-582,"グと":780,"すも":529,"・・":-386,"いつ":-178,"らい":-353,"もつ":-361,"とは":-348,"気な":330,"でい":-203,"たち":-269,"日と":374,"日本":-309,"て欲":-466,"るな":-264,"りな":227,"の方":159,"がし":72,"うい":-216,"にぎ":-250,"もう":-171,"］私":-479,"中さ":322,"たし":-230,"るの":-108,"てや":-142,"そこ":-275,"にこ":-198,"たも":103,"て来":-232,"れた":-94,"ルや":137,"るし":-128,"中だ":114,"たな":-80,"るが":-80,"ぱな":67,"るか":-29,"、清":-33,"がの":29,"たよ":-20,"．９":-24},"BW3":{"こと":1175,"いう":790,"もの":3907,"いい":1123,"その":2329,"ちは":-1191,"この":2317,"まと":1846,"おで":1062,"とき":2382,"はじ":2407,"して":218,"うま":3341,"よう":-1314,"ちょ":2198,"これ":2270,"ある":-287,"なっ":-601,"でも":1755,"なる":316,"とい":-754,"受け":890,"上が":1264,"なん":292,"可能":95,"が、":1559,"そう":-1883,"とて":2483,"でき":917,"おり":-1380,"もら":2822,"かか":1930,"メー":450,"当日":2335,"たま":1011,"から":-1032,"で、":1140,"かけ":2176,"よく":1416,"さん":-2110,"ため":1069,"しま":-296,"ゆる":-896,"もう":2304,"とも":1246,"分か":1490,"かっ":-1165,"ます":-772,"です":-903,"すご":1542,"もん":1103,"より":-1170,"すぐ":1632,"機器":-1682,"した":907,"ない":481,"しい":-957,"ころ":-297,"が観":2221,"とっ":875,"まし":-943,"いて":-460,"あと":1228,"がん":1905,"・・":-1620,"さい":-807,"つな":1280,"とり":1101,"まぁ":1446,"いろ":404,"はま":1074,"しゃ":381,"つぶ":642,"なら":-409,"いか":663,"だけ":-754,"みた":-1184,"はず":770,"だろ":-1479,"うち":552,"わか":660,"デザ":565,"はる":721,"いま":563,"と思":-575,"にぎ":723,"なく":402,"始ま":217,"きま":-605,"さあ":662,"もと":1138,"まだ":610,"おす":397,"つい":573,"かも":-592,"あり":115,"日が":472,"すか":-409,"きる":-925,"ぼっ":-1028,"何で":454,"ええ":1084,"もつ":721,"たっ":576,"なか":235,"以上":-395,"こそ":-557,"出来":-628,"たい":-166,"とこ":408,"ルー":311,"みん":529,"まも":279,"ひと":380,"はし":709,"なさ":208,"どこ":399,"一に":-695,"ごと":-287,"しか":-210,"し、":-70,"アプ":55,"いら":361,"入れ":90,"入場":413,"なに":319,"んで":260,"行く":169,"とら":456,"もっ":336,"まで":-296,"そし":356,"つけ":355,"電話":-44,"ただ":293,"変え":271,"すき":240,"最近":148,"こん":-92,"通り":-261,"など":-117,"友人":108,"ませ":-117,"つき":394,"ぼれ":-380,"かき":293,"電車":82,"いた":-26,"みろ":115,"書い":132,"いる":55,"そく":-136,"使っ":72,"色は":110,"祭り":84,"だい":46,"あふ":84,"こだ":50,"しく":-63,"ほど":-33,"いつ":20},"BW1":{"から":1722,"しい":1439,"ない":1248,"のみ":2935,"んに":-1214,"れた":1317,"いう":530,"とか":1792,"まま":2275,"もは":-3656,"その":-1266,"こと":-1663,"るの":-1335,"よう":-711,"少し":1794,"」と":261,"ても":825,"のは":1264,"して":-150,"うな":592,"、真":4785,"たい":724,"んな":247,"たら":1203,"では":-294,"つな":-1587,"より":1697,"でも":881,"かも":-1721,"まも":-3453,"最近":1892,"この":-1192,"には":454,"んだ":781,"った":226,"たと":-1187,"。・":2850,"たの":-1057,"とが":-1312,"白い":1354,"かし":1573,"もう":1545,"くれ":2314,"が、":1142,"やく":1335,"とき":2050,"全部":695,"とこ":-63,"。」":2184,"おで":-3878,"は、":931,"まと":-1866,"にも":628,"んで":-494,"とで":1529,"なら":1187,"気に":-333,"もの":-627,"い、":-391,"ちが":-674,"こそ":1536,"ただ":1271,"思い":-1500,"晶の":2483,"もし":1384,"なぐ":1197,"同じ":1197,"のが":916,"けど":753,"あー":1779,"で、":433,"うに":-49,"がと":-955,"りゃ":1760,"まだ":776,"いと":-291,"の間":1507,"よく":582,"なぜ":1651,"てい":-500,"た．":1552,"神社":931,"した":325,"人気":1231,"だけ":600,"かけ":-34,"とう":147,"いで":-1082,"まり":470,"れて":-371,"りと":700,"青い":473,"くて":727,"、今":805,"れが":-562,"の後":977,"２、":-2026,"きた":487,"使い":-992,"普段":718,"きの":-962,"やら":986,"いの":-221,"と、":348,"的な":365,"るに":-612,"との":460,"買い":-753,"問い":-436,"ック":270,"いい":-393,"なく":334,"ので":225,"など":623,"取り":-456,"れる":60,"いも":-807,"べき":989,"ると":91,"か，":-1339,"ぶん":673,"効果":1280,"甘味":569,"ころ":485,"、と":308,"是非":377,"パサ":476,"０円":353,"ゃあ":661,"安に":-718,"らな":-591,"寺、":-1144,"かき":580,"めて":147,"分け":593,"言い":-567,"お店":690,"現在":554,"すい":112,"か、":-371,"世の":-645,"うや":-287,"で…":831,"の上":743,"＾＾":408,"だし":582,"わけ":398,"てる":202,"うか":240,"っと":-33,"えば":240,"める":-175,"ろう":-374,"いた":151,"は頭":928,"ｏｒ":446,"待ち":-469,"ため":514,"さん":64,"絶対":443,"ぱり":286,"ねー":307,"て、":9,"知る":-254,"んて":156,"舞う":328,"こう":-168,"うえ":425,"のも":124,"だん":128,"じて":203,"りは":-290,"とは":-110,"リー":157,"４日":102,"とも":-76,"ここ":100,"すが":-69,"とい":-78,"いし":148,"本語":178,"ては":-102,"すの":-60,"人、":-214,"ほぼ":149,"使う":89,"せん":59,"大変":8,"法的":67,"す☆":58,"空き":-54,"持て":-79,"なー":37,"以上":29,"しか":4,"に水":25,"離宮":29,"たり":4},"TW2":{"いとこ":-3730,"してお":-1405,"ではな":-1947,"気に入":-3717,"ちがう":-1802,"分にあ":-2591,"そのま":-1448,"うにな":-974,"んでい":-1891,"そもそ":-1950,"ではあ":-1780,"どんど":-903,"とがあ":-1081,"れはそ":-1417,"女の子":-1717,"国人が":989,"っての":1292,"らと言":-1185,"ようや":-538,"からな":-624,"てもい":-1357,"でもあ":-1421,"からし":556,"ような":-503,"んなん":1024,"ともあ":-687,"でもな":-1053,"その後":-629,"まるで":-281,"れるこ":266,"それ以":261,"とにな":-327,"ものす":-823,"したこ":-283,"っとい":-404,"ってこ":-220,"しかな":308,"のに対":-259,"とがで":-200,"るにつ":-106,"んなこ":-87,"という":-25,"かもし":-8,"いい感":-8},"TW4":{"ところ":3232,"ありが":2595,"もはや":3296,"どのよ":3827,"ような":-1762,"ようや":3170,"ある。":-583,"くらい":1946,"可能性":2270,"いよい":1454,"ことが":-1192,"しかし":2054,"プログ":1692,"が、そ":1483,"ちがう":2357,"とおり":2028,"した。":-1506,"かなり":2324,"うどん":2043,"あるい":-3230,"いっぱ":1905,"ことに":-1257,"ありま":-963,"だって":1379,"で、そ":1288,"しゃべ":1977,"ことで":319,"してお":1218,"できた":1495,"いろい":1055,"ように":-955,"ことも":-948,"わけで":-622,"おりに":-451,"ない。":218,"ちなみ":1830,"なんと":1084,"やって":185,"だった":-1408,"そうで":-738,"ってこ":412,"とこが":1173,"でも、":468,"して人":-1146,"の京都":548,"なんて":-477,"いかな":448,"こと。":569,"いって":-314,"おりま":1584,"これは":1089,"かけら":645,"いけな":-428,"ことを":358,"なんか":476,"はじま":343,"そのま":373,"ひとつ":84,"すると":228,"勝手に":850,"ことは":-267,"ないと":261,"いえば":439,"でもま":632,"しない":213,"どんど":429,"かった":-228,"とこ取":-230,"メール":47,"いまし":-289,"いくさ":-203,"ようで":-254,"はまっ":90,"なかな":111,"いくら":132,"います":-119,"さらに":42,"あるも":46,"京都に":25,"あたり":-4},"TW3":{"という":530,"のよう":-1023,"ている":-2512,"、そし":-3799,"のまま":-494,"ること":-336,"てしま":-1783,"すこと":899,"らない":-1576,"の本は":-1332,"になっ":-458,"ーした":1308,"とした":-1399,"と言っ":-1426,"のよい":597,"である":-911,"」って":906,"はまっ":-1300,"てほし":-994,"ばいい":-1221,"はない":-473,"と同時":-1341,"として":91,"であっ":-1154,"ところ":-834,"ていう":514,"、また":-825,"ておき":-625,"る方は":-700,"ういう":-635,"ととも":-485,"はそれ":-601,"といっ":-29,"にでも":-638,"てない":-314,"くして":-289,"たこと":-68,"といい":-466,"のこの":-157,"があっ":109,"，それ":-71,"にする":-20,"になる":-8}};
+// BudouX (MIT License, Copyright 2021 Google LLC) - minimal inline parser for Japanese phrase-safe line breaks
+class BudouXParser{constructor(model){this.model=new Map(Object.entries(model).map(([k,v])=>[k,new Map(Object.entries(v))]));this.baseScore=-0.5*[...this.model.values()].flatMap(g=>[...g.values()]).reduce((a,b)=>a+b,0);}
+ parseBoundaries(sentence){const result=[];const g=k=>this.model.get(k);const uw1=g('UW1'),uw2=g('UW2'),uw3=g('UW3'),uw4=g('UW4'),uw5=g('UW5'),uw6=g('UW6'),bw1=g('BW1'),bw2=g('BW2'),bw3=g('BW3'),tw1=g('TW1'),tw2=g('TW2'),tw3=g('TW3'),tw4=g('TW4');
+  for(let i=1;i<sentence.length;i++){let score=this.baseScore;
+   score+=(uw1&&uw1.get(sentence.substring(i-3,i-2)))||0;score+=(uw2&&uw2.get(sentence.substring(i-2,i-1)))||0;score+=(uw3&&uw3.get(sentence.substring(i-1,i)))||0;score+=(uw4&&uw4.get(sentence.substring(i,i+1)))||0;score+=(uw5&&uw5.get(sentence.substring(i+1,i+2)))||0;score+=(uw6&&uw6.get(sentence.substring(i+2,i+3)))||0;
+   score+=(bw1&&bw1.get(sentence.substring(i-2,i)))||0;score+=(bw2&&bw2.get(sentence.substring(i-1,i+1)))||0;score+=(bw3&&bw3.get(sentence.substring(i,i+2)))||0;
+   score+=(tw1&&tw1.get(sentence.substring(i-3,i)))||0;score+=(tw2&&tw2.get(sentence.substring(i-2,i+1)))||0;score+=(tw3&&tw3.get(sentence.substring(i-1,i+2)))||0;score+=(tw4&&tw4.get(sentence.substring(i,i+3)))||0;
+   if(score>0)result.push(i);}
+  return result;}}
+const budouxParser=new BudouXParser(BUDOUX_JA_MODEL);
+const ASCII_WORD=/[A-Za-z0-9]/;
+// 対象セレクタ。変更する場合はCSS側の対応セレクタも揃えること（見本では入れ子の span 等を追加。word-break 等は親から継承される）
+const BUDOUX_WRAP_SELECTOR='h1,h2,h3,h4,h5,h6,p,li,td,th,dt,dd,blockquote,figcaption,span,strong,b,small,em,a,time';
+function insertPhraseBreaks(root){
+ (root||document).querySelectorAll(BUDOUX_WRAP_SELECTOR).forEach(elm=>{
+  Array.from(elm.childNodes).forEach(node=>{
+   if(node.nodeType!==Node.TEXT_NODE||!node.textContent)return;
+   const text=node.textContent;
+   const boundaries=budouxParser.parseBoundaries(text).filter(b=>!(ASCII_WORD.test(text[b-1])&&ASCII_WORD.test(text[b])));
+   if(!boundaries.length)return;
+   const frag=document.createDocumentFragment();let start=0;
+   boundaries.forEach(b=>{frag.append(text.slice(start,b),document.createElement('wbr'));start=b;});
+   frag.append(text.slice(start));
+   node.replaceWith(frag);
+  });
+ });
+}
+window.insertPhraseBreaks=insertPhraseBreaks;
+if(document.readyState==='loading'){
+ document.addEventListener('DOMContentLoaded',()=>insertPhraseBreaks());
+}else{
+ insertPhraseBreaks();
+}
+})();
+</script>
+<!-- budoux:end -->
+</body>
+</html>

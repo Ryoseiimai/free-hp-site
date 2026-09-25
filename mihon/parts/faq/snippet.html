@@ -1,0 +1,28 @@
+<!--
+  部品: よくある質問（AIホームページ製作所 freehp.jp の見本用）
+  動いている見本と使い方: https://freehp.jp/mihon/parts/#faq
+  このファイルはカタログから自動で書き出したもの。直すときはカタログ（mihon/parts/index.html）を直して
+  tools/mihon_parts_snippets.py を流し直す。
+  見本（mihon/<slug>/index.html）に差し込むとき:
+    <head> に  <link rel="stylesheet" href="../parts/tokens.css">
+               <link rel="stylesheet" href="../parts/faq/faq.css">
+    <body> に data-fhp-tone="aoba" などトーンを付ける（または tokens.css の変数を見本の :root に書く）
+-->
+<div class="fhp fhp-faq">
+  <details class="fhp-faq-item">
+    <summary><span class="fhp-faq-q">席の予約はできますか？</span><span class="fhp-faq-mark" aria-hidden="true"></span></summary>
+    <div class="fhp-faq-a"><p>ふだんは予約を受けていません。6名以上でお越しのときは、前日までにお電話ください。</p></div>
+  </details>
+  <details class="fhp-faq-item">
+    <summary><span class="fhp-faq-q">カードや電子マネーは使えますか？</span><span class="fhp-faq-mark" aria-hidden="true"></span></summary>
+    <div class="fhp-faq-a"><p>現金のほか、交通系ICカードとQRコード決済が使えます。</p><p class="fhp-faq-note">クレジットカードは使えません。</p></div>
+  </details>
+  <details class="fhp-faq-item">
+    <summary><span class="fhp-faq-q">子ども連れでも入れますか？</span><span class="fhp-faq-mark" aria-hidden="true"></span></summary>
+    <div class="fhp-faq-a"><p>はい。子ども用の椅子が2脚あります。ベビーカーは入口の横に置けます。</p></div>
+  </details>
+  <details class="fhp-faq-item">
+    <summary><span class="fhp-faq-q">駐車場はありますか？</span><span class="fhp-faq-mark" aria-hidden="true"></span></summary>
+    <div class="fhp-faq-a"><p>店の駐車場はありません。近くのコインパーキングをご利用ください。</p></div>
+  </details>
+</div>

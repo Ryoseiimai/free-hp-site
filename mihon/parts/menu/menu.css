@@ -1,0 +1,74 @@
+/*
+  メニュー・料金表
+  同じ HTML を、外側のクラスで2つの形に切り替える。
+    fhp-menu--photo  写真のある品は写真つきの札にし、写真のない品は下に点線の一覧で並べる（大事な品ほど大きく）
+    fhp-menu--text   写真を出さず、全部を点線の一覧にする（品数が多い店・写真がまだない店向け）
+  価格は税込で書き、分類の上に「税込」とひとこと添える。
+  HTML は 品名・価格・説明を .fhp-menu-body に入れる。一覧の形では body を display: contents にして点線でつなぐ。
+*/
+.fhp-menu { container-type: inline-size; }
+.fhp-menu-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: .4rem 1.2rem; border-bottom: 1px solid var(--fhp-line); }
+.fhp-menu-tabs { display: flex; flex-wrap: wrap; gap: 0 .2rem; margin-bottom: -1px; }
+.fhp-menu-tab {
+  min-height: 48px;
+  padding: .5rem .9rem;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  background: none;
+  color: var(--fhp-muted);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.fhp-menu-tab:hover { color: var(--fhp-fg); }
+.fhp-menu-tab[aria-selected="true"] { border-bottom-color: var(--fhp-accent); color: var(--fhp-fg); }
+.fhp-menu-tab:focus-visible { outline-offset: -3px; }
+.fhp-menu-tax { margin: 0 0 .6rem; color: var(--fhp-muted); font-size: .88rem; }
+
+.fhp-menu-panel { padding-top: 1.4rem; }
+.fhp-menu-panel:focus-visible { outline-offset: 4px; }
+.fhp-menu-list { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
+
+/* 点線の一覧（文字だけの形と、写真のない品） */
+.fhp-menu-item { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: .6rem; padding: .55rem 0; }
+.fhp-menu-item img { display: none; }
+.fhp-menu-body { display: contents; }
+.fhp-menu-name { order: 1; margin: 0; font-weight: 700; }
+.fhp-menu-item::after { content: ""; order: 2; flex: 1 1 1.5rem; border-bottom: 2px dotted var(--fhp-edge); transform: translateY(-.3em); }
+.fhp-menu-price { order: 3; margin: 0; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.fhp-menu-desc { order: 4; flex-basis: 100%; margin: .1rem 0 0; color: var(--fhp-muted); font-size: .9rem; line-height: 1.7; }
+
+/* 写真つきの形: 写真のある品だけ札にする */
+.fhp-menu--photo .fhp-menu-list { grid-template-columns: minmax(0, 1fr); column-gap: 20px; }
+.fhp-menu--photo .fhp-menu-item:has(img) {
+  display: grid;
+  grid-template-columns: clamp(72px, 28cqi, 104px) minmax(0, 1fr);
+  column-gap: 16px;
+  align-items: start;
+  padding: 0 0 1.2rem;
+}
+.fhp-menu--photo .fhp-menu-item:has(img)::after { content: none; }
+.fhp-menu--photo .fhp-menu-item:has(img) img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: var(--fhp-radius-s);
+}
+.fhp-menu--photo .fhp-menu-item:has(img) .fhp-menu-body { display: block; }
+.fhp-menu--photo .fhp-menu-item:has(img) .fhp-menu-name { font-family: var(--fhp-display); font-size: 1.2rem; line-height: 1.45; }
+.fhp-menu--photo .fhp-menu-item:has(img) .fhp-menu-price { margin-top: .25rem; font-size: 1.05rem; }
+.fhp-menu--photo .fhp-menu-item:has(img) .fhp-menu-desc { margin-top: .3rem; }
+/* 札と点線の一覧の間を少し空ける */
+.fhp-menu--photo .fhp-menu-item:has(img) + .fhp-menu-item:not(:has(img)) { margin-top: .4rem; padding-top: 1rem; border-top: 1px solid var(--fhp-line); }
+
+@container (min-width: 560px) {
+  .fhp-menu--photo .fhp-menu-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .fhp-menu--photo .fhp-menu-item:not(:has(img)) { grid-column: 1 / -1; }
+  .fhp-menu--photo .fhp-menu-item:has(img) { grid-template-columns: minmax(0, 1fr); row-gap: .8rem; }
+  .fhp-menu--photo .fhp-menu-item:has(img) img { aspect-ratio: 4 / 3; border-radius: var(--fhp-radius); }
+}
+@container (min-width: 900px) {
+  .fhp-menu--photo .fhp-menu-list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
