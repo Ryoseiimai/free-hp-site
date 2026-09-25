@@ -4,6 +4,7 @@
   - 写真ギャラリーの枚数、予約・問い合わせの時刻、メニューの形を試す
   - お知らせの日付を「開いた日から◯日前」に入れ直す（いつ開いても新着の印が見えるように）
   - data-demo の付いたリンクは移動せず、本番で何が起きるかを一言出す
+  - 「コードをコピー」「コードを見る」: <部品>/copy.html（貼るだけで動く1まとまり）を読み込んで使う
   URL の ?tone= ?count= ?now= ?menu= で最初の状態を決められる（撮影・確認用）。
   部品の JS より前（DOMContentLoaded の前）に動くので、日付や枚数は部品が数える前に決まる。
 */
@@ -97,5 +98,72 @@
     e.preventDefault();
     var msg = link.closest('.stage').querySelector('.stage-msg');
     if (msg) msg.textContent = DEMO_TEXT[link.dataset.channel] || '見本のため、このリンクは移動しません。';
+  });
+
+  // コードをコピー／コードを見る
+  var COPIED_MS = 4000;
+  var codeCache = {};
+  function loadCode(name) {
+    if (!codeCache[name]) {
+      codeCache[name] = fetch(name + '/copy.html').then(function (res) {
+        if (!res.ok) throw new Error(res.status);
+        return res.text();
+      });
+    }
+    return codeCache[name];
+  }
+  // クリップボードの API が使えない環境（古いブラウザ・http）では、選択してコピーする昔の方法に切り替える
+  function writeClipboard(text) {
+    if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
+    return new Promise(function (resolve, reject) {
+      var area = document.createElement('textarea');
+      area.value = text;
+      area.setAttribute('readonly', '');
+      area.style.position = 'fixed';
+      area.style.opacity = '0';
+      document.body.appendChild(area);
+      area.select();
+      var ok = document.execCommand('copy');
+      area.remove();
+      if (ok) resolve();
+      else reject(new Error('copy failed'));
+    });
+  }
+  var LOAD_FAILED = 'コードを読み込めませんでした。freehp.jp のページを開き直すか、上の zip をダウンロードしてください。';
+  document.querySelectorAll('.copy-btn').forEach(function (btn) {
+    var msg = document.getElementById(btn.getAttribute('aria-describedby'));
+    var timer = null;
+    // 文を <span> に入れて、BudouX で文節の途中の改行を防ぐ
+    function say(text) {
+      var span = document.createElement('span');
+      span.textContent = text;
+      msg.replaceChildren(span);
+      if (window.insertPhraseBreaks) window.insertPhraseBreaks(msg);
+    }
+    btn.addEventListener('click', function () {
+      loadCode(btn.dataset.copy)
+        .then(writeClipboard)
+        .then(function () {
+          btn.classList.add('is-done');
+          say('コピーしました。置きたい場所に貼り付けてください。');
+        })
+        .catch(function () {
+          btn.classList.remove('is-done');
+          say('コピーできませんでした。「コードを見る」を開いて、選んでコピーしてください。');
+        })
+        .then(function () {
+          clearTimeout(timer);
+          timer = setTimeout(function () { btn.classList.remove('is-done'); }, COPIED_MS);
+        });
+    });
+  });
+  document.querySelectorAll('.part-code').forEach(function (box) {
+    box.addEventListener('toggle', function () {
+      if (!box.open || box.dataset.loaded) return;
+      var code = box.querySelector('code');
+      loadCode(box.dataset.code)
+        .then(function (text) { code.textContent = text; box.dataset.loaded = 'true'; })
+        .catch(function () { code.textContent = LOAD_FAILED; });
+    });
   });
 })();

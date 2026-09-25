@@ -179,6 +179,70 @@ def swipe_run(browser, url, shots):
     return {"before": before, "after": after, "ok": before != after}
 
 
+PARTS = ["gallery", "contact", "map", "menu", "voice", "faq", "news", "hearing"]
+PUBLIC_URL = "https://freehp.jp/mihon/parts/"
+
+
+def copy_run(browser, url, shots):
+    """「コードをコピー」でクリップボードに入る中身と、「コードを見る」の表示。キーボードだけで押す。"""
+    ctx = browser.new_context(viewport={"width": 1440, "height": 900})
+    ctx.grant_permissions(["clipboard-read", "clipboard-write"], origin=url.split("/mihon/")[0])
+    ctx.add_init_script(UNSTICK_JS)
+    page = ctx.new_page()
+    page.goto(f"{url}?tone=genkido")
+    settle(page)
+    r = {"head": page.evaluate("""() => ({
+      noindex: !!document.querySelector('meta[name=robots][content*=noindex]'),
+      og: [...document.querySelectorAll('meta[property^="og:"]')].length,
+      canonical: document.querySelector('link[rel=canonical]')?.href })""")}
+    for name in PARTS:
+        page.evaluate("document.activeElement && document.activeElement.blur()")
+        page.focus(f'.copy-btn[data-copy="{name}"]')
+        page.keyboard.press("Enter")
+        page.wait_for_function(f"document.getElementById('{name}-copy-msg').textContent !== ''")
+        text = page.evaluate("navigator.clipboard.readText()")
+        r[name] = {
+            "msg": page.inner_text(f"#{name}-copy-msg")[:12],
+            "bytes": len(text.encode()),
+            "has_style": "<style>" in text and "--fhp-bg" in text,
+            "has_html": "class=\"fhp " in text,
+            "has_js": "<script>" in text,
+            "no_demo": "data-demo" not in text and "data-days-ago" not in text,
+        }
+    page.locator("#gallery .part-info").screenshot(path=str(shots / "copy-done-gallery-1440.png"))
+    tab_to(page, '.part-code[data-code="gallery"] > summary')
+    page.keyboard.press("Enter")
+    page.wait_for_function("document.querySelector('.part-code[data-code=gallery]').dataset.loaded === 'true'")
+    page.locator('.part-code[data-code="gallery"]').screenshot(path=str(shots / "code-open-gallery-1440.png"))
+    r["code_viewer"] = page.evaluate("document.querySelector('.part-code[data-code=gallery] code').textContent.length")
+    ctx.close()
+    return r
+
+
+def standalone_run(browser, url):
+    """copy.html を、何もない白いページにそのまま貼っても動くか（写真と音声の URL は手元に向け替える）。"""
+    base = url  # http://127.0.0.1:port/mihon/parts/
+    out = {}
+    for name in PARTS:
+        bundle = (ROOT / "mihon/parts" / name / "copy.html").read_text(encoding="utf-8")
+        html = "<!doctype html><html lang=ja><head><meta charset=utf-8><meta name=viewport content='width=device-width'></head><body>" \
+            + bundle.replace(PUBLIC_URL, base) + "</body></html>"
+        page = browser.new_page(viewport={"width": 390, "height": 844})
+        errors = []
+        page.on("pageerror", lambda e: errors.append(str(e)))
+        page.on("console", lambda m: errors.append(m.text) if m.type == "error" else None)
+        page.route("**/standalone.html", lambda route: route.fulfill(content_type="text/html", body=html))
+        page.goto(base + "standalone.html")
+        settle(page)
+        out[name] = {
+            "errors": errors,
+            "ready": page.evaluate("document.querySelectorAll('[data-fhp-ready]').length"),
+            "overflow": page.evaluate("document.documentElement.scrollWidth - document.documentElement.clientWidth"),
+        }
+        page.close()
+    return out
+
+
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     httpd, url = serve()
@@ -273,9 +337,23 @@ def main():
 
         # 4. スワイプ
         report["swipe"] = swipe_run(browser, f"{url}?tone=aoba", OUT)
+        # 5. コードのコピーと表示、貼っただけで動くか
+        report["copy"] = copy_run(browser, url, OUT)
+        report["standalone"] = standalone_run(browser, url)
         browser.close()
     httpd.shutdown()
 
+    cp = report["copy"]
+    if cp["head"]["noindex"] or cp["head"]["og"] < 6:
+        fail.append(f"head {cp['head']}")
+    for name in PARTS:
+        c = cp[name]
+        if not (c["msg"].startswith("コピーしました") and c["has_style"] and c["has_html"] and c["no_demo"]
+                and (c["has_js"] or name == "faq")):
+            fail.append(f"copy {name} {c}")
+        st = report["standalone"][name]
+        if st["errors"] or (name != "faq" and st["ready"] < 1) or st["overflow"] > 0:
+            fail.append(f"standalone {name} {st}")
     kb = report["keyboard"]
     for k, v in kb.items():
         if v is False:

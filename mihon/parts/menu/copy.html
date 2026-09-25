@@ -1,0 +1,313 @@
+<!--
+  メニュー・料金表（AIホームページ製作所がつくった、無料で使える部品）
+  動いている見本: https://freehp.jp/mihon/parts/#menu
+  使い方
+    1. このコードをまるごと、自分のページの置きたい場所に貼る
+    2. すぐ下の :root { ... } にある色（--fhp- で始まる行）を、お店の色に書き換える
+    3. 文字・写真・リンク先を、自分のお店のものに書き換える
+  写真と音声は見本用の仮のものです（実在するお店の商品として使わないでください）。
+  Copyright (c) 2026 RYOSEIWORLD (Ryosei Imai). MIT No Attribution（MIT-0）。商用・改変・再配布も自由で、表記は要りません。
+-->
+<style>
+/*
+  部品の色・角丸・書体の差し込み口（トークン）
+  ------------------------------------------------------------
+  部品のCSSはすべてこの変数だけを見る。色を変えたいときは、下の :root の値を書き換えるだけでよい。
+  用意したトーン（あおば・元気堂・そらまめ）を使うときは、部品の外側（body など）に data-fhp-tone="aoba" などを付ける。
+    --fhp-bg        地の色
+    --fhp-fg        文字の色（地に対し 4.5:1 以上）
+    --fhp-muted     補助の文字（地に対し 4.5:1 以上）
+    --fhp-line      飾りの区切り線（弱くてよい）
+    --fhp-edge      押せる物の枠線（地に対し 3:1 以上。WCAG 1.4.11）
+    --fhp-accent    差し色。ボタンの塗り・印・選んだ状態だけに使う（地に対し 4.5:1 以上）
+    --fhp-on-accent 差し色の上の文字（4.5:1 以上）
+    --fhp-shade     写真を拡大したときの暗い地（白い文字が乗る）
+    --fhp-radius    大きい枠の角丸   --fhp-radius-s  ボタンなど小さい物の角丸
+    --fhp-display   見出しの書体     --fhp-body      本文の書体
+*/
+:root {
+  --fhp-bg: #FFFFFF;
+  --fhp-fg: #1D1D1F;
+  --fhp-muted: #6E6E73;
+  --fhp-line: #D2D2D7;
+  --fhp-edge: #86868B;
+  --fhp-accent: #1B6B44;
+  --fhp-on-accent: #FFFFFF;
+  --fhp-shade: #1D1D1F;
+  --fhp-radius: 14px;
+  --fhp-radius-s: 10px;
+  --fhp-display: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+  --fhp-body: var(--fhp-display);
+}
+
+/* 純喫茶 あおば: 暗い木の地・象牙色の文字・ランプの琥珀。角は立てる */
+[data-fhp-tone="aoba"] {
+  --fhp-bg: #221812;
+  --fhp-fg: #EFE3CB;
+  --fhp-muted: #C9BBA2;
+  --fhp-line: rgba(239, 227, 203, .24);
+  --fhp-edge: #7D6E5A;
+  --fhp-accent: #E4B96A;
+  --fhp-on-accent: #221812;
+  --fhp-shade: #140E0A;
+  --fhp-radius: 0px;
+  --fhp-radius-s: 0px;
+  --fhp-display: "Kaisei Decol", "Hiragino Mincho ProN", serif;
+  --fhp-body: "Zen Kaku Gothic Antique", "Hiragino Sans", sans-serif;
+  color-scheme: dark;
+}
+
+/* からだ元気堂: 白地・システムフォント・観葉植物の緑。角は丸い（Apple HIG 寄り） */
+[data-fhp-tone="genkido"] {
+  color-scheme: light;
+  --fhp-bg: #FFFFFF;
+  --fhp-fg: #1D1D1F;
+  --fhp-muted: #6E6E73;
+  --fhp-line: #D2D2D7;
+  --fhp-edge: #86868B;
+  --fhp-accent: #1B6B44;
+  --fhp-on-accent: #FFFFFF;
+  --fhp-shade: #1D1D1F;
+  --fhp-radius: 14px;
+  --fhp-radius-s: 10px;
+  --fhp-display: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+  --fhp-body: var(--fhp-display);
+}
+
+/* そらまめ焙煎所: 白地・深煎りの茶・クラフト紙。見出しは明朝、角はわずかに */
+[data-fhp-tone="soramame"] {
+  color-scheme: light;
+  --fhp-bg: #FFFFFF;
+  --fhp-fg: #3B2B20;
+  --fhp-muted: #6F6053;
+  --fhp-line: #E6DAC6;
+  --fhp-edge: #9C8466;
+  --fhp-accent: #7A5230;
+  --fhp-on-accent: #FFFFFF;
+  --fhp-shade: #2A1F17;
+  --fhp-radius: 4px;
+  --fhp-radius-s: 3px;
+  --fhp-display: "Zen Old Mincho", "Hiragino Mincho ProN", serif;
+  --fhp-body: "Zen Kaku Gothic New", "Hiragino Sans", sans-serif;
+}
+
+/* 部品の共通の土台。部品の一番外側に .fhp を付ける */
+.fhp {
+  color: var(--fhp-fg);
+  font-family: var(--fhp-body);
+  font-feature-settings: "palt" 1;
+}
+.fhp *, .fhp *::before, .fhp *::after { box-sizing: border-box; }
+.fhp :focus-visible { outline: 2px solid var(--fhp-accent); outline-offset: 3px; }
+.fhp .fhp-nw { white-space: nowrap; }
+/* 部品の中で display を指定していても、hidden を付けた物は必ず隠す */
+.fhp [hidden] { display: none !important; }
+/* 見本の BudouX（文節の途中で改行しない）に合わせ、フォームやボタンの文字も同じ折り返し方にする。
+   文は <span> に入れておくと、BudouX が文節の区切りを入れる */
+.fhp legend, .fhp label, .fhp summary, .fhp button, .fhp .fhp-btn {
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  line-break: strict;
+}
+.fhp-vh {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* 部品で使うボタンの共通形。塗り（主）と枠（副）の2種類だけ */
+.fhp-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5em;
+  min-height: 48px;
+  padding: .55em 1.3em;
+  border: 1px solid var(--fhp-accent);
+  border-radius: var(--fhp-radius-s);
+  background: var(--fhp-accent);
+  color: var(--fhp-on-accent);
+  font: inherit;
+  font-weight: 700;
+  line-height: 1.4;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+.fhp-btn:hover { text-decoration: underline; text-underline-offset: .25em; }
+.fhp-btn--sub {
+  border-color: var(--fhp-edge);
+  background: transparent;
+  color: var(--fhp-fg);
+}
+.fhp-btn svg { flex: none; width: 1.15em; height: 1.15em; }
+.fhp-btn[hidden] { display: none; }
+
+/*
+  メニュー・料金表
+  同じ HTML を、外側のクラスで2つの形に切り替える。
+    fhp-menu--photo  写真のある品は写真つきの札にし、写真のない品は下に点線の一覧で並べる（大事な品ほど大きく）
+    fhp-menu--text   写真を出さず、全部を点線の一覧にする（品数が多い店・写真がまだない店向け）
+  価格は税込で書き、分類の上に「税込」とひとこと添える。
+  HTML は 品名・価格・説明を .fhp-menu-body に入れる。一覧の形では body を display: contents にして点線でつなぐ。
+*/
+.fhp-menu { container-type: inline-size; }
+.fhp-menu-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: .4rem 1.2rem; border-bottom: 1px solid var(--fhp-line); }
+.fhp-menu-tabs { display: flex; flex-wrap: wrap; gap: 0 .2rem; margin-bottom: -1px; }
+.fhp-menu-tab {
+  min-height: 48px;
+  padding: .5rem .9rem;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  background: none;
+  color: var(--fhp-muted);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.fhp-menu-tab:hover { color: var(--fhp-fg); }
+.fhp-menu-tab[aria-selected="true"] { border-bottom-color: var(--fhp-accent); color: var(--fhp-fg); }
+.fhp-menu-tab:focus-visible { outline-offset: -3px; }
+.fhp-menu-tax { margin: 0 0 .6rem; color: var(--fhp-muted); font-size: .88rem; }
+
+.fhp-menu-panel { padding-top: 1.4rem; }
+.fhp-menu-panel:focus-visible { outline-offset: 4px; }
+.fhp-menu-list { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
+
+/* 点線の一覧（文字だけの形と、写真のない品） */
+.fhp-menu-item { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: .6rem; padding: .55rem 0; }
+.fhp-menu-item img { display: none; }
+.fhp-menu-body { display: contents; }
+.fhp-menu-name { order: 1; margin: 0; font-weight: 700; }
+.fhp-menu-item::after { content: ""; order: 2; flex: 1 1 1.5rem; border-bottom: 2px dotted var(--fhp-edge); transform: translateY(-.3em); }
+.fhp-menu-price { order: 3; margin: 0; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.fhp-menu-desc { order: 4; flex-basis: 100%; margin: .1rem 0 0; color: var(--fhp-muted); font-size: .9rem; line-height: 1.7; }
+
+/* 写真つきの形: 写真のある品だけ札にする */
+.fhp-menu--photo .fhp-menu-list { grid-template-columns: minmax(0, 1fr); column-gap: 20px; }
+.fhp-menu--photo .fhp-menu-item:has(img) {
+  display: grid;
+  grid-template-columns: clamp(72px, 28cqi, 104px) minmax(0, 1fr);
+  column-gap: 16px;
+  align-items: start;
+  padding: 0 0 1.2rem;
+}
+.fhp-menu--photo .fhp-menu-item:has(img)::after { content: none; }
+.fhp-menu--photo .fhp-menu-item:has(img) img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: var(--fhp-radius-s);
+}
+.fhp-menu--photo .fhp-menu-item:has(img) .fhp-menu-body { display: block; }
+.fhp-menu--photo .fhp-menu-item:has(img) .fhp-menu-name { font-family: var(--fhp-display); font-size: 1.2rem; line-height: 1.45; }
+.fhp-menu--photo .fhp-menu-item:has(img) .fhp-menu-price { margin-top: .25rem; font-size: 1.05rem; }
+.fhp-menu--photo .fhp-menu-item:has(img) .fhp-menu-desc { margin-top: .3rem; }
+/* 札と点線の一覧の間を少し空ける */
+.fhp-menu--photo .fhp-menu-item:has(img) + .fhp-menu-item:not(:has(img)) { margin-top: .4rem; padding-top: 1rem; border-top: 1px solid var(--fhp-line); }
+
+@container (min-width: 560px) {
+  .fhp-menu--photo .fhp-menu-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .fhp-menu--photo .fhp-menu-item:not(:has(img)) { grid-column: 1 / -1; }
+  .fhp-menu--photo .fhp-menu-item:has(img) { grid-template-columns: minmax(0, 1fr); row-gap: .8rem; }
+  .fhp-menu--photo .fhp-menu-item:has(img) img { aspect-ratio: 4 / 3; border-radius: var(--fhp-radius); }
+}
+@container (min-width: 900px) {
+  .fhp-menu--photo .fhp-menu-list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+</style>
+<div class="fhp fhp-menu fhp-menu--photo" data-fhp-menu>
+  <div class="fhp-menu-head">
+    <div class="fhp-menu-tabs" role="tablist" aria-label="メニューの分類">
+      <button type="button" class="fhp-menu-tab" role="tab" id="fhp-menu-tab-drink" aria-controls="fhp-menu-drink" aria-selected="true">飲みもの</button>
+      <button type="button" class="fhp-menu-tab" role="tab" id="fhp-menu-tab-food" aria-controls="fhp-menu-food" aria-selected="false">お食事</button>
+      <button type="button" class="fhp-menu-tab" role="tab" id="fhp-menu-tab-sweet" aria-controls="fhp-menu-sweet" aria-selected="false">甘いもの</button>
+    </div>
+    <p class="fhp-menu-tax">価格はすべて税込です</p>
+  </div>
+  <div class="fhp-menu-panel" role="tabpanel" id="fhp-menu-drink" aria-labelledby="fhp-menu-tab-drink" tabindex="0">
+    <ul class="fhp-menu-list">
+      <li class="fhp-menu-item">
+        <img src="https://freehp.jp/mihon/parts/img/soda-ice-s.jpg" width="450" height="446" loading="lazy" decoding="async" alt="緑のソーダにバニラアイスとさくらんぼをのせたクリームソーダ。">
+        <div class="fhp-menu-body"><p class="fhp-menu-name">クリームソーダ</p><p class="fhp-menu-price">650円</p><p class="fhp-menu-desc">メロン・いちご・ブルーの3色から選べます。</p></div>
+      </li>
+      <li class="fhp-menu-item">
+        <img src="https://freehp.jp/mihon/parts/img/beans-pile-s.jpg" width="640" height="366" loading="lazy" decoding="async" alt="つやのある中深煎りのコーヒー豆。">
+        <div class="fhp-menu-body"><p class="fhp-menu-name">ブレンド珈琲</p><p class="fhp-menu-price">500円</p><p class="fhp-menu-desc">中深煎りの豆を、一杯ずつネルで淹れます。</p></div>
+      </li>
+      <li class="fhp-menu-item"><div class="fhp-menu-body"><p class="fhp-menu-name">紅茶</p><p class="fhp-menu-price">500円</p><p class="fhp-menu-desc">ストレート・レモン・ミルク</p></div></li>
+      <li class="fhp-menu-item"><div class="fhp-menu-body"><p class="fhp-menu-name">カフェオレ</p><p class="fhp-menu-price">600円</p></div></li>
+      <li class="fhp-menu-item"><div class="fhp-menu-body"><p class="fhp-menu-name">オレンジジュース</p><p class="fhp-menu-price">550円</p></div></li>
+    </ul>
+  </div>
+  <div class="fhp-menu-panel" role="tabpanel" id="fhp-menu-food" aria-labelledby="fhp-menu-tab-food" tabindex="0" hidden>
+    <ul class="fhp-menu-list">
+      <li class="fhp-menu-item"><div class="fhp-menu-body"><p class="fhp-menu-name">ナポリタン</p><p class="fhp-menu-price">850円</p><p class="fhp-menu-desc">太めの麺を、ケチャップでしっかり炒めています。</p></div></li>
+      <li class="fhp-menu-item"><div class="fhp-menu-body"><p class="fhp-menu-name">たまごサンド</p><p class="fhp-menu-price">750円</p></div></li>
+      <li class="fhp-menu-item"><div class="fhp-menu-body"><p class="fhp-menu-name">ピザトースト</p><p class="fhp-menu-price">700円</p></div></li>
+    </ul>
+  </div>
+  <div class="fhp-menu-panel" role="tabpanel" id="fhp-menu-sweet" aria-labelledby="fhp-menu-tab-sweet" tabindex="0" hidden>
+    <ul class="fhp-menu-list">
+      <li class="fhp-menu-item"><div class="fhp-menu-body"><p class="fhp-menu-name">厚焼きホットケーキ</p><p class="fhp-menu-price">700円</p><p class="fhp-menu-desc">焼き上がりまで20分ほどいただきます。</p></div></li>
+      <li class="fhp-menu-item"><div class="fhp-menu-body"><p class="fhp-menu-name">固めのプリン</p><p class="fhp-menu-price">450円</p></div></li>
+    </ul>
+  </div>
+</div>
+<script>
+/*
+  メニュー・料金表: 分類のタブ切り替え（WAI-ARIA の tabs の作法どおり）。
+  左右の矢印キー・Home/End でタブを移り、選んだ分類の一覧だけを見せる。
+  「写真つき」「文字だけ」は JS ではなく外側のクラス（fhp-menu--photo / fhp-menu--text）で切り替える。
+*/
+(function () {
+  'use strict';
+
+  function initMenu(root) {
+    var tabs = Array.prototype.slice.call(root.querySelectorAll('[role="tab"]'));
+    if (!tabs.length) return;
+
+    function select(tab, moveFocus) {
+      tabs.forEach(function (t) {
+        var on = t === tab;
+        t.setAttribute('aria-selected', String(on));
+        t.tabIndex = on ? 0 : -1;
+        var panel = document.getElementById(t.getAttribute('aria-controls'));
+        if (panel) panel.hidden = !on;
+      });
+      if (moveFocus) tab.focus();
+    }
+
+    root.addEventListener('click', function (e) {
+      var tab = e.target.closest('[role="tab"]');
+      if (tab && tabs.indexOf(tab) !== -1) select(tab, false);
+    });
+    root.addEventListener('keydown', function (e) {
+      var i = tabs.indexOf(document.activeElement);
+      if (i === -1) return;
+      var next = { ArrowRight: i + 1, ArrowLeft: i - 1, Home: 0, End: tabs.length - 1 }[e.key];
+      if (next === undefined) return;
+      e.preventDefault();
+      select(tabs[(next + tabs.length) % tabs.length], true);
+    });
+
+    var initial = tabs.find(function (t) { return t.getAttribute('aria-selected') === 'true'; }) || tabs[0];
+    select(initial, false);
+  }
+
+  function initAll() {
+    // 同じ部品のコードを2回貼っても、1つの部品を二重に動かさない
+    document.querySelectorAll('[data-fhp-menu]').forEach(function (el) {
+      if (el.dataset.fhpReady) return;
+      el.dataset.fhpReady = 'true';
+      initMenu(el);
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initAll);
+  else initAll();
+})();
+</script>

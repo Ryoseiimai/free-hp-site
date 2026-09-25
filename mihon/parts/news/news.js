@@ -54,7 +54,12 @@
   }
 
   function initAll() {
-    document.querySelectorAll('[data-fhp-news]').forEach(initNews);
+    // 同じ部品のコードを2回貼っても、1つの部品を二重に動かさない
+    document.querySelectorAll('[data-fhp-news]').forEach(function (el) {
+      if (el.dataset.fhpReady) return;
+      el.dataset.fhpReady = 'true';
+      initNews(el);
+    });
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initAll);
   else initAll();

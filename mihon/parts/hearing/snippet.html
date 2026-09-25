@@ -9,8 +9,9 @@
     </body> の前に <script src="../parts/hearing/hearing.js"></script>
     <body> に data-fhp-tone="aoba" などトーンを付ける（または tokens.css の変数を見本の :root に書く）
 -->
-<!-- data-catalog は部品の説明ページ（このカタログ）の場所。snippet.html では見本から見た ../parts/ になる -->
-<div class="fhp fhp-hear" data-fhp-hearing data-catalog="../parts/">
+<!-- data-mail は相談を受けるメールアドレス（自分のサイトで使うときは書き換える）。
+     data-catalog は部品の説明ページ（このカタログ）の場所。snippet.html では ../parts/、copy.html では https://freehp.jp/mihon/parts/ になる -->
+<div class="fhp fhp-hear" data-fhp-hearing data-catalog="../parts/" data-mail="info@freehp.jp">
   <form novalidate>
     <fieldset data-required data-short="お仕事">
       <legend><span>どんなお仕事ですか</span></legend>
@@ -61,6 +62,6 @@
       <ul class="fhp-hear-secondary"></ul>
     </div>
     <p class="fhp-hear-cta"><a class="fhp-btn fhp-hear-mail" href="mailto:info@freehp.jp">この内容でご相談ください</a></p>
-    <p class="fhp-hear-cta-note">メールのアプリが開き、答えと組み合わせが本文に入ります。送るかどうかは、中身を見てから決められます。宛先は info@freehp.jp です。</p>
+    <p class="fhp-hear-cta-note">メールのアプリが開き、答えと組み合わせが本文に入ります。送るかどうかは、中身を見てから決められます。宛先は <span class="fhp-hear-mail-to">info@freehp.jp</span> です。</p>
   </div>
 </div>

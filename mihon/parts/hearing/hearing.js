@@ -1,6 +1,7 @@
 /*
   聞き返し: 「どんなホームページにしたいか」を4問の選択式で聞き、答えから部品の組み合わせを提案する。
-  - 送信はしない。提案の下に info@freehp.jp へのメールのリンク（答えと提案を本文に入れたもの）だけ出す
+  - 送信はしない。提案の下に相談先へのメールのリンク（答えと提案を本文に入れたもの）だけ出す。
+    相談先は data-mail（既定 info@freehp.jp）。自分のサイトで使うときは自分のアドレスに書き換える
   - 部品の説明リンクは data-catalog（既定は同じページ）+ #部品名 に飛ぶ
   - 提案の決まり（RULES）: 答えに当てはまる理由を1つずつ見て、先に当たった理由を使う。
     Q2「いちばん見てほしいもの」で選ばれた部品を先頭（まず入れる部品）にする
@@ -74,14 +75,14 @@
       .map(function (x) { return x.c; });
   }
 
-  function mailHref(form, list) {
+  function mailHref(form, list, mailTo) {
     var lines = Array.prototype.slice.call(form.querySelectorAll('fieldset')).map(function (fs) {
       var picked = Array.prototype.slice.call(fs.querySelectorAll('input:checked')).map(labelOf);
       return fs.dataset.short + ': ' + (picked.join('、') || 'とくになし');
     });
     lines.push('提案された部品: ' + list.map(function (c) { return PARTS[c.part]; }).join('、'));
     var body = 'ホームページの相談です。\n\n' + lines.join('\n') + '\n\n（ここに、お店や活動の名前と、ご希望があれば書いてください）\n';
-    return 'mailto:' + MAIL_TO + '?subject=' + encodeURIComponent(MAIL_SUBJECT) + '&body=' + encodeURIComponent(body);
+    return 'mailto:' + mailTo + '?subject=' + encodeURIComponent(MAIL_SUBJECT) + '&body=' + encodeURIComponent(body);
   }
 
   function item(c, base, primary) {
@@ -106,6 +107,7 @@
     var result = root.querySelector('.fhp-hear-result');
     var error = root.querySelector('.fhp-hear-error');
     var base = root.dataset.catalog || '';
+    var mailTo = root.dataset.mail || MAIL_TO;
 
     form.addEventListener('submit', function (e) {
       e.preventDefault();
@@ -133,7 +135,9 @@
         (i < PRIMARY_COUNT ? primary : secondary).appendChild(item(c, base, i < PRIMARY_COUNT));
       });
       result.querySelector('.fhp-hear-secondary-wrap').hidden = list.length <= PRIMARY_COUNT;
-      result.querySelector('.fhp-hear-mail').href = mailHref(form, list);
+      result.querySelector('.fhp-hear-mail').href = mailHref(form, list, mailTo);
+      var shown = result.querySelector('.fhp-hear-mail-to');
+      if (shown) shown.textContent = mailTo;
       result.hidden = false;
       if (window.insertPhraseBreaks) {
         window.insertPhraseBreaks(primary);
@@ -163,7 +167,12 @@
   }
 
   function initAll() {
-    document.querySelectorAll('[data-fhp-hearing]').forEach(initHearing);
+    // 同じ部品のコードを2回貼っても、1つの部品を二重に動かさない
+    document.querySelectorAll('[data-fhp-hearing]').forEach(function (el) {
+      if (el.dataset.fhpReady) return;
+      el.dataset.fhpReady = 'true';
+      initHearing(el);
+    });
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initAll);
   else initAll();

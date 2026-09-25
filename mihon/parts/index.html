@@ -1,18 +1,20 @@
 <!doctype html>
 <!--
-  見本に差し込む部品（カタログ）
+  ホームページに貼れる部品（カタログ・誰でも無料で使える配布物）
   ============================================================
   ■ このページの役割
-    見込み客の要望（「写真をたくさん見せたい」「LINEで予約を受けたい」など）を聞いたら、
-    ここから合う部品を選んで、見本（mihon/<slug>/）にそのまま差し込む。全部品をこのページで実際に動かしている。
+    ①誰でも: 部品の「コードをコピー」で copy.html（トークン・CSS・HTML・JS の1まとまり）をコピーし、貼るだけで使える。
+       全部品の zip（freehp-parts.zip）も置く。ライセンスは MIT No Attribution（LICENSE）。
+    ②freehp 自身: 見込み客の要望（「写真をたくさん見せたい」など）を聞いたら、合う部品を見本（mihon/<slug>/）に差し込む。
+    全部品をこのページで実際に動かしている。検索に出す（noindex を付けない）。架空の見本ページ5件は noindex のまま。
 
   ■ 部品の差し込み方（どの部品も同じ）
     1. tokens.css と、部品のフォルダの ○○.css を <head> で読み込む
     2. 部品のフォルダの snippet.html の中身を、見本の入れたい場所に貼る（文言・写真・リンク先を差し替える）
     3. 部品のフォルダの ○○.js を </body> の直前で読み込む（よくある質問だけは JS なし）
     4. 見本の <body> に data-fhp-tone="aoba" のようにトーンを付けるか、tokens.css の変数を見本の :root に書く
-    snippet.html は tools/mihon_parts_snippets.py が、このページの「part:名前」の印の間から書き出す。
-    直すときはこのページを直してから、スクリプトを流し直す。
+    snippet.html・copy.html・freehp-parts.zip は tools/mihon_parts_snippets.py が、このページの「part:名前」の印の間と
+    各 CSS/JS から書き出す。直すときはこのページや CSS/JS を直してから、スクリプトを流し直す。
 
   ■ カタログの見た目（トークン）
     --paper #FFFFFF  地
@@ -33,9 +35,20 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="robots" content="noindex">
-<title>見本に差し込む部品（架空のお店の見本）</title>
-<meta name="description" content="AIホームページ製作所（freehp.jp）が、架空のお店の見本に差し込むために作った部品の一覧です。">
+<title>ホームページに貼れる部品8種（無料・コピーして貼るだけ）｜AIホームページ製作所</title>
+<meta name="description" content="写真ギャラリー・予約ボタン・地図・メニュー表・音声プレーヤー・よくある質問・お知らせなど、コピーして貼るだけで動くホームページの部品です。外部ライブラリなし。商用・改変・再配布も自由で、表記も要りません。">
+<link rel="canonical" href="https://freehp.jp/mihon/parts/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AIホームページ製作所（freehp.jp）">
+<meta property="og:title" content="ホームページに貼れる部品8種（無料・コピーして貼るだけ）">
+<meta property="og:description" content="写真ギャラリー・予約ボタン・地図・メニュー表・音声プレーヤーなど。コピーして貼るだけで動き、商用・改変・再配布も自由です。">
+<meta property="og:url" content="https://freehp.jp/mihon/parts/">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://freehp.jp/mihon/parts/ogp.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="ホームページに貼れる部品8種。写真ギャラリーや予約ボタンなど、コピーして貼るだけで動く無料の部品。">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Kaisei+Decol:wght@700&amp;family=Zen+Kaku+Gothic+Antique:wght@400;500;700&amp;family=Zen+Kaku+Gothic+New:wght@400;500;700;900&amp;family=Zen+Old+Mincho:wght@700&amp;display=swap" rel="stylesheet">
@@ -51,11 +64,21 @@
 <link rel="stylesheet" href="catalog.css">
 </head>
 <body>
-<p class="notice">これはAIホームページ製作所（freehp.jp）が見本づくりのために作った部品の一覧です。中に出てくるお店・電話番号・予約先はすべて架空です。</p>
+<p class="notice">AIホームページ製作所（freehp.jp）がつくった、誰でも無料で使える部品です。見本の中に出てくるお店・電話番号・予約先はすべて架空です。</p>
 
 <header class="masthead">
-  <h1>見本に差し込む部品</h1>
-  <p class="lead">お客さんの一言を聞いたら、合う部品を選んで見本にそのまま差し込めます。どれも外部のライブラリを使わず、HTML・CSS・JSのまとまりだけで動きます。迷ったら、いちばん下の<a href="#hearing">聞き返し</a>から。</p>
+  <h1>ホームページに貼れる部品</h1>
+  <p class="lead">写真ギャラリー・予約ボタン・地図・メニュー表など8種類。コピーして貼るだけで動きます。外部のライブラリは使っていません。無料で、お店や仕事のサイトにも使えます。何を載せるか迷ったら、いちばん下の<a href="#hearing">聞き返し</a>から。</p>
+  <div class="howto">
+    <h2 class="howto-title">使い方</h2>
+    <ol class="howto-steps">
+      <li>使いたい部品の「コードをコピー」を押す</li>
+      <li>自分のページの、置きたい場所に貼り付ける</li>
+      <li>コードの上のほうにある色（<code>--fhp-</code>で始まる行）を、お店の色に書き換える</li>
+    </ol>
+    <p class="howto-dl"><a class="dl-btn" href="freehp-parts.zip" download>全部の部品をまとめてダウンロード<small>zip・約1.5MB</small></a></p>
+    <p class="howto-license">商用・改変・再配布も自由で、作者名の表記も要りません。<a href="#license">使ってよい範囲</a></p>
+  </div>
 </header>
 
 <div class="tonebar" role="group" aria-labelledby="tone-label">
@@ -94,6 +117,10 @@
         <dt>枚数</dt><dd>3〜12枚。枚数に合わせて並びが変わり、最後の行に穴が空かない</dd>
         <dt>ファイル</dt><dd><code>gallery/</code> snippet.html・gallery.css・gallery.js</dd>
       </dl>
+      <div class="part-tools">
+        <button type="button" class="copy-btn" data-copy="gallery" aria-describedby="gallery-copy-msg">コードをコピー</button>
+        <p class="copy-msg" id="gallery-copy-msg" aria-live="polite"></p>
+      </div>
       <fieldset class="demo-ctl">
         <legend><span>枚数を変えて試す</span></legend>
         <label><input type="radio" name="gallery-count" value="3">3枚</label>
@@ -136,6 +163,10 @@
 <!-- /part:gallery -->
       <p class="stage-note">写真はAIで作成したイメージです（見本5件の写真と、その一部を切り出したもの）。</p>
     </div>
+    <details class="part-code" data-code="gallery">
+      <summary>写真ギャラリーのコードを見る</summary>
+      <pre tabindex="0"><code>コードを読み込んでいます…</code></pre>
+    </details>
   </section>
 
   <!-- ============ 2. 予約・問い合わせ ============ -->
@@ -148,6 +179,10 @@
         <dt>送信</dt><dd>フォームは持たない。外の予約ページ・LINE・電話へつなぐだけ</dd>
         <dt>ファイル</dt><dd><code>contact/</code> snippet.html・contact.css・contact.js</dd>
       </dl>
+      <div class="part-tools">
+        <button type="button" class="copy-btn" data-copy="contact" aria-describedby="contact-copy-msg">コードをコピー</button>
+        <p class="copy-msg" id="contact-copy-msg" aria-live="polite"></p>
+      </div>
       <fieldset class="demo-ctl">
         <legend><span>時刻を変えて試す</span></legend>
         <label><input type="radio" name="contact-now" value="" checked>いま</label>
@@ -188,6 +223,10 @@
 <!-- /part:contact -->
       <p class="stage-msg" aria-live="polite"></p>
     </div>
+    <details class="part-code" data-code="contact">
+      <summary>予約・問い合わせのコードを見る</summary>
+      <pre tabindex="0"><code>コードを読み込んでいます…</code></pre>
+    </details>
   </section>
 
   <!-- ============ 3. 地図 ============ -->
@@ -200,6 +239,10 @@
         <dt>差し替え</dt><dd><code>data-query</code> とリンクの <code>query=</code> に住所か店名を書く</dd>
         <dt>ファイル</dt><dd><code>map/</code> snippet.html・map.css・map.js</dd>
       </dl>
+      <div class="part-tools">
+        <button type="button" class="copy-btn" data-copy="map" aria-describedby="map-copy-msg">コードをコピー</button>
+        <p class="copy-msg" id="map-copy-msg" aria-live="polite"></p>
+      </div>
     </div>
     <div class="stage" data-fhp-tone="aoba">
 <!-- part:map -->
@@ -216,6 +259,10 @@
 </div>
 <!-- /part:map -->
     </div>
+    <details class="part-code" data-code="map">
+      <summary>地図のコードを見る</summary>
+      <pre tabindex="0"><code>コードを読み込んでいます…</code></pre>
+    </details>
   </section>
 
   <!-- ============ 4. メニュー・料金表 ============ -->
@@ -228,6 +275,10 @@
         <dt>税</dt><dd>価格は税込で書き、分類の横に「税込」と出す</dd>
         <dt>ファイル</dt><dd><code>menu/</code> snippet.html・menu.css・menu.js</dd>
       </dl>
+      <div class="part-tools">
+        <button type="button" class="copy-btn" data-copy="menu" aria-describedby="menu-copy-msg">コードをコピー</button>
+        <p class="copy-msg" id="menu-copy-msg" aria-live="polite"></p>
+      </div>
       <fieldset class="demo-ctl">
         <legend><span>形を変えて試す</span></legend>
         <label><input type="radio" name="menu-format" value="photo" checked>写真つき</label>
@@ -276,6 +327,10 @@
 </div>
 <!-- /part:menu -->
     </div>
+    <details class="part-code" data-code="menu">
+      <summary>メニュー・料金表のコードを見る</summary>
+      <pre tabindex="0"><code>コードを読み込んでいます…</code></pre>
+    </details>
   </section>
 
   <!-- ============ 5. 音声・ボイスサンプル ============ -->
@@ -288,6 +343,10 @@
         <dt>操作</dt><dd>ボタンで再生と一時停止。波形にフォーカスして左右キーで位置を変える</dd>
         <dt>ファイル</dt><dd><code>voice/</code> snippet.html・voice.css・voice.js</dd>
       </dl>
+      <div class="part-tools">
+        <button type="button" class="copy-btn" data-copy="voice" aria-describedby="voice-copy-msg">コードをコピー</button>
+        <p class="copy-msg" id="voice-copy-msg" aria-live="polite"></p>
+      </div>
     </div>
     <div class="stage" data-fhp-tone="aoba">
 <!-- part:voice -->
@@ -355,6 +414,10 @@
 </div>
 <!-- /part:voice -->
     </div>
+    <details class="part-code" data-code="voice">
+      <summary>音声・ボイスサンプルのコードを見る</summary>
+      <pre tabindex="0"><code>コードを読み込んでいます…</code></pre>
+    </details>
   </section>
 
   <!-- ============ 6. よくある質問 ============ -->
@@ -366,6 +429,10 @@
         <dt>仕組み</dt><dd><code>&lt;details&gt;</code> をそのまま使うので JS は要らない。ページ内検索でも答えが見つかる</dd>
         <dt>ファイル</dt><dd><code>faq/</code> snippet.html・faq.css</dd>
       </dl>
+      <div class="part-tools">
+        <button type="button" class="copy-btn" data-copy="faq" aria-describedby="faq-copy-msg">コードをコピー</button>
+        <p class="copy-msg" id="faq-copy-msg" aria-live="polite"></p>
+      </div>
     </div>
     <div class="stage" data-fhp-tone="aoba">
 <!-- part:faq -->
@@ -389,6 +456,10 @@
 </div>
 <!-- /part:faq -->
     </div>
+    <details class="part-code" data-code="faq">
+      <summary>よくある質問のコードを見る</summary>
+      <pre tabindex="0"><code>コードを読み込んでいます…</code></pre>
+    </details>
   </section>
 
   <!-- ============ 7. お知らせ ============ -->
@@ -400,6 +471,10 @@
         <dt>書き方</dt><dd>1件ずつ日付（<code>time</code> の <code>datetime</code>）を付けて足すだけ。順番は自動で並ぶ</dd>
         <dt>ファイル</dt><dd><code>news/</code> snippet.html・news.css・news.js</dd>
       </dl>
+      <div class="part-tools">
+        <button type="button" class="copy-btn" data-copy="news" aria-describedby="news-copy-msg">コードをコピー</button>
+        <p class="copy-msg" id="news-copy-msg" aria-live="polite"></p>
+      </div>
     </div>
     <div class="stage" data-fhp-tone="aoba">
 <!-- part:news -->
@@ -436,6 +511,10 @@
 <!-- /part:news -->
       <p class="stage-note">見本のため、日付は開いた日から数えて入れています。</p>
     </div>
+    <details class="part-code" data-code="news">
+      <summary>お知らせのコードを見る</summary>
+      <pre tabindex="0"><code>コードを読み込んでいます…</code></pre>
+    </details>
   </section>
 
   <!-- ============ 8. 聞き返し ============ -->
@@ -447,11 +526,16 @@
         <dt>提案</dt><dd>いちばん見てほしいものに合う部品を「まず入れる部品」として先に出す</dd>
         <dt>ファイル</dt><dd><code>hearing/</code> snippet.html・hearing.css・hearing.js</dd>
       </dl>
+      <div class="part-tools">
+        <button type="button" class="copy-btn" data-copy="hearing" aria-describedby="hearing-copy-msg">コードをコピー</button>
+        <p class="copy-msg" id="hearing-copy-msg" aria-live="polite"></p>
+      </div>
     </div>
     <div class="stage" data-fhp-tone="aoba">
 <!-- part:hearing -->
-<!-- data-catalog は部品の説明ページ（このカタログ）の場所。snippet.html では見本から見た ../parts/ になる -->
-<div class="fhp fhp-hear" data-fhp-hearing data-catalog="">
+<!-- data-mail は相談を受けるメールアドレス（自分のサイトで使うときは書き換える）。
+     data-catalog は部品の説明ページ（このカタログ）の場所。snippet.html では ../parts/、copy.html では https://freehp.jp/mihon/parts/ になる -->
+<div class="fhp fhp-hear" data-fhp-hearing data-catalog="" data-mail="info@freehp.jp">
   <form novalidate>
     <fieldset data-required data-short="お仕事">
       <legend><span>どんなお仕事ですか</span></legend>
@@ -502,11 +586,27 @@
       <ul class="fhp-hear-secondary"></ul>
     </div>
     <p class="fhp-hear-cta"><a class="fhp-btn fhp-hear-mail" href="mailto:info@freehp.jp">この内容でご相談ください</a></p>
-    <p class="fhp-hear-cta-note">メールのアプリが開き、答えと組み合わせが本文に入ります。送るかどうかは、中身を見てから決められます。宛先は info@freehp.jp です。</p>
+    <p class="fhp-hear-cta-note">メールのアプリが開き、答えと組み合わせが本文に入ります。送るかどうかは、中身を見てから決められます。宛先は <span class="fhp-hear-mail-to">info@freehp.jp</span> です。</p>
   </div>
 </div>
 <!-- /part:hearing -->
     </div>
+    <details class="part-code" data-code="hearing">
+      <summary>聞き返しのコードを見る</summary>
+      <pre tabindex="0"><code>コードを読み込んでいます…</code></pre>
+    </details>
+  </section>
+
+  <section class="license" id="license" aria-labelledby="license-title">
+    <h2 id="license-title">使ってよい範囲</h2>
+    <ul class="license-list">
+      <li>無料で使えます。お店や仕事のサイト（商用）にも使えます。</li>
+      <li>書き換えても、配り直しても、自分の商品に組み込んでもかまいません。</li>
+      <li>作者名の表記や、こちらへの連絡は要りません。</li>
+      <li>使ったことで何か起きても、作者は責任を負いません。</li>
+    </ul>
+    <p class="license-note">正式な条件は <a href="LICENSE">MIT No Attribution（MIT-0）</a> です。MIT ライセンスから「著作権表示を残す」決まりだけを外したものです。</p>
+    <p class="license-note">見本の写真はAIで作った架空のお店の写真です。見本や仮置きには自由に使えますが、実在するお店の商品の写真としては使わないでください（条件は<a href="https://ryoseiimai.github.io/kakuu-shotengai/">架空の商店街</a>の素材と同じです）。音声は声の代わりに合成した仮の音です。</p>
   </section>
 </main>
 

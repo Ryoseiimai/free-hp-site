@@ -46,7 +46,12 @@
   }
 
   function initAll() {
-    document.querySelectorAll('[data-fhp-map]').forEach(initMap);
+    // 同じ部品のコードを2回貼っても、1つの部品を二重に動かさない
+    document.querySelectorAll('[data-fhp-map]').forEach(function (el) {
+      if (el.dataset.fhpReady) return;
+      el.dataset.fhpReady = 'true';
+      initMap(el);
+    });
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initAll);
   else initAll();

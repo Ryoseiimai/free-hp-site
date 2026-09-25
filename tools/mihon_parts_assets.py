@@ -6,7 +6,9 @@
       ミニけしの写真は袋に架空の社名が大きく写っているので使わない。
 音声: 声の代わりに数秒の合成音を作る（mp3）。波形の棒グラフ用に音量の山も書き出す。
 
-使い方: python3 tools/mihon_parts_assets.py
+OGP: カタログの共有用画像（1200x630）を、切り出した写真と文字から作る（playwright で描画）。
+
+使い方: python3 tools/mihon_parts_assets.py [--ogp-only]
 """
 import json
 import math
@@ -144,6 +146,48 @@ def make_audio():
     print(json.dumps(table))
 
 
+OGP_HTML = """<!doctype html><html lang="ja"><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; width: 1200px; height: 630px; display: grid; grid-template-columns: 600px 600px;
+         background: #FFFFFF; color: #1E2A44; font-family: "Zen Kaku Gothic New", sans-serif; font-feature-settings: "palt" 1; }
+  .text { display: flex; flex-direction: column; justify-content: center; padding: 0 56px 0 72px; }
+  .by { margin: 0; font-size: 26px; font-weight: 700; color: #5A6275; }
+  h1 { margin: 18px 0 0; font-size: 66px; white-space: nowrap; font-weight: 900; line-height: 1.18; letter-spacing: .01em; }
+  .sub { margin: 28px 0 0; font-size: 28px; white-space: nowrap; font-weight: 700; line-height: 1.5; }
+  .photos { display: grid; grid-template-columns: 276px 276px; grid-template-rows: 271px 271px; gap: 8px; padding: 40px 40px 40px 0; }
+  .photos img { width: 100%; height: 100%; min-height: 0; object-fit: cover; display: block; }
+</style></head><body>
+<div class="text"><p class="by">AIホームページ製作所</p><h1>ホームページに<br>貼れる部品</h1>
+<p class="sub">8種類。コピーして貼るだけ。<br>無料で、商用にも使えます。</p></div>
+<div class="photos"><img src="soda-s.jpg"><img src="beans-label-s.jpg"><img src="room-s.jpg"><img src="salon-scissors-s.jpg"></div>
+</body></html>"""
+
+
+def make_ogp():
+    from playwright.sync_api import sync_playwright
+
+    page_path = IMG_OUT / "_ogp.html"
+    page_path.write_text(OGP_HTML, encoding="utf-8")
+    try:
+        with sync_playwright() as p:
+            browser = p.chromium.launch()
+            page = browser.new_page(viewport={"width": 1200, "height": 630})
+            page.goto(page_path.as_uri())
+            page.wait_for_load_state("networkidle")
+            page.evaluate("document.fonts.ready")
+            page.screenshot(path=str(OUT / "ogp.png"))
+            browser.close()
+    finally:
+        page_path.unlink()
+    print("ogp.png")
+
+
 if __name__ == "__main__":
-    make_images()
-    make_audio()
+    import sys
+
+    if "--ogp-only" not in sys.argv:
+        make_images()
+        make_audio()
+    make_ogp()

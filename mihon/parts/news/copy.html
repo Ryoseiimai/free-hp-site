@@ -1,0 +1,280 @@
+<!--
+  お知らせ（AIホームページ製作所がつくった、無料で使える部品）
+  動いている見本: https://freehp.jp/mihon/parts/#news
+  使い方
+    1. このコードをまるごと、自分のページの置きたい場所に貼る
+    2. すぐ下の :root { ... } にある色（--fhp- で始まる行）を、お店の色に書き換える
+    3. 文字・写真・リンク先を、自分のお店のものに書き換える
+  写真と音声は見本用の仮のものです（実在するお店の商品として使わないでください）。
+  Copyright (c) 2026 RYOSEIWORLD (Ryosei Imai). MIT No Attribution（MIT-0）。商用・改変・再配布も自由で、表記は要りません。
+-->
+<style>
+/*
+  部品の色・角丸・書体の差し込み口（トークン）
+  ------------------------------------------------------------
+  部品のCSSはすべてこの変数だけを見る。色を変えたいときは、下の :root の値を書き換えるだけでよい。
+  用意したトーン（あおば・元気堂・そらまめ）を使うときは、部品の外側（body など）に data-fhp-tone="aoba" などを付ける。
+    --fhp-bg        地の色
+    --fhp-fg        文字の色（地に対し 4.5:1 以上）
+    --fhp-muted     補助の文字（地に対し 4.5:1 以上）
+    --fhp-line      飾りの区切り線（弱くてよい）
+    --fhp-edge      押せる物の枠線（地に対し 3:1 以上。WCAG 1.4.11）
+    --fhp-accent    差し色。ボタンの塗り・印・選んだ状態だけに使う（地に対し 4.5:1 以上）
+    --fhp-on-accent 差し色の上の文字（4.5:1 以上）
+    --fhp-shade     写真を拡大したときの暗い地（白い文字が乗る）
+    --fhp-radius    大きい枠の角丸   --fhp-radius-s  ボタンなど小さい物の角丸
+    --fhp-display   見出しの書体     --fhp-body      本文の書体
+*/
+:root {
+  --fhp-bg: #FFFFFF;
+  --fhp-fg: #1D1D1F;
+  --fhp-muted: #6E6E73;
+  --fhp-line: #D2D2D7;
+  --fhp-edge: #86868B;
+  --fhp-accent: #1B6B44;
+  --fhp-on-accent: #FFFFFF;
+  --fhp-shade: #1D1D1F;
+  --fhp-radius: 14px;
+  --fhp-radius-s: 10px;
+  --fhp-display: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+  --fhp-body: var(--fhp-display);
+}
+
+/* 純喫茶 あおば: 暗い木の地・象牙色の文字・ランプの琥珀。角は立てる */
+[data-fhp-tone="aoba"] {
+  --fhp-bg: #221812;
+  --fhp-fg: #EFE3CB;
+  --fhp-muted: #C9BBA2;
+  --fhp-line: rgba(239, 227, 203, .24);
+  --fhp-edge: #7D6E5A;
+  --fhp-accent: #E4B96A;
+  --fhp-on-accent: #221812;
+  --fhp-shade: #140E0A;
+  --fhp-radius: 0px;
+  --fhp-radius-s: 0px;
+  --fhp-display: "Kaisei Decol", "Hiragino Mincho ProN", serif;
+  --fhp-body: "Zen Kaku Gothic Antique", "Hiragino Sans", sans-serif;
+  color-scheme: dark;
+}
+
+/* からだ元気堂: 白地・システムフォント・観葉植物の緑。角は丸い（Apple HIG 寄り） */
+[data-fhp-tone="genkido"] {
+  color-scheme: light;
+  --fhp-bg: #FFFFFF;
+  --fhp-fg: #1D1D1F;
+  --fhp-muted: #6E6E73;
+  --fhp-line: #D2D2D7;
+  --fhp-edge: #86868B;
+  --fhp-accent: #1B6B44;
+  --fhp-on-accent: #FFFFFF;
+  --fhp-shade: #1D1D1F;
+  --fhp-radius: 14px;
+  --fhp-radius-s: 10px;
+  --fhp-display: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+  --fhp-body: var(--fhp-display);
+}
+
+/* そらまめ焙煎所: 白地・深煎りの茶・クラフト紙。見出しは明朝、角はわずかに */
+[data-fhp-tone="soramame"] {
+  color-scheme: light;
+  --fhp-bg: #FFFFFF;
+  --fhp-fg: #3B2B20;
+  --fhp-muted: #6F6053;
+  --fhp-line: #E6DAC6;
+  --fhp-edge: #9C8466;
+  --fhp-accent: #7A5230;
+  --fhp-on-accent: #FFFFFF;
+  --fhp-shade: #2A1F17;
+  --fhp-radius: 4px;
+  --fhp-radius-s: 3px;
+  --fhp-display: "Zen Old Mincho", "Hiragino Mincho ProN", serif;
+  --fhp-body: "Zen Kaku Gothic New", "Hiragino Sans", sans-serif;
+}
+
+/* 部品の共通の土台。部品の一番外側に .fhp を付ける */
+.fhp {
+  color: var(--fhp-fg);
+  font-family: var(--fhp-body);
+  font-feature-settings: "palt" 1;
+}
+.fhp *, .fhp *::before, .fhp *::after { box-sizing: border-box; }
+.fhp :focus-visible { outline: 2px solid var(--fhp-accent); outline-offset: 3px; }
+.fhp .fhp-nw { white-space: nowrap; }
+/* 部品の中で display を指定していても、hidden を付けた物は必ず隠す */
+.fhp [hidden] { display: none !important; }
+/* 見本の BudouX（文節の途中で改行しない）に合わせ、フォームやボタンの文字も同じ折り返し方にする。
+   文は <span> に入れておくと、BudouX が文節の区切りを入れる */
+.fhp legend, .fhp label, .fhp summary, .fhp button, .fhp .fhp-btn {
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  line-break: strict;
+}
+.fhp-vh {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* 部品で使うボタンの共通形。塗り（主）と枠（副）の2種類だけ */
+.fhp-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5em;
+  min-height: 48px;
+  padding: .55em 1.3em;
+  border: 1px solid var(--fhp-accent);
+  border-radius: var(--fhp-radius-s);
+  background: var(--fhp-accent);
+  color: var(--fhp-on-accent);
+  font: inherit;
+  font-weight: 700;
+  line-height: 1.4;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+.fhp-btn:hover { text-decoration: underline; text-underline-offset: .25em; }
+.fhp-btn--sub {
+  border-color: var(--fhp-edge);
+  background: transparent;
+  color: var(--fhp-fg);
+}
+.fhp-btn svg { flex: none; width: 1.15em; height: 1.15em; }
+.fhp-btn[hidden] { display: none; }
+
+/*
+  お知らせ
+  日付（数字をそろえる）と種類を1行目に、題名を2行目に。広い幅では日付を左の列に出す。
+  「新着」は色だけに頼らず文字で出す。
+*/
+.fhp-news { container-type: inline-size; }
+.fhp-news-list { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--fhp-line); }
+.fhp-news-item { display: grid; gap: .2rem; padding: 1rem 0; border-bottom: 1px solid var(--fhp-line); }
+.fhp-news-item:focus { outline: none; }
+.fhp-news-item:focus-visible { outline: 2px solid var(--fhp-accent); outline-offset: 2px; }
+.fhp-news-meta { display: flex; flex-wrap: wrap; align-items: center; gap: .3rem .8rem; margin: 0; color: var(--fhp-muted); font-size: .9rem; }
+.fhp-news-meta time { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.fhp-news-kind { white-space: nowrap; }
+.fhp-news-new {
+  padding: 0 .55em;
+  border: 1px solid var(--fhp-accent);
+  border-radius: var(--fhp-radius-s);
+  color: var(--fhp-fg);
+  font-size: .82rem;
+  font-weight: 700;
+  line-height: 1.7;
+  white-space: nowrap;
+}
+.fhp-news-title { margin: 0; font-family: var(--fhp-display); font-size: 1.08rem; font-weight: 700; line-height: 1.6; }
+.fhp-news-title a { color: inherit; text-decoration: underline; text-decoration-color: var(--fhp-edge); text-underline-offset: .28em; }
+.fhp-news-title a:hover { text-decoration-color: currentColor; }
+.fhp-news-body { margin: .15rem 0 0; color: var(--fhp-muted); font-size: .94rem; line-height: 1.75; }
+.fhp-news-more { margin-top: 1.1rem; }
+
+@container (min-width: 600px) {
+  .fhp-news-item { grid-template-columns: 11.5rem minmax(0, 1fr); column-gap: 1.5rem; }
+  .fhp-news-meta { grid-row: span 2; align-content: start; align-self: start; padding-top: .2rem; }
+  .fhp-news-title, .fhp-news-body { grid-column: 2; }
+}
+</style>
+<div class="fhp fhp-news" data-fhp-news data-new-days="14" data-show="4">
+  <ol class="fhp-news-list">
+    <li class="fhp-news-item">
+      <p class="fhp-news-meta"><time datetime="2026-09-23">2026年9月23日</time><span class="fhp-news-kind">新しいメニュー</span></p>
+      <p class="fhp-news-title">秋のクリームソーダ「ぶどう」を始めました</p>
+      <p class="fhp-news-body">巨峰のシロップで作る、紫のクリームソーダです。</p>
+    </li>
+    <li class="fhp-news-item">
+      <p class="fhp-news-meta"><time datetime="2026-09-16">2026年9月16日</time><span class="fhp-news-kind">お休み</span></p>
+      <p class="fhp-news-title">店内の点検のため、臨時でお休みをいただきます</p>
+    </li>
+    <li class="fhp-news-item">
+      <p class="fhp-news-meta"><time datetime="2026-09-01">2026年9月1日</time><span class="fhp-news-kind">お知らせ</span></p>
+      <p class="fhp-news-title">モーニングを11時まで延ばしました</p>
+    </li>
+    <li class="fhp-news-item">
+      <p class="fhp-news-meta"><time datetime="2026-08-04">2026年8月4日</time><span class="fhp-news-kind">お知らせ</span></p>
+      <p class="fhp-news-title">コーヒー豆の量り売りを始めました</p>
+    </li>
+    <li class="fhp-news-item">
+      <p class="fhp-news-meta"><time datetime="2026-07-07">2026年7月7日</time><span class="fhp-news-kind">お知らせ</span></p>
+      <p class="fhp-news-title">店内を全席禁煙にしました</p>
+    </li>
+    <li class="fhp-news-item">
+      <p class="fhp-news-meta"><time datetime="2026-05-18">2026年5月18日</time><span class="fhp-news-kind">お知らせ</span></p>
+      <p class="fhp-news-title">ホームページを新しくしました</p>
+    </li>
+  </ol>
+  <button type="button" class="fhp-btn fhp-btn--sub fhp-news-more" hidden>過去のお知らせを見る</button>
+</div>
+<script>
+/*
+  お知らせ: 日付つきの一覧。新しいものに「新着」の印を付け、古いものは畳む。
+  - 各項目の <time datetime="YYYY-MM-DD"> を見て、新しい順に並べ直す（書く順番を間違えても崩れない）
+  - data-new-days（既定14）日以内のものに「新着」を付ける。今日の日付は日本時間で数える
+  - data-show（既定4）件より多いときは残りを畳み、「過去のお知らせを見る」ボタンで開く
+*/
+(function () {
+  'use strict';
+
+  var DEFAULT_NEW_DAYS = 14;
+  var DEFAULT_SHOW = 4;
+  var DAY_MS = 24 * 60 * 60 * 1000;
+
+  // 日本時間の今日（0時）を UTC の日付として返す。datetime="YYYY-MM-DD" と同じ物差しで比べるため
+  function tokyoToday() {
+    var ymd = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Tokyo' }).format(new Date());
+    return Date.parse(ymd + 'T00:00:00Z');
+  }
+
+  function initNews(root) {
+    var list = root.querySelector('.fhp-news-list');
+    var items = Array.prototype.slice.call(list.querySelectorAll('.fhp-news-item'));
+    var dateOf = function (li) { return Date.parse(li.querySelector('time').getAttribute('datetime') + 'T00:00:00Z'); };
+    items.sort(function (a, b) { return dateOf(b) - dateOf(a); });
+    items.forEach(function (li) { list.appendChild(li); });
+
+    var newDays = Number(root.dataset.newDays || DEFAULT_NEW_DAYS);
+    var today = tokyoToday();
+    items.forEach(function (li) {
+      var old = li.querySelector('.fhp-news-new');
+      if (old) old.remove();
+      var age = (today - dateOf(li)) / DAY_MS;
+      if (age < 0 || age > newDays) return;
+      var mark = document.createElement('span');
+      mark.className = 'fhp-news-new';
+      mark.textContent = '新着';
+      li.querySelector('.fhp-news-meta').appendChild(mark);
+    });
+
+    var show = Number(root.dataset.show || DEFAULT_SHOW);
+    var more = root.querySelector('.fhp-news-more');
+    var rest = items.slice(show);
+    if (!more) return;
+    if (!rest.length) { more.hidden = true; return; }
+    rest.forEach(function (li) { li.hidden = true; });
+    more.hidden = false;
+    more.textContent = '過去のお知らせを見る（あと' + rest.length + '件）';
+    more.addEventListener('click', function () {
+      rest.forEach(function (li) { li.hidden = false; });
+      more.hidden = true;
+      rest[0].tabIndex = -1;
+      rest[0].focus();
+    });
+  }
+
+  function initAll() {
+    // 同じ部品のコードを2回貼っても、1つの部品を二重に動かさない
+    document.querySelectorAll('[data-fhp-news]').forEach(function (el) {
+      if (el.dataset.fhpReady) return;
+      el.dataset.fhpReady = 'true';
+      initNews(el);
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initAll);
+  else initAll();
+})();
+</script>

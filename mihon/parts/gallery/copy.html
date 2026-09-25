@@ -1,0 +1,472 @@
+<!--
+  写真ギャラリー（AIホームページ製作所がつくった、無料で使える部品）
+  動いている見本: https://freehp.jp/mihon/parts/#gallery
+  使い方
+    1. このコードをまるごと、自分のページの置きたい場所に貼る
+    2. すぐ下の :root { ... } にある色（--fhp- で始まる行）を、お店の色に書き換える
+    3. 文字・写真・リンク先を、自分のお店のものに書き換える
+  写真と音声は見本用の仮のものです（実在するお店の商品として使わないでください）。
+  Copyright (c) 2026 RYOSEIWORLD (Ryosei Imai). MIT No Attribution（MIT-0）。商用・改変・再配布も自由で、表記は要りません。
+-->
+<style>
+/*
+  部品の色・角丸・書体の差し込み口（トークン）
+  ------------------------------------------------------------
+  部品のCSSはすべてこの変数だけを見る。色を変えたいときは、下の :root の値を書き換えるだけでよい。
+  用意したトーン（あおば・元気堂・そらまめ）を使うときは、部品の外側（body など）に data-fhp-tone="aoba" などを付ける。
+    --fhp-bg        地の色
+    --fhp-fg        文字の色（地に対し 4.5:1 以上）
+    --fhp-muted     補助の文字（地に対し 4.5:1 以上）
+    --fhp-line      飾りの区切り線（弱くてよい）
+    --fhp-edge      押せる物の枠線（地に対し 3:1 以上。WCAG 1.4.11）
+    --fhp-accent    差し色。ボタンの塗り・印・選んだ状態だけに使う（地に対し 4.5:1 以上）
+    --fhp-on-accent 差し色の上の文字（4.5:1 以上）
+    --fhp-shade     写真を拡大したときの暗い地（白い文字が乗る）
+    --fhp-radius    大きい枠の角丸   --fhp-radius-s  ボタンなど小さい物の角丸
+    --fhp-display   見出しの書体     --fhp-body      本文の書体
+*/
+:root {
+  --fhp-bg: #FFFFFF;
+  --fhp-fg: #1D1D1F;
+  --fhp-muted: #6E6E73;
+  --fhp-line: #D2D2D7;
+  --fhp-edge: #86868B;
+  --fhp-accent: #1B6B44;
+  --fhp-on-accent: #FFFFFF;
+  --fhp-shade: #1D1D1F;
+  --fhp-radius: 14px;
+  --fhp-radius-s: 10px;
+  --fhp-display: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+  --fhp-body: var(--fhp-display);
+}
+
+/* 純喫茶 あおば: 暗い木の地・象牙色の文字・ランプの琥珀。角は立てる */
+[data-fhp-tone="aoba"] {
+  --fhp-bg: #221812;
+  --fhp-fg: #EFE3CB;
+  --fhp-muted: #C9BBA2;
+  --fhp-line: rgba(239, 227, 203, .24);
+  --fhp-edge: #7D6E5A;
+  --fhp-accent: #E4B96A;
+  --fhp-on-accent: #221812;
+  --fhp-shade: #140E0A;
+  --fhp-radius: 0px;
+  --fhp-radius-s: 0px;
+  --fhp-display: "Kaisei Decol", "Hiragino Mincho ProN", serif;
+  --fhp-body: "Zen Kaku Gothic Antique", "Hiragino Sans", sans-serif;
+  color-scheme: dark;
+}
+
+/* からだ元気堂: 白地・システムフォント・観葉植物の緑。角は丸い（Apple HIG 寄り） */
+[data-fhp-tone="genkido"] {
+  color-scheme: light;
+  --fhp-bg: #FFFFFF;
+  --fhp-fg: #1D1D1F;
+  --fhp-muted: #6E6E73;
+  --fhp-line: #D2D2D7;
+  --fhp-edge: #86868B;
+  --fhp-accent: #1B6B44;
+  --fhp-on-accent: #FFFFFF;
+  --fhp-shade: #1D1D1F;
+  --fhp-radius: 14px;
+  --fhp-radius-s: 10px;
+  --fhp-display: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+  --fhp-body: var(--fhp-display);
+}
+
+/* そらまめ焙煎所: 白地・深煎りの茶・クラフト紙。見出しは明朝、角はわずかに */
+[data-fhp-tone="soramame"] {
+  color-scheme: light;
+  --fhp-bg: #FFFFFF;
+  --fhp-fg: #3B2B20;
+  --fhp-muted: #6F6053;
+  --fhp-line: #E6DAC6;
+  --fhp-edge: #9C8466;
+  --fhp-accent: #7A5230;
+  --fhp-on-accent: #FFFFFF;
+  --fhp-shade: #2A1F17;
+  --fhp-radius: 4px;
+  --fhp-radius-s: 3px;
+  --fhp-display: "Zen Old Mincho", "Hiragino Mincho ProN", serif;
+  --fhp-body: "Zen Kaku Gothic New", "Hiragino Sans", sans-serif;
+}
+
+/* 部品の共通の土台。部品の一番外側に .fhp を付ける */
+.fhp {
+  color: var(--fhp-fg);
+  font-family: var(--fhp-body);
+  font-feature-settings: "palt" 1;
+}
+.fhp *, .fhp *::before, .fhp *::after { box-sizing: border-box; }
+.fhp :focus-visible { outline: 2px solid var(--fhp-accent); outline-offset: 3px; }
+.fhp .fhp-nw { white-space: nowrap; }
+/* 部品の中で display を指定していても、hidden を付けた物は必ず隠す */
+.fhp [hidden] { display: none !important; }
+/* 見本の BudouX（文節の途中で改行しない）に合わせ、フォームやボタンの文字も同じ折り返し方にする。
+   文は <span> に入れておくと、BudouX が文節の区切りを入れる */
+.fhp legend, .fhp label, .fhp summary, .fhp button, .fhp .fhp-btn {
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  line-break: strict;
+}
+.fhp-vh {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* 部品で使うボタンの共通形。塗り（主）と枠（副）の2種類だけ */
+.fhp-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5em;
+  min-height: 48px;
+  padding: .55em 1.3em;
+  border: 1px solid var(--fhp-accent);
+  border-radius: var(--fhp-radius-s);
+  background: var(--fhp-accent);
+  color: var(--fhp-on-accent);
+  font: inherit;
+  font-weight: 700;
+  line-height: 1.4;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+.fhp-btn:hover { text-decoration: underline; text-underline-offset: .25em; }
+.fhp-btn--sub {
+  border-color: var(--fhp-edge);
+  background: transparent;
+  color: var(--fhp-fg);
+}
+.fhp-btn svg { flex: none; width: 1.15em; height: 1.15em; }
+.fhp-btn[hidden] { display: none; }
+
+/*
+  写真ギャラリー
+  一覧: 1枚目を大きく、残りを3列（狭い幅では2列）。枚数が3〜12枚のどれでも最後の行に穴が空かないよう、
+  枚数を :has() で数えて、1枚目・2枚目・最後の1枚の大きさを変える。
+  1段の高さは幅に合わせて変わるが、広い段組みに置いても大きくなりすぎないよう 240px で止める
+  （変えたいときは --fhp-gallery-row-max）。
+  拡大: <dialog> を画面いっぱいに開く。暗い地は --fhp-shade。
+*/
+.fhp-gallery { container-type: inline-size; }
+.fhp-gallery-grid {
+  --gap: 6px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-rows: min(calc((100cqi - var(--gap)) / 2 * .72), var(--fhp-gallery-row-max, 240px));
+  grid-auto-flow: dense;
+  gap: var(--gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.fhp-gallery-grid > li { min-width: 0; }
+.fhp-gallery-grid > li:first-child { grid-column: span 2; grid-row: span 2; }
+/* 2列のとき、枚数が偶数だと最後に1マス空くので最後の1枚を横長にする */
+.fhp-gallery-grid:has(> li:nth-child(2n):last-child) > li:last-child { grid-column: span 2; }
+
+@container (min-width: 560px) {
+  .fhp-gallery-grid {
+    --gap: 8px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-auto-rows: min(calc((100cqi - 2 * var(--gap)) / 3 * .72), var(--fhp-gallery-row-max, 240px));
+  }
+  .fhp-gallery-grid:has(> li:nth-child(2n):last-child) > li:last-child { grid-column: auto; }
+  /* 3で割って1余る枚数: 1枚目を横いっぱいにする */
+  .fhp-gallery-grid:has(> li:nth-child(3n+1):last-child) > li:first-child { grid-column: span 3; }
+  /* 3で割って2余る枚数: 2枚目を縦長にする */
+  .fhp-gallery-grid:has(> li:nth-child(3n+2):last-child) > li:nth-child(2) { grid-row: span 2; }
+}
+
+.fhp-gallery-item {
+  display: block;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--fhp-radius-s);
+  overflow: hidden;
+  background: none;
+  cursor: zoom-in;
+}
+.fhp-gallery-item img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.fhp-gallery-item:focus-visible { outline: 3px solid var(--fhp-accent); outline-offset: 2px; }
+.fhp-gallery-hint { margin: .7rem 0 0; color: var(--fhp-muted); font-size: .88rem; line-height: 1.6; }
+
+/* 拡大表示 */
+.fhp-lightbox {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: var(--fhp-shade);
+  color: #FFFFFF;
+  overscroll-behavior: contain;
+}
+.fhp-lightbox::backdrop { background: var(--fhp-shade); }
+.fhp-lightbox[open] {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+}
+.fhp-lb-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px clamp(12px, 3vw, 28px);
+}
+.fhp-lb-count { margin: 0; font-variant-numeric: tabular-nums; font-size: .95rem; letter-spacing: .06em; }
+.fhp-lb-stage {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  padding: 0 clamp(0px, 3vw, 28px);
+  overflow: hidden;
+  touch-action: pan-y pinch-zoom;
+  cursor: zoom-out;
+}
+.fhp-lb-img {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  cursor: default;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+.fhp-lb-img.is-shown { animation: fhp-lb-in .18s ease-out; }
+@keyframes fhp-lb-in { from { opacity: 0; } to { opacity: 1; } }
+.fhp-lb-foot {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px 20px;
+  padding: 12px clamp(12px, 3vw, 28px) max(14px, env(safe-area-inset-bottom));
+}
+.fhp-lb-caption { margin: 0; font-size: .95rem; line-height: 1.6; }
+.fhp-lb-nav { display: flex; gap: 8px; }
+.fhp-lb-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .4em;
+  min-width: 48px;
+  min-height: 48px;
+  padding: 0 .9em;
+  border: 1px solid rgba(255, 255, 255, .55);
+  border-radius: var(--fhp-radius-s);
+  background: transparent;
+  color: #FFFFFF;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.fhp-lb-btn:hover { border-color: #FFFFFF; }
+.fhp-lb-btn:focus-visible { outline: 2px solid #FFFFFF; outline-offset: 2px; }
+.fhp-lb-btn svg { width: 22px; height: 22px; }
+:root.fhp-lb-lock { overflow: hidden; }
+
+@media (max-width: 559px) {
+  .fhp-lb-foot { grid-template-columns: minmax(0, 1fr); }
+  .fhp-lb-nav { justify-content: space-between; }
+  .fhp-lb-nav .fhp-lb-btn { flex: 1 1 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fhp-lb-img.is-shown { animation: none; }
+}
+</style>
+<div class="fhp fhp-gallery" data-fhp-gallery>
+  <ul class="fhp-gallery-grid">
+    <li><button type="button" class="fhp-gallery-item" data-large="https://freehp.jp/mihon/parts/img/soda-l.jpg" data-caption="いちばん人気のメロンのクリームソーダ。">
+      <img src="https://freehp.jp/mihon/parts/img/soda-s.jpg" width="427" height="640" loading="lazy" decoding="async" alt="木のテーブルに置かれたメロンのクリームソーダ。奥にランプの灯りが見える。"></button></li>
+    <li><button type="button" class="fhp-gallery-item" data-large="https://freehp.jp/mihon/parts/img/soda-ice-l.jpg" data-caption="バニラアイスとさくらんぼをのせています。">
+      <img src="https://freehp.jp/mihon/parts/img/soda-ice-s.jpg" width="450" height="446" loading="lazy" decoding="async" alt="緑のソーダの上に丸いバニラアイスと赤いさくらんぼ。"></button></li>
+    <li><button type="button" class="fhp-gallery-item" data-large="https://freehp.jp/mihon/parts/img/beans-l.jpg" data-caption="店で焼いた豆は、袋に焙煎日を書いてお渡しします。">
+      <img src="https://freehp.jp/mihon/parts/img/beans-s.jpg" width="640" height="427" loading="lazy" decoding="async" alt="クラフト紙の袋に丸いラベルが貼られ、手前にコーヒー豆がこぼれている。"></button></li>
+    <li><button type="button" class="fhp-gallery-item" data-large="https://freehp.jp/mihon/parts/img/soda-lamp-l.jpg" data-caption="夕方からはランプを灯します。">
+      <img src="https://freehp.jp/mihon/parts/img/soda-lamp-s.jpg" width="430" height="461" loading="lazy" decoding="async" alt="暗い木の壁の前で灯る、布の笠のランプ。"></button></li>
+    <li><button type="button" class="fhp-gallery-item" data-large="https://freehp.jp/mihon/parts/img/beans-label-l.jpg" data-caption="ラベルの焙煎度は手書きです。">
+      <img src="https://freehp.jp/mihon/parts/img/beans-label-s.jpg" width="492" height="512" loading="lazy" decoding="async" alt="豆の袋の丸いラベル。産地と焙煎日、手書きの「中深煎り」の文字。"></button></li>
+    <li><button type="button" class="fhp-gallery-item" data-large="https://freehp.jp/mihon/parts/img/room-l.jpg" data-caption="奥の個室は、すりガラスの窓で外から見えません。">
+      <img src="https://freehp.jp/mihon/parts/img/room-s.jpg" width="640" height="427" loading="lazy" decoding="async" alt="すりガラスの窓と壁掛け時計のある、明るい小部屋。手前に施術用のベッド。"></button></li>
+    <li><button type="button" class="fhp-gallery-item" data-large="https://freehp.jp/mihon/parts/img/soda-spoon-l.jpg" data-caption="受け皿とスプーンは開店のころから同じものです。">
+      <img src="https://freehp.jp/mihon/parts/img/soda-spoon-s.jpg" width="640" height="411" loading="lazy" decoding="async" alt="クリームソーダのグラスの足もとに、白い受け皿と銀のスプーン。"></button></li>
+    <li><button type="button" class="fhp-gallery-item" data-large="https://freehp.jp/mihon/parts/img/beans-pile-l.jpg" data-caption="中深煎りの豆。量り売りもしています。">
+      <img src="https://freehp.jp/mihon/parts/img/beans-pile-s.jpg" width="640" height="366" loading="lazy" decoding="async" alt="木の台の上に寄せて置かれた、つやのある焙煎豆。"></button></li>
+    <li><button type="button" class="fhp-gallery-item" data-large="https://freehp.jp/mihon/parts/img/room-window-l.jpg" data-caption="窓は草木の模様のすりガラスです。">
+      <img src="https://freehp.jp/mihon/parts/img/room-window-s.jpg" width="614" height="430" loading="lazy" decoding="async" alt="草木の模様が入ったすりガラスの窓。"></button></li>
+    <li><button type="button" class="fhp-gallery-item" data-large="https://freehp.jp/mihon/parts/img/salon-l.jpg" data-caption="道具はお客さまごとに消毒しています。">
+      <img src="https://freehp.jp/mihon/parts/img/salon-s.jpg" width="640" height="427" loading="lazy" decoding="async" alt="白いタオルの上に置かれた、すきばさみとカットばさみと黒いコーム。"></button></li>
+    <li><button type="button" class="fhp-gallery-item" data-large="https://freehp.jp/mihon/parts/img/room-towel-l.jpg" data-caption="タオルはおひとりずつ取り替えます。">
+      <img src="https://freehp.jp/mihon/parts/img/room-towel-s.jpg" width="522" height="287" loading="lazy" decoding="async" alt="ベッドの上に畳んで重ねた、茶色と白のタオル。"></button></li>
+    <li><button type="button" class="fhp-gallery-item" data-large="https://freehp.jp/mihon/parts/img/salon-scissors-l.jpg" data-caption="よく研いだはさみで、毛先を整えます。">
+      <img src="https://freehp.jp/mihon/parts/img/salon-scissors-s.jpg" width="640" height="355" loading="lazy" decoding="async" alt="タオルの上のカットばさみの刃先。"></button></li>
+  </ul>
+  <p class="fhp-gallery-hint">写真を押すと大きく見られます。</p>
+</div>
+<script>
+/*
+  写真ギャラリー: 一覧の写真を押すと画面いっぱいに拡大する。
+  操作: 左右の矢印キー・Home/End で送る、Esc で閉じる。スマホは左右にスワイプ。
+  一覧の <button class="fhp-gallery-item" data-large="大きい画像" data-caption="説明"> を開くたびに数え直すので、
+  写真を足したり減らしたりしても JS は触らなくてよい。
+*/
+(function () {
+  'use strict';
+
+  var SWIPE_MIN_PX = 50;
+  var ICON_PREV = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2"/></svg>';
+  var ICON_NEXT = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2"/></svg>';
+  var ICON_CLOSE = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2"/></svg>';
+
+  function buildDialog() {
+    var dialog = document.createElement('dialog');
+    dialog.className = 'fhp-lightbox';
+    dialog.setAttribute('aria-label', '写真の拡大表示');
+    dialog.innerHTML =
+      '<div class="fhp-lb-bar">' +
+        '<p class="fhp-lb-count" aria-live="polite"></p>' +
+        '<button type="button" class="fhp-lb-btn" data-lb="close">' + ICON_CLOSE + '<span>閉じる</span></button>' +
+      '</div>' +
+      '<div class="fhp-lb-stage"><img class="fhp-lb-img" alt=""></div>' +
+      '<div class="fhp-lb-foot">' +
+        '<p class="fhp-lb-caption"></p>' +
+        '<div class="fhp-lb-nav">' +
+          '<button type="button" class="fhp-lb-btn" data-lb="prev" aria-label="前の写真">' + ICON_PREV + '</button>' +
+          '<button type="button" class="fhp-lb-btn" data-lb="next" aria-label="次の写真">' + ICON_NEXT + '</button>' +
+        '</div>' +
+      '</div>';
+    return dialog;
+  }
+
+  function initGallery(root) {
+    var dialog = buildDialog();
+    root.appendChild(dialog);
+    var img = dialog.querySelector('.fhp-lb-img');
+    var stage = dialog.querySelector('.fhp-lb-stage');
+    var count = dialog.querySelector('.fhp-lb-count');
+    var caption = dialog.querySelector('.fhp-lb-caption');
+    var items = [];
+    var index = 0;
+    var opener = null;
+
+    function preload(i) {
+      var item = items[(i + items.length) % items.length];
+      if (item) new Image().src = item.dataset.large;
+    }
+
+    function show(i) {
+      index = (i + items.length) % items.length;
+      var item = items[index];
+      var thumb = item.querySelector('img');
+      img.classList.remove('is-shown');
+      img.style.transform = '';
+      img.src = item.dataset.large || thumb.currentSrc || thumb.src;
+      img.alt = thumb.alt;
+      void img.offsetWidth; // アニメーションをやり直すための再計算
+      img.classList.add('is-shown');
+      count.textContent = (index + 1) + ' / ' + items.length;
+      caption.textContent = item.dataset.caption || '';
+      if (window.insertPhraseBreaks) window.insertPhraseBreaks(caption.parentNode);
+      preload(index + 1);
+      preload(index - 1);
+    }
+
+    function open(item) {
+      items = Array.prototype.slice.call(root.querySelectorAll('.fhp-gallery-item'));
+      opener = item;
+      show(items.indexOf(item));
+      document.documentElement.classList.add('fhp-lb-lock');
+      dialog.showModal();
+      dialog.querySelector('[data-lb="next"]').focus();
+    }
+
+    root.addEventListener('click', function (e) {
+      var item = e.target.closest('.fhp-gallery-item');
+      if (item && root.contains(item)) open(item);
+    });
+
+    dialog.addEventListener('close', function () {
+      document.documentElement.classList.remove('fhp-lb-lock');
+      if (opener && document.contains(opener)) opener.focus();
+    });
+
+    dialog.addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-lb]');
+      if (btn) {
+        var action = btn.dataset.lb;
+        if (action === 'close') dialog.close();
+        if (action === 'prev') show(index - 1);
+        if (action === 'next') show(index + 1);
+        return;
+      }
+      // 写真の外側（暗い地）を押したときだけ閉じる。スワイプの直後は閉じない
+      if (e.target === stage && pressTarget === stage && !swiped) dialog.close();
+    });
+
+    dialog.addEventListener('keydown', function (e) {
+      var keys = { ArrowLeft: index - 1, ArrowRight: index + 1, Home: 0, End: items.length - 1 };
+      if (!(e.key in keys)) return;
+      e.preventDefault();
+      show(keys[e.key]);
+    });
+
+    // スワイプ: 指に合わせて写真を動かし、離した位置で前後を決める
+    var startX = null;
+    var swiped = false;
+    var pressTarget = null;
+    stage.addEventListener('pointerdown', function (e) {
+      pressTarget = e.target;
+      if (e.pointerType === 'mouse') return;
+      startX = e.clientX;
+      swiped = false;
+      stage.setPointerCapture(e.pointerId);
+    });
+    stage.addEventListener('pointermove', function (e) {
+      if (startX === null) return;
+      img.style.transform = 'translateX(' + (e.clientX - startX) + 'px)';
+    });
+    function endSwipe(e) {
+      if (startX === null) return;
+      var dx = e.clientX - startX;
+      startX = null;
+      img.style.transform = '';
+      if (Math.abs(dx) < SWIPE_MIN_PX) return;
+      swiped = true;
+      show(dx < 0 ? index + 1 : index - 1);
+      setTimeout(function () { swiped = false; }, 0);
+    }
+    stage.addEventListener('pointerup', endSwipe);
+    stage.addEventListener('pointercancel', function () { startX = null; img.style.transform = ''; });
+  }
+
+  function initAll() {
+    // 同じ部品のコードを2回貼っても、1つの部品を二重に動かさない
+    document.querySelectorAll('[data-fhp-gallery]').forEach(function (el) {
+      if (el.dataset.fhpReady) return;
+      el.dataset.fhpReady = 'true';
+      initGallery(el);
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initAll);
+  else initAll();
+})();
+</script>

@@ -137,6 +137,76 @@ main { max-width: 1200px; margin: 0 auto; padding: 0 var(--cpad); }
 .credit { max-width: 1200px; margin: 96px auto 0; padding: 0 var(--cpad) 56px; color: var(--sub); font-size: 13px; line-height: 1.8; }
 .credit p { margin: 0; padding-top: 22px; border-top: 1px solid var(--line); }
 
+/* 使い方（3手順）とダウンロード */
+.howto { max-width: 44em; margin-top: 1.8rem; }
+.howto-title { margin: 0; font-size: 1.1rem; font-weight: 900; }
+.howto-steps { margin: .5rem 0 0; padding-left: 1.6em; }
+.howto-steps li { padding-left: .2em; font-weight: 500; }
+.howto-steps li + li { margin-top: .2rem; }
+.howto-steps code { font-weight: 700; }
+.howto-dl { margin: 1.2rem 0 0; }
+.dl-btn, .copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .7em;
+  min-height: 48px;
+  padding: .55rem 1.2rem;
+  border: 2px solid var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+  font: inherit;
+  font-weight: 700;
+  line-height: 1.4;
+  text-decoration: none;
+  cursor: pointer;
+}
+.dl-btn small { font-size: .82rem; font-weight: 500; white-space: nowrap; }
+.dl-btn:hover, .copy-btn:hover { text-decoration: underline; text-underline-offset: .25em; }
+.howto-license { margin: .8rem 0 0; color: var(--sub); font-size: .92rem; }
+
+/* 部品ごとの「コードをコピー」と「コードを見る」 */
+.part-tools { margin-top: 1.3rem; }
+.copy-btn.is-done::before {
+  content: "";
+  width: .45em;
+  height: .8em;
+  border: solid currentColor;
+  border-width: 0 2px 2px 0;
+  transform: translateY(-.1em) rotate(45deg);
+}
+.copy-msg { margin: .5rem 0 0; font-size: .9rem; font-weight: 700; line-height: 1.6; }
+.copy-msg:empty { display: none; }
+.part-code { min-width: 0; margin-top: -8px; border: 1px solid var(--line); }
+.part-code > summary {
+  display: flex;
+  align-items: center;
+  min-height: 48px;
+  padding: .5rem 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.part-code > summary:hover { text-decoration: underline; text-underline-offset: .25em; }
+.part-code pre {
+  max-height: 28rem;
+  margin: 0;
+  padding: 1rem;
+  overflow: auto;
+  border-top: 1px solid var(--line);
+  font-size: .8rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+.part-code code { font-size: 1em; }
+
+/* 使ってよい範囲 */
+.license { padding-top: 96px; max-width: 44em; }
+.license h2 { margin: 0; font-size: 1.3rem; font-weight: 900; line-height: 1.4; }
+.license-list { margin: .9rem 0 0; padding-left: 1.2em; }
+.license-list li + li { margin-top: .2rem; }
+.license-note { margin: .9rem 0 0; color: var(--sub); font-size: .92rem; line-height: 1.8; }
+
 @media (max-width: 599px) {
   .tonebar-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
   .tone small, .tone .tone-long { display: none; }
@@ -155,6 +225,7 @@ main { max-width: 1200px; margin: 0 auto; padding: 0 var(--cpad); }
 @media (min-width: 1024px) {
   .part { grid-template-columns: 330px minmax(0, 1fr); column-gap: 56px; align-items: start; }
   .part-info { position: sticky; top: 84px; }
+  .part-code { grid-column: 2; }
 }
 @media (prefers-reduced-motion: no-preference) {
   html { scroll-behavior: smooth; }

@@ -1,0 +1,413 @@
+<!--
+  音声・ボイスサンプル（AIホームページ製作所がつくった、無料で使える部品）
+  動いている見本: https://freehp.jp/mihon/parts/#voice
+  使い方
+    1. このコードをまるごと、自分のページの置きたい場所に貼る
+    2. すぐ下の :root { ... } にある色（--fhp- で始まる行）を、お店の色に書き換える
+    3. 文字・写真・リンク先を、自分のお店のものに書き換える
+  写真と音声は見本用の仮のものです（実在するお店の商品として使わないでください）。
+  Copyright (c) 2026 RYOSEIWORLD (Ryosei Imai). MIT No Attribution（MIT-0）。商用・改変・再配布も自由で、表記は要りません。
+-->
+<style>
+/*
+  部品の色・角丸・書体の差し込み口（トークン）
+  ------------------------------------------------------------
+  部品のCSSはすべてこの変数だけを見る。色を変えたいときは、下の :root の値を書き換えるだけでよい。
+  用意したトーン（あおば・元気堂・そらまめ）を使うときは、部品の外側（body など）に data-fhp-tone="aoba" などを付ける。
+    --fhp-bg        地の色
+    --fhp-fg        文字の色（地に対し 4.5:1 以上）
+    --fhp-muted     補助の文字（地に対し 4.5:1 以上）
+    --fhp-line      飾りの区切り線（弱くてよい）
+    --fhp-edge      押せる物の枠線（地に対し 3:1 以上。WCAG 1.4.11）
+    --fhp-accent    差し色。ボタンの塗り・印・選んだ状態だけに使う（地に対し 4.5:1 以上）
+    --fhp-on-accent 差し色の上の文字（4.5:1 以上）
+    --fhp-shade     写真を拡大したときの暗い地（白い文字が乗る）
+    --fhp-radius    大きい枠の角丸   --fhp-radius-s  ボタンなど小さい物の角丸
+    --fhp-display   見出しの書体     --fhp-body      本文の書体
+*/
+:root {
+  --fhp-bg: #FFFFFF;
+  --fhp-fg: #1D1D1F;
+  --fhp-muted: #6E6E73;
+  --fhp-line: #D2D2D7;
+  --fhp-edge: #86868B;
+  --fhp-accent: #1B6B44;
+  --fhp-on-accent: #FFFFFF;
+  --fhp-shade: #1D1D1F;
+  --fhp-radius: 14px;
+  --fhp-radius-s: 10px;
+  --fhp-display: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+  --fhp-body: var(--fhp-display);
+}
+
+/* 純喫茶 あおば: 暗い木の地・象牙色の文字・ランプの琥珀。角は立てる */
+[data-fhp-tone="aoba"] {
+  --fhp-bg: #221812;
+  --fhp-fg: #EFE3CB;
+  --fhp-muted: #C9BBA2;
+  --fhp-line: rgba(239, 227, 203, .24);
+  --fhp-edge: #7D6E5A;
+  --fhp-accent: #E4B96A;
+  --fhp-on-accent: #221812;
+  --fhp-shade: #140E0A;
+  --fhp-radius: 0px;
+  --fhp-radius-s: 0px;
+  --fhp-display: "Kaisei Decol", "Hiragino Mincho ProN", serif;
+  --fhp-body: "Zen Kaku Gothic Antique", "Hiragino Sans", sans-serif;
+  color-scheme: dark;
+}
+
+/* からだ元気堂: 白地・システムフォント・観葉植物の緑。角は丸い（Apple HIG 寄り） */
+[data-fhp-tone="genkido"] {
+  color-scheme: light;
+  --fhp-bg: #FFFFFF;
+  --fhp-fg: #1D1D1F;
+  --fhp-muted: #6E6E73;
+  --fhp-line: #D2D2D7;
+  --fhp-edge: #86868B;
+  --fhp-accent: #1B6B44;
+  --fhp-on-accent: #FFFFFF;
+  --fhp-shade: #1D1D1F;
+  --fhp-radius: 14px;
+  --fhp-radius-s: 10px;
+  --fhp-display: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+  --fhp-body: var(--fhp-display);
+}
+
+/* そらまめ焙煎所: 白地・深煎りの茶・クラフト紙。見出しは明朝、角はわずかに */
+[data-fhp-tone="soramame"] {
+  color-scheme: light;
+  --fhp-bg: #FFFFFF;
+  --fhp-fg: #3B2B20;
+  --fhp-muted: #6F6053;
+  --fhp-line: #E6DAC6;
+  --fhp-edge: #9C8466;
+  --fhp-accent: #7A5230;
+  --fhp-on-accent: #FFFFFF;
+  --fhp-shade: #2A1F17;
+  --fhp-radius: 4px;
+  --fhp-radius-s: 3px;
+  --fhp-display: "Zen Old Mincho", "Hiragino Mincho ProN", serif;
+  --fhp-body: "Zen Kaku Gothic New", "Hiragino Sans", sans-serif;
+}
+
+/* 部品の共通の土台。部品の一番外側に .fhp を付ける */
+.fhp {
+  color: var(--fhp-fg);
+  font-family: var(--fhp-body);
+  font-feature-settings: "palt" 1;
+}
+.fhp *, .fhp *::before, .fhp *::after { box-sizing: border-box; }
+.fhp :focus-visible { outline: 2px solid var(--fhp-accent); outline-offset: 3px; }
+.fhp .fhp-nw { white-space: nowrap; }
+/* 部品の中で display を指定していても、hidden を付けた物は必ず隠す */
+.fhp [hidden] { display: none !important; }
+/* 見本の BudouX（文節の途中で改行しない）に合わせ、フォームやボタンの文字も同じ折り返し方にする。
+   文は <span> に入れておくと、BudouX が文節の区切りを入れる */
+.fhp legend, .fhp label, .fhp summary, .fhp button, .fhp .fhp-btn {
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  line-break: strict;
+}
+.fhp-vh {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* 部品で使うボタンの共通形。塗り（主）と枠（副）の2種類だけ */
+.fhp-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5em;
+  min-height: 48px;
+  padding: .55em 1.3em;
+  border: 1px solid var(--fhp-accent);
+  border-radius: var(--fhp-radius-s);
+  background: var(--fhp-accent);
+  color: var(--fhp-on-accent);
+  font: inherit;
+  font-weight: 700;
+  line-height: 1.4;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+.fhp-btn:hover { text-decoration: underline; text-underline-offset: .25em; }
+.fhp-btn--sub {
+  border-color: var(--fhp-edge);
+  background: transparent;
+  color: var(--fhp-fg);
+}
+.fhp-btn svg { flex: none; width: 1.15em; height: 1.15em; }
+.fhp-btn[hidden] { display: none; }
+
+/*
+  音声・ボイスサンプル
+  1曲 = 再生ボタン／題名と説明／波形の棒と時間。再生した分だけ棒が差し色に変わる。
+  波形の上には透明な range を重ねてあり、押した位置から再生できる。
+*/
+.fhp-voice { container-type: inline-size; }
+.fhp-voice-list { margin: 0; padding: 0; list-style: none; }
+.fhp-voice-track {
+  --fhp-voice-progress: 0%;
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr);
+  column-gap: 16px;
+  row-gap: .7rem;
+  padding: 1.2rem 0;
+  border-top: 1px solid var(--fhp-line);
+}
+.fhp-voice-track:last-child { border-bottom: 1px solid var(--fhp-line); }
+.fhp-voice-play {
+  grid-row: span 2;
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  padding: 0;
+  border: 1px solid var(--fhp-accent);
+  border-radius: var(--fhp-radius-s);
+  background: var(--fhp-accent);
+  color: var(--fhp-on-accent);
+  cursor: pointer;
+}
+.fhp-voice-play svg { width: 22px; height: 22px; }
+.fhp-voice-play .is-pause, .fhp-voice-track.is-playing .fhp-voice-play .is-play { display: none; }
+.fhp-voice-track.is-playing .fhp-voice-play .is-pause { display: block; }
+.fhp-voice-head { min-width: 0; }
+.fhp-voice-title { margin: 0; font-family: var(--fhp-display); font-size: 1.15rem; font-weight: 700; line-height: 1.45; }
+.fhp-voice-time { margin: 0; color: var(--fhp-muted); font-size: .92rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.fhp-voice-track.is-playing .fhp-voice-time { color: var(--fhp-fg); }
+.fhp-voice-desc { margin: .15rem 0 0; color: var(--fhp-muted); font-size: .92rem; line-height: 1.7; }
+
+.fhp-voice-row { grid-column: 2; display: flex; align-items: center; gap: 14px; }
+.fhp-voice-wave { position: relative; flex: 1 1 auto; min-width: 0; height: 40px; }
+.fhp-voice-bars {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  pointer-events: none;
+}
+.fhp-voice-bars span { flex: 1 1 0; min-width: 1px; border-radius: 1px; background: var(--fhp-edge); }
+.fhp-voice-bars.is-played { clip-path: inset(0 calc(100% - var(--fhp-voice-progress)) 0 0); }
+.fhp-voice-bars.is-played span { background: var(--fhp-accent); }
+.fhp-voice-seek {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.fhp-voice-wave:has(.fhp-voice-seek:focus-visible) { outline: 2px solid var(--fhp-accent); outline-offset: 4px; }
+.fhp-voice-note { margin: .9rem 0 0; color: var(--fhp-muted); font-size: .88rem; line-height: 1.7; }
+
+/* とても狭い幅（320px の画面など）: ボタンを少し小さくし、題名が途中で折れないようにする */
+@container (max-width: 300px) {
+  .fhp-voice-track { grid-template-columns: 44px minmax(0, 1fr); column-gap: 12px; }
+  .fhp-voice-play { width: 44px; height: 44px; }
+  .fhp-voice-title { font-size: 1rem; }
+}
+</style>
+<div class="fhp fhp-voice" data-fhp-voice>
+  <ul class="fhp-voice-list">
+    <li class="fhp-voice-track" data-duration="3.1" data-peaks="0.96,0.99,0.88,0.77,0.58,0.4,0.26,0.14,0.05,0.94,0.99,0.88,0.77,0.58,0.41,0.26,0.14,0.05,0.92,1.0,0.89,0.77,0.6,0.41,0.27,0.15,0.05,0.9,1.0,0.88,0.79,0.69,0.62,0.55,0.48,0.43,0.38,0.34,0.3,0.26,0.23,0.21,0.18,0.16,0.14,0.12,0.1,0.08,0.06,0.05,0.04,0.03,0.02,0.01,0.01,0.0">
+      <button type="button" class="fhp-voice-play" aria-label="再生: 自己紹介ボイス">
+        <svg class="is-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z" fill="currentColor"/></svg>
+        <svg class="is-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 4.5h4v15h-4zM13.5 4.5h4v15h-4z" fill="currentColor"/></svg>
+      </button>
+      <div class="fhp-voice-head">
+        <p class="fhp-voice-title">自己紹介ボイス</p>
+        <p class="fhp-voice-desc">はじめましての方へ。短い自己紹介です。</p>
+      </div>
+      <div class="fhp-voice-row">
+        <div class="fhp-voice-wave">
+          <div class="fhp-voice-bars" aria-hidden="true"></div>
+          <div class="fhp-voice-bars is-played" aria-hidden="true"></div>
+          <input class="fhp-voice-seek" type="range" min="0" max="1000" step="10" value="0" aria-label="再生位置: 自己紹介ボイス">
+        </div>
+        <p class="fhp-voice-time"><span class="fhp-voice-cur">0:00</span> / <span class="fhp-voice-dur">0:03</span></p>
+      </div>
+      <audio preload="metadata" src="https://freehp.jp/mihon/parts/voice/intro.mp3"></audio>
+    </li>
+    <li class="fhp-voice-track" data-duration="6.0" data-peaks="0.05,0.15,0.25,0.41,0.58,0.69,0.88,0.83,0.86,0.93,0.78,0.67,0.62,0.61,0.42,0.33,0.28,0.17,0.11,0.1,0.12,0.13,0.19,0.25,0.33,0.44,0.49,0.6,0.68,0.8,0.95,1.0,0.88,0.94,0.93,0.87,0.85,0.82,0.67,0.6,0.44,0.35,0.29,0.24,0.16,0.1,0.08,0.1,0.09,0.12,0.13,0.13,0.13,0.12,0.08,0.04">
+      <button type="button" class="fhp-voice-play" aria-label="再生: シチュエーションボイス">
+        <svg class="is-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z" fill="currentColor"/></svg>
+        <svg class="is-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 4.5h4v15h-4zM13.5 4.5h4v15h-4z" fill="currentColor"/></svg>
+      </button>
+      <div class="fhp-voice-head">
+        <p class="fhp-voice-title">シチュエーションボイス</p>
+        <p class="fhp-voice-desc">雨の日の帰り道、という設定の一場面です。</p>
+      </div>
+      <div class="fhp-voice-row">
+        <div class="fhp-voice-wave">
+          <div class="fhp-voice-bars" aria-hidden="true"></div>
+          <div class="fhp-voice-bars is-played" aria-hidden="true"></div>
+          <input class="fhp-voice-seek" type="range" min="0" max="1000" step="10" value="0" aria-label="再生位置: シチュエーションボイス">
+        </div>
+        <p class="fhp-voice-time"><span class="fhp-voice-cur">0:00</span> / <span class="fhp-voice-dur">0:06</span></p>
+      </div>
+      <audio preload="metadata" src="https://freehp.jp/mihon/parts/voice/scene.mp3"></audio>
+    </li>
+    <li class="fhp-voice-track" data-duration="6.4" data-peaks="1.0,0.78,0.33,0.7,0.95,0.55,0.17,1.0,0.84,0.65,0.43,0.24,0.11,0.04,1.0,0.78,0.34,0.7,0.95,0.55,0.17,1.0,0.84,0.65,0.43,0.24,0.11,0.03,1.0,0.78,0.34,0.7,0.95,0.55,0.17,1.0,0.78,0.33,0.7,0.95,0.55,0.17,1.0,0.84,0.65,0.51,0.4,0.31,0.24,0.19,0.14,0.1,0.06,0.03,0.02,0.0">
+      <button type="button" class="fhp-voice-play" aria-label="再生: 歌ってみた（抜粋）">
+        <svg class="is-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z" fill="currentColor"/></svg>
+        <svg class="is-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 4.5h4v15h-4zM13.5 4.5h4v15h-4z" fill="currentColor"/></svg>
+      </button>
+      <div class="fhp-voice-head">
+        <p class="fhp-voice-title">歌ってみた（抜粋）</p>
+        <p class="fhp-voice-desc">サビの部分だけを抜き出しています。</p>
+      </div>
+      <div class="fhp-voice-row">
+        <div class="fhp-voice-wave">
+          <div class="fhp-voice-bars" aria-hidden="true"></div>
+          <div class="fhp-voice-bars is-played" aria-hidden="true"></div>
+          <input class="fhp-voice-seek" type="range" min="0" max="1000" step="10" value="0" aria-label="再生位置: 歌ってみた（抜粋）">
+        </div>
+        <p class="fhp-voice-time"><span class="fhp-voice-cur">0:00</span> / <span class="fhp-voice-dur">0:06</span></p>
+      </div>
+      <audio preload="metadata" src="https://freehp.jp/mihon/parts/voice/song.mp3"></audio>
+    </li>
+  </ul>
+  <p class="fhp-voice-note">見本のため、声の代わりに合成した音を入れています。</p>
+</div>
+<script>
+/*
+  音声・ボイスサンプル: 本物の <audio> を、店や人のトーンに合わせた見た目で操作する。
+  - 再生／一時停止ボタン、波形の棒（押した位置から再生）、経過時間／長さ
+  - 1つ再生したら、ページ内の他の音声は止める（部品が2つあっても同じ）
+  - 波形は data-peaks（0〜1 の数をカンマ区切り）から描く。無ければ一定の高さの棒にする
+  - 波形の上に透明な <input type="range"> を重ね、キーボードの左右キーでも位置を変えられる
+*/
+(function () {
+  'use strict';
+
+  var SEEK_STEPS = 1000;
+  var FALLBACK_BARS = 40;
+  var MIN_BAR = 0.12;
+  var BAR_PITCH_PX = 5;
+
+  // 経過は切り捨て、長さは四捨五入（3.1秒の音が「0:03 / 0:03」で止まらないように）
+  function fmt(sec, round) {
+    if (!isFinite(sec) || sec < 0) sec = 0;
+    var s = round ? Math.round(sec) : Math.floor(sec);
+    return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+  }
+
+  // 波形の幅に合わせて棒の数を減らす（狭い画面で棒が細くなりすぎないように）。山は区間の最大で残す
+  function fitPeaks(peaks, width) {
+    var count = Math.max(8, Math.min(peaks.length, Math.floor(width / BAR_PITCH_PX)));
+    if (count >= peaks.length) return peaks;
+    var out = [];
+    for (var i = 0; i < count; i++) {
+      var from = Math.floor(i * peaks.length / count);
+      var to = Math.max(from + 1, Math.floor((i + 1) * peaks.length / count));
+      out.push(Math.max.apply(null, peaks.slice(from, to)));
+    }
+    return out;
+  }
+
+  function drawBars(container, peaks) {
+    var frag = document.createDocumentFragment();
+    peaks.forEach(function (p) {
+      var bar = document.createElement('span');
+      bar.style.height = Math.max(MIN_BAR, p) * 100 + '%';
+      frag.appendChild(bar);
+    });
+    container.replaceChildren(frag);
+  }
+
+  function initTrack(track) {
+    var audio = track.querySelector('audio');
+    var button = track.querySelector('.fhp-voice-play');
+    var seek = track.querySelector('.fhp-voice-seek');
+    var cur = track.querySelector('.fhp-voice-cur');
+    var dur = track.querySelector('.fhp-voice-dur');
+    var title = track.querySelector('.fhp-voice-title').textContent.trim();
+    var peaks = (track.dataset.peaks || '').split(',').filter(Boolean).map(Number);
+    if (!peaks.length) peaks = Array(FALLBACK_BARS).fill(0.6);
+    var wave = track.querySelector('.fhp-voice-wave');
+    var drawnWidth = 0;
+    function redraw() {
+      var width = wave.clientWidth;
+      if (!width || width === drawnWidth) return;
+      drawnWidth = width;
+      var fitted = fitPeaks(peaks, width);
+      track.querySelectorAll('.fhp-voice-bars').forEach(function (c) { drawBars(c, fitted); });
+    }
+    redraw();
+    if ('ResizeObserver' in window) new ResizeObserver(redraw).observe(wave);
+
+    function duration() {
+      return isFinite(audio.duration) && audio.duration > 0 ? audio.duration : Number(track.dataset.duration || 0);
+    }
+    function paint() {
+      var total = duration();
+      var ratio = total ? Math.min(1, audio.currentTime / total) : 0;
+      track.style.setProperty('--fhp-voice-progress', (ratio * 100).toFixed(2) + '%');
+      seek.value = String(Math.round(ratio * SEEK_STEPS));
+      cur.textContent = fmt(audio.currentTime);
+      dur.textContent = fmt(total, true);
+      seek.setAttribute('aria-valuetext', fmt(audio.currentTime) + ' / ' + fmt(total, true));
+    }
+    // 再生中は画面の書き換えに合わせて進み具合を塗る（timeupdate だけだと1秒に4回でカクつく）
+    function loop() {
+      paint();
+      if (!audio.paused) requestAnimationFrame(loop);
+    }
+    function setPlaying(on) {
+      if (on) requestAnimationFrame(loop);
+      track.classList.toggle('is-playing', on);
+      button.setAttribute('aria-label', (on ? '一時停止: ' : '再生: ') + title);
+    }
+
+    button.addEventListener('click', function () {
+      if (audio.paused) {
+        audio.play().catch(function (err) {
+          track.dataset.error = err.name;
+          setPlaying(false);
+        });
+      } else {
+        audio.pause();
+      }
+    });
+    seek.addEventListener('input', function () {
+      var total = duration();
+      if (total) audio.currentTime = (Number(seek.value) / SEEK_STEPS) * total;
+      paint();
+    });
+    audio.addEventListener('play', function () { setPlaying(true); });
+    audio.addEventListener('pause', function () { setPlaying(false); });
+    audio.addEventListener('ended', function () { audio.currentTime = 0; setPlaying(false); paint(); });
+    audio.addEventListener('timeupdate', paint);
+    audio.addEventListener('loadedmetadata', paint);
+    setPlaying(false);
+    paint();
+  }
+
+  // 1つ再生したら、他の音声を止める
+  document.addEventListener('play', function (e) {
+    document.querySelectorAll('[data-fhp-voice] audio').forEach(function (a) {
+      if (a !== e.target && !a.paused) a.pause();
+    });
+  }, true);
+
+  function initAll() {
+    // 同じ部品のコードを2回貼っても、1つの部品を二重に動かさない
+    document.querySelectorAll('[data-fhp-voice] .fhp-voice-track').forEach(function (el) {
+      if (el.dataset.fhpReady) return;
+      el.dataset.fhpReady = 'true';
+      initTrack(el);
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initAll);
+  else initAll();
+})();
+</script>

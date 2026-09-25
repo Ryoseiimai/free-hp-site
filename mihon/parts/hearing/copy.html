@@ -1,0 +1,442 @@
+<!--
+  聞き返し（AIホームページ製作所がつくった、無料で使える部品）
+  動いている見本: https://freehp.jp/mihon/parts/#hearing
+  使い方
+    1. このコードをまるごと、自分のページの置きたい場所に貼る
+    2. すぐ下の :root { ... } にある色（--fhp- で始まる行）を、お店の色に書き換える
+    3. 文字・写真・リンク先を、自分のお店のものに書き換える
+  写真と音声は見本用の仮のものです（実在するお店の商品として使わないでください）。
+  Copyright (c) 2026 RYOSEIWORLD (Ryosei Imai). MIT No Attribution（MIT-0）。商用・改変・再配布も自由で、表記は要りません。
+-->
+<style>
+/*
+  部品の色・角丸・書体の差し込み口（トークン）
+  ------------------------------------------------------------
+  部品のCSSはすべてこの変数だけを見る。色を変えたいときは、下の :root の値を書き換えるだけでよい。
+  用意したトーン（あおば・元気堂・そらまめ）を使うときは、部品の外側（body など）に data-fhp-tone="aoba" などを付ける。
+    --fhp-bg        地の色
+    --fhp-fg        文字の色（地に対し 4.5:1 以上）
+    --fhp-muted     補助の文字（地に対し 4.5:1 以上）
+    --fhp-line      飾りの区切り線（弱くてよい）
+    --fhp-edge      押せる物の枠線（地に対し 3:1 以上。WCAG 1.4.11）
+    --fhp-accent    差し色。ボタンの塗り・印・選んだ状態だけに使う（地に対し 4.5:1 以上）
+    --fhp-on-accent 差し色の上の文字（4.5:1 以上）
+    --fhp-shade     写真を拡大したときの暗い地（白い文字が乗る）
+    --fhp-radius    大きい枠の角丸   --fhp-radius-s  ボタンなど小さい物の角丸
+    --fhp-display   見出しの書体     --fhp-body      本文の書体
+*/
+:root {
+  --fhp-bg: #FFFFFF;
+  --fhp-fg: #1D1D1F;
+  --fhp-muted: #6E6E73;
+  --fhp-line: #D2D2D7;
+  --fhp-edge: #86868B;
+  --fhp-accent: #1B6B44;
+  --fhp-on-accent: #FFFFFF;
+  --fhp-shade: #1D1D1F;
+  --fhp-radius: 14px;
+  --fhp-radius-s: 10px;
+  --fhp-display: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+  --fhp-body: var(--fhp-display);
+}
+
+/* 純喫茶 あおば: 暗い木の地・象牙色の文字・ランプの琥珀。角は立てる */
+[data-fhp-tone="aoba"] {
+  --fhp-bg: #221812;
+  --fhp-fg: #EFE3CB;
+  --fhp-muted: #C9BBA2;
+  --fhp-line: rgba(239, 227, 203, .24);
+  --fhp-edge: #7D6E5A;
+  --fhp-accent: #E4B96A;
+  --fhp-on-accent: #221812;
+  --fhp-shade: #140E0A;
+  --fhp-radius: 0px;
+  --fhp-radius-s: 0px;
+  --fhp-display: "Kaisei Decol", "Hiragino Mincho ProN", serif;
+  --fhp-body: "Zen Kaku Gothic Antique", "Hiragino Sans", sans-serif;
+  color-scheme: dark;
+}
+
+/* からだ元気堂: 白地・システムフォント・観葉植物の緑。角は丸い（Apple HIG 寄り） */
+[data-fhp-tone="genkido"] {
+  color-scheme: light;
+  --fhp-bg: #FFFFFF;
+  --fhp-fg: #1D1D1F;
+  --fhp-muted: #6E6E73;
+  --fhp-line: #D2D2D7;
+  --fhp-edge: #86868B;
+  --fhp-accent: #1B6B44;
+  --fhp-on-accent: #FFFFFF;
+  --fhp-shade: #1D1D1F;
+  --fhp-radius: 14px;
+  --fhp-radius-s: 10px;
+  --fhp-display: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+  --fhp-body: var(--fhp-display);
+}
+
+/* そらまめ焙煎所: 白地・深煎りの茶・クラフト紙。見出しは明朝、角はわずかに */
+[data-fhp-tone="soramame"] {
+  color-scheme: light;
+  --fhp-bg: #FFFFFF;
+  --fhp-fg: #3B2B20;
+  --fhp-muted: #6F6053;
+  --fhp-line: #E6DAC6;
+  --fhp-edge: #9C8466;
+  --fhp-accent: #7A5230;
+  --fhp-on-accent: #FFFFFF;
+  --fhp-shade: #2A1F17;
+  --fhp-radius: 4px;
+  --fhp-radius-s: 3px;
+  --fhp-display: "Zen Old Mincho", "Hiragino Mincho ProN", serif;
+  --fhp-body: "Zen Kaku Gothic New", "Hiragino Sans", sans-serif;
+}
+
+/* 部品の共通の土台。部品の一番外側に .fhp を付ける */
+.fhp {
+  color: var(--fhp-fg);
+  font-family: var(--fhp-body);
+  font-feature-settings: "palt" 1;
+}
+.fhp *, .fhp *::before, .fhp *::after { box-sizing: border-box; }
+.fhp :focus-visible { outline: 2px solid var(--fhp-accent); outline-offset: 3px; }
+.fhp .fhp-nw { white-space: nowrap; }
+/* 部品の中で display を指定していても、hidden を付けた物は必ず隠す */
+.fhp [hidden] { display: none !important; }
+/* 見本の BudouX（文節の途中で改行しない）に合わせ、フォームやボタンの文字も同じ折り返し方にする。
+   文は <span> に入れておくと、BudouX が文節の区切りを入れる */
+.fhp legend, .fhp label, .fhp summary, .fhp button, .fhp .fhp-btn {
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  line-break: strict;
+}
+.fhp-vh {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* 部品で使うボタンの共通形。塗り（主）と枠（副）の2種類だけ */
+.fhp-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5em;
+  min-height: 48px;
+  padding: .55em 1.3em;
+  border: 1px solid var(--fhp-accent);
+  border-radius: var(--fhp-radius-s);
+  background: var(--fhp-accent);
+  color: var(--fhp-on-accent);
+  font: inherit;
+  font-weight: 700;
+  line-height: 1.4;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+.fhp-btn:hover { text-decoration: underline; text-underline-offset: .25em; }
+.fhp-btn--sub {
+  border-color: var(--fhp-edge);
+  background: transparent;
+  color: var(--fhp-fg);
+}
+.fhp-btn svg { flex: none; width: 1.15em; height: 1.15em; }
+.fhp-btn[hidden] { display: none; }
+
+/*
+  聞き返し
+  1問ずつ枠で囲まず、問いの文字の大きさと余白で区切る。選択肢は押しやすい大きさの札（ラベル全体が押せる）。
+  提案は「まず入れる部品」2つを大きく、残りを文字だけで軽く並べる。
+*/
+.fhp-hear { container-type: inline-size; }
+.fhp-hear form { margin: 0; }
+.fhp-hear fieldset { margin: 0 0 1.8rem; padding: 0; border: 0; min-width: 0; }
+.fhp-hear legend { padding: 0; font-family: var(--fhp-display); font-size: 1.15rem; font-weight: 700; line-height: 1.5; }
+/* 答えていない問い: 左に差し色の線と「選んでください」 */
+.fhp-hear fieldset.is-missing { padding-left: 14px; border-left: 3px solid var(--fhp-accent); }
+.fhp-hear fieldset.is-missing legend::after { content: "　選んでください"; color: var(--fhp-accent); font-family: var(--fhp-body); font-size: .88rem; }
+.fhp-hear-help { margin: .15rem 0 0; color: var(--fhp-muted); font-size: .9rem; }
+.fhp-hear-options { display: grid; gap: 8px; margin: .8rem 0 0; padding: 0; list-style: none; }
+.fhp-hear-option {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  min-height: 52px;
+  padding: .6rem 1rem;
+  border: 1px solid var(--fhp-edge);
+  border-radius: var(--fhp-radius-s);
+  line-height: 1.5;
+  cursor: pointer;
+}
+.fhp-hear-option:hover { border-color: var(--fhp-fg); }
+.fhp-hear-option:has(input:checked) { padding: calc(.6rem - 1px) calc(1rem - 1px); border: 2px solid var(--fhp-accent); font-weight: 700; }
+.fhp-hear-option:has(input:focus-visible) { outline: 2px solid var(--fhp-accent); outline-offset: 2px; }
+.fhp-hear-option input { width: 20px; height: 20px; margin: 0; accent-color: var(--fhp-accent); }
+.fhp-hear-option input:focus-visible { outline: none; }
+.fhp-hear-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }
+.fhp-hear-error { flex-basis: 100%; margin: 0; color: var(--fhp-fg); font-weight: 700; }
+.fhp-hear-error::before { content: "！"; margin-right: .3em; color: var(--fhp-accent); }
+.fhp-hear-error[hidden] { display: none; }
+
+.fhp-hear-result { margin-top: 2.2rem; padding-top: 1.6rem; border-top: 2px solid var(--fhp-fg); }
+.fhp-hear-result[hidden] { display: none; }
+.fhp-hear-result-title { margin: 0; font-family: var(--fhp-display); font-size: 1.4rem; font-weight: 700; line-height: 1.45; }
+.fhp-hear-result-title:focus { outline: none; }
+.fhp-hear-result-title:focus-visible { outline: 2px solid var(--fhp-accent); outline-offset: 4px; }
+.fhp-hear-primary, .fhp-hear-secondary { margin: 0; padding: 0; list-style: none; }
+.fhp-hear-primary { display: grid; gap: 1.2rem; margin-top: 1.1rem; }
+.fhp-hear-pick p { margin: 0; }
+.fhp-hear-pick-name a { color: var(--fhp-fg); font-weight: 700; text-decoration-color: var(--fhp-accent); text-decoration-thickness: 2px; text-underline-offset: .3em; }
+.fhp-hear-pick.is-primary .fhp-hear-pick-name { font-family: var(--fhp-display); font-size: 1.3rem; line-height: 1.5; }
+.fhp-hear-pick-reason { margin-top: .2rem !important; color: var(--fhp-muted); line-height: 1.75; }
+.fhp-hear-secondary-title { margin: 1.8rem 0 0; font-weight: 700; }
+.fhp-hear-secondary .fhp-hear-pick { padding: .7rem 0; border-bottom: 1px solid var(--fhp-line); }
+.fhp-hear-secondary .fhp-hear-pick-reason { font-size: .92rem; }
+.fhp-hear-cta { margin: 1.8rem 0 0; }
+.fhp-hear-cta-note { margin: .6rem 0 0; color: var(--fhp-muted); font-size: .88rem; line-height: 1.7; }
+
+@container (min-width: 520px) {
+  .fhp-hear-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .fhp-hear-primary { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 2rem; }
+}
+</style>
+<!-- data-mail は相談を受けるメールアドレス（自分のサイトで使うときは書き換える）。
+     data-catalog は部品の説明ページ（このカタログ）の場所。snippet.html では ../parts/、copy.html では https://freehp.jp/mihon/parts/ になる -->
+<div class="fhp fhp-hear" data-fhp-hearing data-catalog="https://freehp.jp/mihon/parts/" data-mail="info@freehp.jp">
+  <form novalidate>
+    <fieldset data-required data-short="お仕事">
+      <legend><span>どんなお仕事ですか</span></legend>
+      <ul class="fhp-hear-options">
+        <li><label class="fhp-hear-option"><input type="radio" name="work" value="food"><span class="fhp-hear-label">飲食店・カフェ</span></label></li>
+        <li><label class="fhp-hear-option"><input type="radio" name="work" value="booking"><span class="fhp-hear-label">美容室・整体など予約制のお店</span></label></li>
+        <li><label class="fhp-hear-option"><input type="radio" name="work" value="shop"><span class="fhp-hear-label">物販・教室・工房</span></label></li>
+        <li><label class="fhp-hear-option"><input type="radio" name="work" value="creator"><span class="fhp-hear-label">声・音楽・作品の活動</span></label></li>
+      </ul>
+    </fieldset>
+    <fieldset data-short="見てほしいもの">
+      <legend><span>ホームページで、いちばん見てほしいものは</span></legend>
+      <p class="fhp-hear-help">当てはまるものをすべて選んでください。</p>
+      <ul class="fhp-hear-options">
+        <li><label class="fhp-hear-option"><input type="checkbox" name="look" value="photos"><span class="fhp-hear-label">写真（料理・店内・作品）</span></label></li>
+        <li><label class="fhp-hear-option"><input type="checkbox" name="look" value="prices"><span class="fhp-hear-label">メニューと料金</span></label></li>
+        <li><label class="fhp-hear-option"><input type="checkbox" name="look" value="place"><span class="fhp-hear-label">場所と行き方</span></label></li>
+        <li><label class="fhp-hear-option"><input type="checkbox" name="look" value="sound"><span class="fhp-hear-label">声や音</span></label></li>
+      </ul>
+    </fieldset>
+    <fieldset data-required data-short="連絡の受け方">
+      <legend><span>お客さんからの連絡は、どう受けたいですか</span></legend>
+      <ul class="fhp-hear-options">
+        <li><label class="fhp-hear-option"><input type="radio" name="contact" value="tel"><span class="fhp-hear-label">電話で受けたい</span></label></li>
+        <li><label class="fhp-hear-option"><input type="radio" name="contact" value="line"><span class="fhp-hear-label">LINEで受けたい</span></label></li>
+        <li><label class="fhp-hear-option"><input type="radio" name="contact" value="reserve"><span class="fhp-hear-label">予約サイトを使っている</span></label></li>
+        <li><label class="fhp-hear-option"><input type="radio" name="contact" value="mail"><span class="fhp-hear-label">メールだけでいい</span></label></li>
+      </ul>
+    </fieldset>
+    <fieldset data-required data-short="更新">
+      <legend><span>お知らせは、よく出しますか</span></legend>
+      <ul class="fhp-hear-options">
+        <li><label class="fhp-hear-option"><input type="radio" name="update" value="often"><span class="fhp-hear-label">よく出したい（休み・新作など）</span></label></li>
+        <li><label class="fhp-hear-option"><input type="radio" name="update" value="rarely"><span class="fhp-hear-label">あまり変えない</span></label></li>
+      </ul>
+    </fieldset>
+    <div class="fhp-hear-actions">
+      <button type="submit" class="fhp-btn">組み合わせを見る</button>
+      <button type="reset" class="fhp-btn fhp-btn--sub">答えを消す</button>
+      <p class="fhp-hear-error" role="alert" hidden></p>
+    </div>
+  </form>
+  <div class="fhp-hear-result" hidden>
+    <h3 class="fhp-hear-result-title">この組み合わせがおすすめです</h3>
+    <ul class="fhp-hear-primary"></ul>
+    <div class="fhp-hear-secondary-wrap">
+      <p class="fhp-hear-secondary-title">あわせて入れると便利</p>
+      <ul class="fhp-hear-secondary"></ul>
+    </div>
+    <p class="fhp-hear-cta"><a class="fhp-btn fhp-hear-mail" href="mailto:info@freehp.jp">この内容でご相談ください</a></p>
+    <p class="fhp-hear-cta-note">メールのアプリが開き、答えと組み合わせが本文に入ります。送るかどうかは、中身を見てから決められます。宛先は <span class="fhp-hear-mail-to">info@freehp.jp</span> です。</p>
+  </div>
+</div>
+<script>
+/*
+  聞き返し: 「どんなホームページにしたいか」を4問の選択式で聞き、答えから部品の組み合わせを提案する。
+  - 送信はしない。提案の下に相談先へのメールのリンク（答えと提案を本文に入れたもの）だけ出す。
+    相談先は data-mail（既定 info@freehp.jp）。自分のサイトで使うときは自分のアドレスに書き換える
+  - 部品の説明リンクは data-catalog（既定は同じページ）+ #部品名 に飛ぶ
+  - 提案の決まり（RULES）: 答えに当てはまる理由を1つずつ見て、先に当たった理由を使う。
+    Q2「いちばん見てほしいもの」で選ばれた部品を先頭（まず入れる部品）にする
+*/
+(function () {
+  'use strict';
+
+  var MAIL_TO = 'info@freehp.jp';
+  var MAIL_SUBJECT = 'ホームページの相談（部品の組み合わせ）';
+  var PRIMARY_COUNT = 2;
+
+  var PARTS = {
+    gallery: '写真ギャラリー',
+    menu: 'メニュー・料金表',
+    map: '地図',
+    contact: '予約・問い合わせ',
+    voice: '音声・ボイスサンプル',
+    news: 'お知らせ',
+    faq: 'よくある質問'
+  };
+
+  // [部品, 当てはまる条件, 理由]。上から順に見る
+  var RULES = [
+    ['gallery', function (a) { return a.look.indexOf('photos') !== -1; }, '写真を一覧にして、押すと大きく見られるようにします。'],
+    ['gallery', function (a) { return a.work === 'creator'; }, '作品やジャケットの画像を、押すと大きく見られる一覧にします。'],
+    ['menu', function (a) { return a.look.indexOf('prices') !== -1; }, '分類ごとに切り替えられる料金表にします。価格は税込で出します。'],
+    ['menu', function (a) { return a.work === 'food' || a.work === 'booking'; }, 'メニューと料金を、分類ごとに切り替えて見られるようにします。'],
+    ['voice', function (a) { return a.look.indexOf('sound') !== -1 || a.work === 'creator'; }, '声や曲を、その場で再生して聞けるようにします。1つ再生すると他は止まります。'],
+    ['map', function (a) { return a.look.indexOf('place') !== -1; }, 'Google マップと「地図アプリで開く」ボタンを置きます。'],
+    ['map', function (a) { return a.work !== 'creator'; }, 'お店の場所がすぐ分かるよう、地図と道順のボタンを置きます。'],
+    ['contact', function (a) { return a.contact === 'tel'; }, '営業中は電話のボタンを大きく出し、時間外は予約やLINEに切り替えます。'],
+    ['contact', function (a) { return a.contact === 'line' || a.contact === 'reserve'; }, '予約・LINEのボタンと、いま営業中かどうかを表示します。'],
+    ['news', function (a) { return a.update === 'often'; }, '日付つきのお知らせを新しい順に並べ、新しいものに印を付けます。'],
+    ['faq', function (a) { return a.work === 'booking'; }, '予約の取り方や当日の流れなど、よく聞かれることを開閉式でまとめます。'],
+    ['faq', function (a) { return a.work === 'creator'; }, '依頼の受け方や納期など、よく聞かれることを開閉式でまとめます。'],
+    ['faq', function () { return true; }, '支払い方法や駐車場など、よく聞かれることを開閉式でまとめます。']
+  ];
+
+  var LOOK_TO_PART = { photos: 'gallery', prices: 'menu', place: 'map', sound: 'voice' };
+
+  function labelOf(input) {
+    return input.closest('label').querySelector('.fhp-hear-label').textContent.trim();
+  }
+
+  function readAnswers(form) {
+    var pick = function (name) {
+      var el = form.querySelector('input[name="' + name + '"]:checked');
+      return el ? el.value : '';
+    };
+    var looks = Array.prototype.slice.call(form.querySelectorAll('input[name="look"]:checked'));
+    return {
+      work: pick('work'),
+      look: looks.map(function (el) { return el.value; }),
+      contact: pick('contact'),
+      update: pick('update')
+    };
+  }
+
+  function propose(answers) {
+    var chosen = [];
+    RULES.forEach(function (rule) {
+      var part = rule[0];
+      if (chosen.some(function (c) { return c.part === part; })) return;
+      if (rule[1](answers)) chosen.push({ part: part, reason: rule[2] });
+    });
+    var wanted = answers.look.map(function (v) { return LOOK_TO_PART[v]; });
+    var rank = function (c) { var i = wanted.indexOf(c.part); return i === -1 ? wanted.length : i; };
+    return chosen
+      .map(function (c, i) { return { c: c, i: i }; })
+      .sort(function (x, y) { return rank(x.c) - rank(y.c) || x.i - y.i; })
+      .map(function (x) { return x.c; });
+  }
+
+  function mailHref(form, list, mailTo) {
+    var lines = Array.prototype.slice.call(form.querySelectorAll('fieldset')).map(function (fs) {
+      var picked = Array.prototype.slice.call(fs.querySelectorAll('input:checked')).map(labelOf);
+      return fs.dataset.short + ': ' + (picked.join('、') || 'とくになし');
+    });
+    lines.push('提案された部品: ' + list.map(function (c) { return PARTS[c.part]; }).join('、'));
+    var body = 'ホームページの相談です。\n\n' + lines.join('\n') + '\n\n（ここに、お店や活動の名前と、ご希望があれば書いてください）\n';
+    return 'mailto:' + mailTo + '?subject=' + encodeURIComponent(MAIL_SUBJECT) + '&body=' + encodeURIComponent(body);
+  }
+
+  function item(c, base, primary) {
+    var li = document.createElement('li');
+    li.className = primary ? 'fhp-hear-pick is-primary' : 'fhp-hear-pick';
+    var name = document.createElement('p');
+    name.className = 'fhp-hear-pick-name';
+    var a = document.createElement('a');
+    a.href = base + '#' + c.part;
+    a.textContent = PARTS[c.part];
+    name.appendChild(a);
+    var reason = document.createElement('p');
+    reason.className = 'fhp-hear-pick-reason';
+    reason.textContent = c.reason;
+    li.appendChild(name);
+    li.appendChild(reason);
+    return li;
+  }
+
+  function initHearing(root) {
+    var form = root.querySelector('form');
+    var result = root.querySelector('.fhp-hear-result');
+    var error = root.querySelector('.fhp-hear-error');
+    var base = root.dataset.catalog || '';
+    var mailTo = root.dataset.mail || MAIL_TO;
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var missing = Array.prototype.slice.call(form.querySelectorAll('fieldset[data-required]'))
+        .filter(function (fs) { return !fs.querySelector('input:checked'); });
+      form.querySelectorAll('fieldset').forEach(function (fs) {
+        var isMissing = missing.indexOf(fs) !== -1;
+        fs.classList.toggle('is-missing', isMissing);
+        if (isMissing) fs.setAttribute('aria-invalid', 'true');
+        else fs.removeAttribute('aria-invalid');
+      });
+      if (missing.length) {
+        error.textContent = '「' + missing[0].dataset.short + '」を選んでください。';
+        error.hidden = false;
+        missing[0].querySelector('input').focus();
+        return;
+      }
+      error.hidden = true;
+      var list = propose(readAnswers(form));
+      var primary = result.querySelector('.fhp-hear-primary');
+      var secondary = result.querySelector('.fhp-hear-secondary');
+      primary.innerHTML = '';
+      secondary.innerHTML = '';
+      list.forEach(function (c, i) {
+        (i < PRIMARY_COUNT ? primary : secondary).appendChild(item(c, base, i < PRIMARY_COUNT));
+      });
+      result.querySelector('.fhp-hear-secondary-wrap').hidden = list.length <= PRIMARY_COUNT;
+      result.querySelector('.fhp-hear-mail').href = mailHref(form, list, mailTo);
+      var shown = result.querySelector('.fhp-hear-mail-to');
+      if (shown) shown.textContent = mailTo;
+      result.hidden = false;
+      if (window.insertPhraseBreaks) {
+        window.insertPhraseBreaks(primary);
+        window.insertPhraseBreaks(secondary);
+      }
+      var heading = result.querySelector('.fhp-hear-result-title');
+      heading.tabIndex = -1;
+      heading.focus();
+    });
+
+    // 選び直したら、その問いの「選んでください」の印を外す
+    form.addEventListener('change', function (e) {
+      var fs = e.target.closest('fieldset.is-missing');
+      if (!fs) return;
+      fs.classList.remove('is-missing');
+      fs.removeAttribute('aria-invalid');
+    });
+
+    form.addEventListener('reset', function () {
+      result.hidden = true;
+      error.hidden = true;
+      form.querySelectorAll('fieldset.is-missing').forEach(function (fs) {
+        fs.classList.remove('is-missing');
+        fs.removeAttribute('aria-invalid');
+      });
+    });
+  }
+
+  function initAll() {
+    // 同じ部品のコードを2回貼っても、1つの部品を二重に動かさない
+    document.querySelectorAll('[data-fhp-hearing]').forEach(function (el) {
+      if (el.dataset.fhpReady) return;
+      el.dataset.fhpReady = 'true';
+      initHearing(el);
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initAll);
+  else initAll();
+})();
+</script>

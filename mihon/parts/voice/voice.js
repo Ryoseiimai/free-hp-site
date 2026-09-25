@@ -119,7 +119,12 @@
   }, true);
 
   function initAll() {
-    document.querySelectorAll('[data-fhp-voice] .fhp-voice-track').forEach(initTrack);
+    // 同じ部品のコードを2回貼っても、1つの部品を二重に動かさない
+    document.querySelectorAll('[data-fhp-voice] .fhp-voice-track').forEach(function (el) {
+      if (el.dataset.fhpReady) return;
+      el.dataset.fhpReady = 'true';
+      initTrack(el);
+    });
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initAll);
   else initAll();

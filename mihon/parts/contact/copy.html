@@ -1,0 +1,399 @@
+<!--
+  予約・問い合わせ（AIホームページ製作所がつくった、無料で使える部品）
+  動いている見本: https://freehp.jp/mihon/parts/#contact
+  使い方
+    1. このコードをまるごと、自分のページの置きたい場所に貼る
+    2. すぐ下の :root { ... } にある色（--fhp- で始まる行）を、お店の色に書き換える
+    3. 文字・写真・リンク先を、自分のお店のものに書き換える
+  写真と音声は見本用の仮のものです（実在するお店の商品として使わないでください）。
+  Copyright (c) 2026 RYOSEIWORLD (Ryosei Imai). MIT No Attribution（MIT-0）。商用・改変・再配布も自由で、表記は要りません。
+-->
+<style>
+/*
+  部品の色・角丸・書体の差し込み口（トークン）
+  ------------------------------------------------------------
+  部品のCSSはすべてこの変数だけを見る。色を変えたいときは、下の :root の値を書き換えるだけでよい。
+  用意したトーン（あおば・元気堂・そらまめ）を使うときは、部品の外側（body など）に data-fhp-tone="aoba" などを付ける。
+    --fhp-bg        地の色
+    --fhp-fg        文字の色（地に対し 4.5:1 以上）
+    --fhp-muted     補助の文字（地に対し 4.5:1 以上）
+    --fhp-line      飾りの区切り線（弱くてよい）
+    --fhp-edge      押せる物の枠線（地に対し 3:1 以上。WCAG 1.4.11）
+    --fhp-accent    差し色。ボタンの塗り・印・選んだ状態だけに使う（地に対し 4.5:1 以上）
+    --fhp-on-accent 差し色の上の文字（4.5:1 以上）
+    --fhp-shade     写真を拡大したときの暗い地（白い文字が乗る）
+    --fhp-radius    大きい枠の角丸   --fhp-radius-s  ボタンなど小さい物の角丸
+    --fhp-display   見出しの書体     --fhp-body      本文の書体
+*/
+:root {
+  --fhp-bg: #FFFFFF;
+  --fhp-fg: #1D1D1F;
+  --fhp-muted: #6E6E73;
+  --fhp-line: #D2D2D7;
+  --fhp-edge: #86868B;
+  --fhp-accent: #1B6B44;
+  --fhp-on-accent: #FFFFFF;
+  --fhp-shade: #1D1D1F;
+  --fhp-radius: 14px;
+  --fhp-radius-s: 10px;
+  --fhp-display: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+  --fhp-body: var(--fhp-display);
+}
+
+/* 純喫茶 あおば: 暗い木の地・象牙色の文字・ランプの琥珀。角は立てる */
+[data-fhp-tone="aoba"] {
+  --fhp-bg: #221812;
+  --fhp-fg: #EFE3CB;
+  --fhp-muted: #C9BBA2;
+  --fhp-line: rgba(239, 227, 203, .24);
+  --fhp-edge: #7D6E5A;
+  --fhp-accent: #E4B96A;
+  --fhp-on-accent: #221812;
+  --fhp-shade: #140E0A;
+  --fhp-radius: 0px;
+  --fhp-radius-s: 0px;
+  --fhp-display: "Kaisei Decol", "Hiragino Mincho ProN", serif;
+  --fhp-body: "Zen Kaku Gothic Antique", "Hiragino Sans", sans-serif;
+  color-scheme: dark;
+}
+
+/* からだ元気堂: 白地・システムフォント・観葉植物の緑。角は丸い（Apple HIG 寄り） */
+[data-fhp-tone="genkido"] {
+  color-scheme: light;
+  --fhp-bg: #FFFFFF;
+  --fhp-fg: #1D1D1F;
+  --fhp-muted: #6E6E73;
+  --fhp-line: #D2D2D7;
+  --fhp-edge: #86868B;
+  --fhp-accent: #1B6B44;
+  --fhp-on-accent: #FFFFFF;
+  --fhp-shade: #1D1D1F;
+  --fhp-radius: 14px;
+  --fhp-radius-s: 10px;
+  --fhp-display: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+  --fhp-body: var(--fhp-display);
+}
+
+/* そらまめ焙煎所: 白地・深煎りの茶・クラフト紙。見出しは明朝、角はわずかに */
+[data-fhp-tone="soramame"] {
+  color-scheme: light;
+  --fhp-bg: #FFFFFF;
+  --fhp-fg: #3B2B20;
+  --fhp-muted: #6F6053;
+  --fhp-line: #E6DAC6;
+  --fhp-edge: #9C8466;
+  --fhp-accent: #7A5230;
+  --fhp-on-accent: #FFFFFF;
+  --fhp-shade: #2A1F17;
+  --fhp-radius: 4px;
+  --fhp-radius-s: 3px;
+  --fhp-display: "Zen Old Mincho", "Hiragino Mincho ProN", serif;
+  --fhp-body: "Zen Kaku Gothic New", "Hiragino Sans", sans-serif;
+}
+
+/* 部品の共通の土台。部品の一番外側に .fhp を付ける */
+.fhp {
+  color: var(--fhp-fg);
+  font-family: var(--fhp-body);
+  font-feature-settings: "palt" 1;
+}
+.fhp *, .fhp *::before, .fhp *::after { box-sizing: border-box; }
+.fhp :focus-visible { outline: 2px solid var(--fhp-accent); outline-offset: 3px; }
+.fhp .fhp-nw { white-space: nowrap; }
+/* 部品の中で display を指定していても、hidden を付けた物は必ず隠す */
+.fhp [hidden] { display: none !important; }
+/* 見本の BudouX（文節の途中で改行しない）に合わせ、フォームやボタンの文字も同じ折り返し方にする。
+   文は <span> に入れておくと、BudouX が文節の区切りを入れる */
+.fhp legend, .fhp label, .fhp summary, .fhp button, .fhp .fhp-btn {
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  line-break: strict;
+}
+.fhp-vh {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* 部品で使うボタンの共通形。塗り（主）と枠（副）の2種類だけ */
+.fhp-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5em;
+  min-height: 48px;
+  padding: .55em 1.3em;
+  border: 1px solid var(--fhp-accent);
+  border-radius: var(--fhp-radius-s);
+  background: var(--fhp-accent);
+  color: var(--fhp-on-accent);
+  font: inherit;
+  font-weight: 700;
+  line-height: 1.4;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+.fhp-btn:hover { text-decoration: underline; text-underline-offset: .25em; }
+.fhp-btn--sub {
+  border-color: var(--fhp-edge);
+  background: transparent;
+  color: var(--fhp-fg);
+}
+.fhp-btn svg { flex: none; width: 1.15em; height: 1.15em; }
+.fhp-btn[hidden] { display: none; }
+
+/*
+  予約・問い合わせ
+  いちばん上に「いま営業中か」を大きく出し、その下に押してほしい順でボタンを並べる。
+  一番上のボタンだけ塗り、残りは枠だけ（contact.js が状態に合わせて付け替える）。
+*/
+/* 部品の幅でボタンの並びを変える（差し込む先の段組みに合わせるため、画面幅ではなく部品の幅で見る） */
+.fhp-contact { container-type: inline-size; }
+.fhp-contact-status { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: .7rem; align-items: baseline; margin: 0; }
+.fhp-contact-dot {
+  width: .8rem;
+  height: .8rem;
+  border: 2px solid var(--fhp-edge);
+  border-radius: 50%;
+  transform: translateY(-.1rem);
+}
+.fhp-contact[data-state="open"] .fhp-contact-dot { border-color: var(--fhp-accent); background: var(--fhp-accent); }
+.fhp-contact-title {
+  font-family: var(--fhp-display);
+  font-size: clamp(1.45rem, 4.2vw, 1.9rem);
+  font-weight: 700;
+  line-height: 1.35;
+}
+.fhp-contact-detail {
+  grid-column: 2;
+  margin-top: .15rem;
+  color: var(--fhp-muted);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.fhp-contact-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 1.4rem 0 0;
+}
+.fhp-contact-actions .fhp-btn { flex-wrap: wrap; justify-content: flex-start; row-gap: 0; width: 100%; padding-left: 1.1em; padding-right: 1.1em; text-align: left; }
+/* 狭いときは、右の補足（電話番号など）だけが次の行に回る。ボタンの名前は途中で折らない */
+.fhp-contact-actions .fhp-btn-label { white-space: nowrap; }
+.fhp-contact-actions .fhp-btn small { margin-left: auto; font-size: .86em; font-weight: 500; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.fhp-contact-note { margin: .9rem 0 0; color: var(--fhp-muted); font-size: .9rem; line-height: 1.7; }
+
+.fhp-contact-week { width: 100%; margin: 1.6rem 0 0; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.fhp-contact-week caption { padding-bottom: .4rem; font-weight: 700; text-align: left; }
+.fhp-contact-week th, .fhp-contact-week td { padding: .5rem 0; border-top: 1px solid var(--fhp-line); text-align: left; font-weight: 400; }
+.fhp-contact-week th { width: 7.5em; color: var(--fhp-muted); }
+.fhp-contact-week tr.is-today th, .fhp-contact-week tr.is-today td { color: var(--fhp-fg); font-weight: 700; }
+.fhp-contact-week tr.is-today th { border-left: 3px solid var(--fhp-accent); padding-left: .7rem; }
+
+@container (min-width: 620px) {
+  .fhp-contact-actions { flex-direction: row; flex-wrap: wrap; }
+  .fhp-contact-actions .fhp-btn { width: auto; flex: 1 1 14rem; }
+}
+</style>
+<!-- 営業時間は data-hours に曜日ごと。昼休みは "11:00-14:00,17:00-22:00"、定休日は ""。
+     使わない連絡手段は href を空にするか、その <a> を消す。 -->
+<div class="fhp fhp-contact" data-fhp-contact data-last-call="30"
+     data-hours='{"月":"9:00-19:00","火":"9:00-19:00","水":"","木":"9:00-19:00","金":"9:00-19:00","土":"9:00-19:00","日":"10:00-17:00"}'>
+  <p class="fhp-contact-status" aria-live="polite">
+    <span class="fhp-contact-dot" aria-hidden="true"></span>
+    <span class="fhp-contact-title">営業時間を確かめています</span>
+    <span class="fhp-contact-detail"></span>
+  </p>
+  <div class="fhp-contact-actions">
+    <a class="fhp-btn" data-channel="tel" href="tel:000-0000-0000">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 3.5l2.6 3.7-1.7 2.1a12.4 12.4 0 0 0 7.2 7.2l2.1-1.7 3.7 2.6-1.3 3.1c-.4.9-1.3 1.4-2.3 1.2C9.6 20.5 3.5 14.4 2.3 7.1c-.2-1 .3-1.9 1.2-2.3z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+      <span class="fhp-btn-label">電話する</span><small>000-0000-0000</small></a>
+    <a class="fhp-btn fhp-btn--sub" data-channel="reserve" href="https://example.com/reserve">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 10h17M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.8"/></svg>
+      <span class="fhp-btn-label">ネットで予約する</span><small>24時間</small></a>
+    <a class="fhp-btn fhp-btn--sub" data-channel="line" href="https://line.me/">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4C7 4 3 7.2 3 11.2c0 3.5 3.1 6.5 7.3 7.1l-.6 2.7 3.6-2.6c4.6-.3 7.7-3.4 7.7-7.2C21 7.2 17 4 12 4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+      <span class="fhp-btn-label">LINEで問い合わせる</span><small>返信は営業時間内</small></a>
+  </div>
+  <p class="fhp-contact-note" hidden><span></span></p>
+  <table class="fhp-contact-week">
+    <caption>営業時間</caption>
+    <tbody></tbody>
+  </table>
+</div>
+<script>
+/*
+  予約・問い合わせ: 営業時間内かどうかをページ側で計算して表示し、押してほしいボタンを出し分ける。
+  - 時刻はいつも日本時間（Asia/Tokyo）で計算する。海外から見ても店の時刻で判定される
+  - data-hours に曜日ごとの営業時間（"9:00-19:00"、昼休みは "11:00-14:00,17:00-22:00"、定休日は ""）
+  - data-last-call に「まもなく終了」と出す分数（既定30分）
+  - 営業中: 電話を主に。時間外・定休日: 電話ボタンを隠し、ネット予約（なければLINE）を主にする
+  - href が空のボタンは最初に取り除く（使わない連絡手段は書かなくてよい）
+  - data-now="2026-09-24T10:00" を付けると、その時刻で表示する（見本・確認用）。付け替えたら
+    要素に 'fhp:refresh' イベントを送る
+*/
+(function () {
+  'use strict';
+
+  var DAYS = ['日', '月', '火', '水', '木', '金', '土'];
+  var WEEK_ORDER = [1, 2, 3, 4, 5, 6, 0];
+  var DEFAULT_LAST_CALL_MIN = 30;
+  var REFRESH_MS = 60 * 1000;
+  var PRIORITY = {
+    open: ['tel', 'reserve', 'line'],
+    closed: ['reserve', 'line', 'tel']
+  };
+  var CHANNEL_NAMES = { reserve: 'ネット予約', line: 'LINE' };
+
+  function toMin(hhmm) {
+    var p = hhmm.trim().split(':');
+    return Number(p[0]) * 60 + Number(p[1] || 0);
+  }
+  function fmt(min) {
+    return Math.floor(min / 60) + ':' + String(min % 60).padStart(2, '0');
+  }
+  function parseRanges(text) {
+    if (!text) return [];
+    return text.split(',').map(function (r) {
+      var p = r.split('-');
+      return { start: toMin(p[0]), end: toMin(p[1]) };
+    });
+  }
+
+  // 日本時間の「曜日」と「0時からの分」
+  function tokyoNow(override) {
+    if (override) {
+      var m = override.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
+      if (m) {
+        var d = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3]));
+        return { day: d.getUTCDay(), min: +m[4] * 60 + +m[5] };
+      }
+    }
+    var parts = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'Asia/Tokyo', weekday: 'short', hour: '2-digit', minute: '2-digit', hourCycle: 'h23'
+    }).formatToParts(new Date());
+    var get = function (type) { return parts.find(function (p) { return p.type === type; }).value; };
+    var dayIndex = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(get('weekday'));
+    return { day: dayIndex, min: Number(get('hour')) * 60 + Number(get('minute')) };
+  }
+
+  function dayLabel(offset, day) {
+    if (offset === 0) return '本日';
+    if (offset === 1) return '明日（' + DAYS[day] + '）';
+    return DAYS[day] + '曜';
+  }
+
+  function findNextOpen(week, now) {
+    for (var offset = 0; offset <= 7; offset++) {
+      var day = (now.day + offset) % 7;
+      var later = week[day].filter(function (r) { return offset > 0 || r.start > now.min; });
+      if (later.length) return { offset: offset, day: day, start: later[0].start };
+    }
+    return null;
+  }
+
+  function judge(week, now, lastCall) {
+    var today = week[now.day];
+    var current = today.find(function (r) { return now.min >= r.start && now.min < r.end; });
+    if (current) {
+      var left = current.end - now.min;
+      var soon = left <= lastCall;
+      return {
+        state: 'open',
+        title: soon ? 'まもなく終了します' : '営業中です',
+        detail: '本日 ' + fmt(current.end) + ' まで' + (soon ? '（あと' + left + '分）' : '')
+      };
+    }
+    var next = findNextOpen(week, now);
+    var nextText = next ? '次は ' + dayLabel(next.offset, next.day) + ' ' + fmt(next.start) + ' から' : '';
+    if (!today.length) return { state: 'closed', title: '本日は定休日です', detail: nextText, next: next };
+    var before = now.min < today[0].start;
+    return { state: 'closed', title: before ? '開店前です' : '営業時間外です', detail: nextText, next: next };
+  }
+
+  function renderWeek(table, week, today) {
+    table.innerHTML = '';
+    WEEK_ORDER.forEach(function (day) {
+      var tr = document.createElement('tr');
+      if (day === today) tr.className = 'is-today';
+      var th = document.createElement('th');
+      th.scope = 'row';
+      th.textContent = DAYS[day] + (day === today ? '（今日）' : '');
+      var td = document.createElement('td');
+      td.textContent = week[day].length
+        ? week[day].map(function (r) { return fmt(r.start) + '〜' + fmt(r.end); }).join('、')
+        : '定休日';
+      tr.appendChild(th);
+      tr.appendChild(td);
+      table.appendChild(tr);
+    });
+  }
+
+  function initContact(root) {
+    var raw = JSON.parse(root.dataset.hours || '{}');
+    var week = DAYS.map(function (d) { return parseRanges(raw[d]); });
+    var lastCall = Number(root.dataset.lastCall || DEFAULT_LAST_CALL_MIN);
+    var buttons = Array.prototype.slice.call(root.querySelectorAll('[data-channel]'));
+    buttons.filter(function (b) { return !b.getAttribute('href'); }).forEach(function (b) { b.remove(); });
+    buttons = buttons.filter(function (b) { return b.isConnected; });
+    var titleEl = root.querySelector('.fhp-contact-title');
+    var detailEl = root.querySelector('.fhp-contact-detail');
+    var noteEl = root.querySelector('.fhp-contact-note');
+    var noteText = noteEl.querySelector('span') || noteEl;
+    var weekEl = root.querySelector('.fhp-contact-week tbody');
+
+    function update() {
+      var now = tokyoNow(root.dataset.now);
+      var result = judge(week, now, lastCall);
+      root.dataset.state = result.state;
+      titleEl.textContent = result.title;
+      detailEl.textContent = result.detail;
+
+      var order = PRIORITY[result.state];
+      var visible = buttons.filter(function (b) {
+        var hide = result.state === 'closed' && b.dataset.channel === 'tel';
+        b.hidden = hide;
+        return !hide;
+      });
+      visible.sort(function (a, b) { return order.indexOf(a.dataset.channel) - order.indexOf(b.dataset.channel); });
+      visible.forEach(function (b, i) {
+        b.style.order = String(i);
+        b.classList.toggle('fhp-btn--sub', i > 0);
+      });
+
+      var hasTel = buttons.some(function (b) { return b.dataset.channel === 'tel'; });
+      var anytime = buttons
+        .map(function (b) { return CHANNEL_NAMES[b.dataset.channel]; })
+        .filter(Boolean);
+      noteText.textContent = result.state === 'closed' && hasTel
+        ? 'お電話は営業時間内にお願いします。' + (anytime.length ? anytime.join('と') + 'は、時間外でも受け付けています。' : '')
+        : '';
+      noteEl.hidden = !noteText.textContent;
+      // 見本と同じ「文節の途中で改行しない」処理を、書き換えた文にもかける（BudouX を読み込んでいるページのみ）
+      if (window.insertPhraseBreaks) {
+        window.insertPhraseBreaks(root.querySelector('.fhp-contact-status'));
+        window.insertPhraseBreaks(noteEl);
+      }
+      if (weekEl) renderWeek(weekEl, week, now.day);
+    }
+
+    update();
+    root.addEventListener('fhp:refresh', update);
+    setInterval(function () { if (!root.dataset.now) update(); }, REFRESH_MS);
+  }
+
+  function initAll() {
+    // 同じ部品のコードを2回貼っても、1つの部品を二重に動かさない
+    document.querySelectorAll('[data-fhp-contact]').forEach(function (el) {
+      if (el.dataset.fhpReady) return;
+      el.dataset.fhpReady = 'true';
+      initContact(el);
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initAll);
+  else initAll();
+})();
+</script>
