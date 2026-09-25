@@ -25,7 +25,7 @@ ZIP_ROOT = "freehp-parts"
 ZIP_DATE = (2026, 9, 25, 0, 0, 0)
 ZIP_SKIP_SUFFIX = {".zip", ".pyc"}
 ZIP_SKIP_NAMES = {"ogp.png"}
-COPYRIGHT = "Copyright (c) 2026 RYOSEIWORLD (Ryosei Imai)"
+COPYRIGHT = "Copyright (c) 2026 RYOSEIWORKS (Ryosei Imai)"
 
 # (名前, 表示名, JS があるか)
 PARTS = [
