@@ -133,9 +133,9 @@ class DryRunTest(unittest.TestCase):
         self.assertIn("10,000円", text)
         self.assertIn("5,000円", text)
         self.assertIn("3,000円", text)
-        self.assertIn("通常プラン", text)
-        self.assertIn("起業応援プラン", text)
-        self.assertIn("独自ドメイン追加", text)
+        self.assertIn("最低500円", text)
+        self.assertIn("運用費（年3,000円）", text)
+        self.assertIn("応援（任意）", text)
         self.assertIn(stripe_setup.FIELD_LABEL, text)
         self.assertIn(stripe_setup.AFTER_MESSAGE, text)
 
@@ -171,27 +171,27 @@ class ProductReuseTest(unittest.TestCase):
 
 
 class PaymentLinkGenerationTest(unittest.TestCase):
-    def test_setup_creates_three_payment_links(self) -> None:
+    def test_setup_creates_two_payment_links(self) -> None:
         fake = FakeStripeAPI()
         with mock.patch.object(stripe_setup, "urlopen", fake):
             links = stripe_setup.setup("sk_test", dry_run=False)
 
         self.assertEqual(
-            set(links.keys()), {"通常プラン", "起業応援プラン", "独自ドメイン追加"}
+            set(links.keys()), {"運用費（年3,000円）", "応援（任意）"}
         )
         for url in links.values():
             self.assertTrue(url.startswith("https://buy.stripe.com/"))
 
-        # 商品4件 + 価格4件 + Payment Link 3件 = POST 11回
+        # 商品6件（旧4+新2） + 価格6件 + Payment Link 2件 = POST 14回
         post_calls = [c for c in fake.calls if c[0] == "POST"]
-        self.assertEqual(len(post_calls), 11)
+        self.assertEqual(len(post_calls), 14)
 
         # フォーム内容が想定どおりStripe形式で送られているか確認する。
-        normal_link = next(
+        unyo_link = next(
             link for link in fake.payment_links
-            if link["metadata"].get("freehp_key") == "freehp_plan_normal"
+            if link["metadata"].get("freehp_key") == "freehp_plan_unyo_v1"
         )
-        form = normal_link["_form"]
+        form = unyo_link["_form"]
         self.assertEqual(form["custom_fields"]["0"]["key"], "store_name")
         self.assertEqual(
             form["custom_fields"]["0"]["label"]["custom"], stripe_setup.FIELD_LABEL
@@ -202,8 +202,16 @@ class PaymentLinkGenerationTest(unittest.TestCase):
             form["after_completion"]["hosted_confirmation"]["custom_message"],
             stripe_setup.AFTER_MESSAGE,
         )
-        self.assertEqual(form["line_items"]["0"]["price"], form["line_items"]["0"]["price"])
-        self.assertIn("1", form["line_items"])  # 通常プランは商品2つ→line_items[0],[1]
+        self.assertIn("price", form["line_items"]["0"])
+        self.assertEqual(form["line_items"]["0"]["quantity"], "1")
+
+        # 応援（custom_unit_amount）は quantity を固定しない。
+        ouen_link = next(
+            link for link in fake.payment_links
+            if link["metadata"].get("freehp_key") == "freehp_plan_ouen_v1"
+        )
+        ouen_form = ouen_link["_form"]
+        self.assertNotIn("quantity", ouen_form["line_items"]["0"])
 
     def test_setup_reuses_existing_payment_link(self) -> None:
         fake = FakeStripeAPI()
@@ -214,7 +222,7 @@ class PaymentLinkGenerationTest(unittest.TestCase):
         self.assertEqual(first, second)
         post_calls = [c for c in fake.calls if c[0] == "POST"]
         # 2回目はすべて既存流用のはずなので、1回目からPOSTは増えない。
-        self.assertEqual(len(post_calls), 11)
+        self.assertEqual(len(post_calls), 14)
 
 
 class MissingKeyTest(unittest.TestCase):

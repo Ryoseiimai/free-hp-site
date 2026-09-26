@@ -32,50 +32,64 @@ LINKS_PATH = Path.home() / ".freehp-stripe" / "links.json"
 MISSING_KEY_MESSAGE = "鍵がありません。手順書を見てください。"
 
 # このスクリプトが商品定義の唯一の正。
-# recurring は None(一回払い) か "month"(毎月の定期)。
+# recurring は None(一回払い) / "month"(毎月の定期) / "year"(年次の定期)。
+# custom_unit_amount がある商品は amount を使わず、顧客が金額を選べる価格になる。
 PRODUCTS: tuple[dict, ...] = (
+    # --- 旧料金（〜2026-09-27）。新規の契約では使わない。既存契約の参照・解約導線用に残す。 ---
     {
         "key": "freehp_seisaku",
-        "name": "ホームページ制作（初回）",
+        "name": "ホームページ制作（初回・旧料金）",
         "amount": 10_000,
         "recurring": None,
     },
     {
         "key": "freehp_kanri",
-        "name": "管理費（毎月）",
+        "name": "管理費（毎月・旧料金）",
         "amount": 5_000,
         "recurring": "month",
     },
     {
         "key": "freehp_kigyo",
-        "name": "起業応援 管理費（毎月）",
+        "name": "起業応援 管理費（毎月・旧料金）",
         "amount": 3_000,
         "recurring": "month",
     },
     {
         "key": "freehp_domain",
-        "name": "独自ドメイン（取得・接続・初年度）",
+        "name": "独自ドメイン（取得・接続・初年度・旧料金）",
         "amount": 10_000,
         "recurring": None,
     },
+    # --- 新料金（2026-09-27〜）: 制作0円・運用費 年3,000円・独自ドメインは実費・応援は任意。 ---
+    {
+        "key": "freehp_unyo_v1",
+        "name": "運用費（年額）",
+        "amount": 3_000,
+        "recurring": "year",
+    },
+    {
+        "key": "freehp_ouen_v1",
+        "name": "応援（任意）",
+        "amount": None,
+        "recurring": None,
+        # 顧客が金額を自分で決められる単発の価格。最低500円・初期表示は3,000円。
+        "custom_unit_amount": {"enabled": True, "minimum": 500, "preset": 3_000},
+    },
 )
 
+# 独自ドメインは実費（原価）のため固定価格の Payment Link は作らない。
+# 申込フォーム経由で内容を確認のうえ個別に請求する。
 # 作成する Payment Link。products はまとめる商品 key のタプル。
 PLAN_DEFS: tuple[dict, ...] = (
     {
-        "key": "freehp_plan_normal",
-        "label": "通常プラン",
-        "products": ("freehp_seisaku", "freehp_kanri"),
+        "key": "freehp_plan_unyo_v1",
+        "label": "運用費（年3,000円）",
+        "products": ("freehp_unyo_v1",),
     },
     {
-        "key": "freehp_plan_kigyo",
-        "label": "起業応援プラン",
-        "products": ("freehp_kigyo",),
-    },
-    {
-        "key": "freehp_plan_domain",
-        "label": "独自ドメイン追加",
-        "products": ("freehp_domain",),
+        "key": "freehp_plan_ouen_v1",
+        "label": "応援（任意）",
+        "products": ("freehp_ouen_v1",),
     },
 )
 
@@ -194,8 +208,9 @@ def get_or_create_price(
     api_key: str,
     freehp_key: str,
     product_id: str,
-    amount: int,
+    amount: int | None,
     recurring: str | None,
+    custom_unit_amount: dict | None = None,
 ) -> dict:
     listing = stripe_request(
         "GET", "/v1/prices", api_key, {"product": product_id, "limit": 100}
@@ -205,13 +220,17 @@ def get_or_create_price(
         return existing
 
     params: dict = {
-        # JPY はゼロ・デシマル通貨のため unit_amount はそのまま円の数値。
-        "unit_amount": amount,
         "currency": "jpy",
         "product": product_id,
         "tax_behavior": "inclusive",
         "metadata": {"freehp_key": freehp_key},
     }
+    if custom_unit_amount:
+        # 顧客が金額を選べる価格（応援など）。unit_amount とは排他。
+        params["custom_unit_amount"] = custom_unit_amount
+    else:
+        # JPY はゼロ・デシマル通貨のため unit_amount はそのまま円の数値。
+        params["unit_amount"] = amount
     if recurring:
         params["recurring"] = {"interval": recurring}
     return stripe_request(
@@ -223,9 +242,29 @@ def get_or_create_price(
     )
 
 
-def build_payment_link_params(freehp_key: str, price_ids: list[str]) -> dict:
+def _is_custom_amount_key(product_key: str) -> bool:
+    for definition in PRODUCTS:
+        if definition["key"] == product_key:
+            return bool(definition.get("custom_unit_amount"))
+    return False
+
+
+def build_payment_link_params(
+    freehp_key: str,
+    price_ids: list[str],
+    product_keys: list[str] | None = None,
+) -> dict:
+    product_keys = product_keys or []
+    line_items = []
+    for i, price_id in enumerate(price_ids):
+        item: dict = {"price": price_id}
+        key = product_keys[i] if i < len(product_keys) else None
+        # custom_unit_amount の価格は顧客が金額を選ぶため quantity を固定しない。
+        if not (key and _is_custom_amount_key(key)):
+            item["quantity"] = 1
+        line_items.append(item)
     return {
-        "line_items": [{"price": price_id, "quantity": 1} for price_id in price_ids],
+        "line_items": line_items,
         "after_completion": {
             "type": "hosted_confirmation",
             "hosted_confirmation": {"custom_message": AFTER_MESSAGE},
@@ -244,7 +283,10 @@ def build_payment_link_params(freehp_key: str, price_ids: list[str]) -> dict:
 
 
 def get_or_create_payment_link(
-    api_key: str, freehp_key: str, price_ids: list[str]
+    api_key: str,
+    freehp_key: str,
+    price_ids: list[str],
+    product_keys: list[str] | None = None,
 ) -> dict:
     listing = stripe_request(
         "GET", "/v1/payment_links", api_key, {"active": "true", "limit": 100}
@@ -252,7 +294,7 @@ def get_or_create_payment_link(
     existing = _find_by_freehp_key(listing.get("data", []), freehp_key)
     if existing:
         return existing
-    params = build_payment_link_params(freehp_key, price_ids)
+    params = build_payment_link_params(freehp_key, price_ids, product_keys)
     return stripe_request(
         "POST",
         "/v1/payment_links",
@@ -269,13 +311,28 @@ def _product_name(key: str) -> str:
     return key
 
 
+def _kind_label(recurring: str | None) -> str:
+    if recurring == "month":
+        return "定期(毎月)"
+    if recurring == "year":
+        return "定期(年次)"
+    return "一回払い"
+
+
+def _amount_label(definition: dict) -> str:
+    custom = definition.get("custom_unit_amount")
+    if custom:
+        return f"お好きな額（最低{custom['minimum']:,}円・既定{custom['preset']:,}円）"
+    return f"{definition['amount']:,}円"
+
+
 def _dry_run_preview() -> None:
     lines = ["[dry-run] 実際には Stripe API を呼びません。作成予定の内容:", ""]
     lines.append("[商品・価格]")
     for definition in PRODUCTS:
-        kind = "定期(毎月)" if definition["recurring"] else "一回払い"
+        kind = _kind_label(definition["recurring"])
         lines.append(
-            f"  - {definition['name']}: {definition['amount']:,}円 / {kind}"
+            f"  - {definition['name']}: {_amount_label(definition)} / {kind}"
             f" (key={definition['key']})"
         )
     lines.append("")
@@ -302,15 +359,19 @@ def setup(api_key: str, dry_run: bool = False) -> dict[str, str]:
             api_key,
             definition["key"],
             product["id"],
-            definition["amount"],
+            definition.get("amount"),
             definition["recurring"],
+            definition.get("custom_unit_amount"),
         )
 
     links: dict[str, str] = {}
     for plan in PLAN_DEFS:
         price_ids = [prices[key]["id"] for key in plan["products"]]
+        product_keys = list(plan["products"])
         try:
-            link = get_or_create_payment_link(api_key, plan["key"], price_ids)
+            link = get_or_create_payment_link(
+                api_key, plan["key"], price_ids, product_keys
+            )
             links[plan["label"]] = link["url"]
         except StripeError:
             if len(price_ids) <= 1:
@@ -319,7 +380,9 @@ def setup(api_key: str, dry_run: bool = False) -> dict[str, str]:
             for product_key, price_id in zip(plan["products"], price_ids):
                 sub_key = f"{plan['key']}__{product_key}"
                 sub_label = f"{plan['label']}（{_product_name(product_key)}）"
-                sub_link = get_or_create_payment_link(api_key, sub_key, [price_id])
+                sub_link = get_or_create_payment_link(
+                    api_key, sub_key, [price_id], [product_key]
+                )
                 links[sub_label] = sub_link["url"]
 
     return links
