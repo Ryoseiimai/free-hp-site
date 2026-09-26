@@ -19,7 +19,7 @@ FORBIDDEN = (
     "1,500円前後",
 )
 STARTUP_CONTEXT = ("起業応援", "初期0円")
-INDEX_REQUIRED_PRICES = ("3,000円",)
+INDEX_REQUIRED_PRICES = ("制作0円", "3,000円")
 
 
 class MetadataParser(HTMLParser):
@@ -104,7 +104,7 @@ def main() -> None:
 
     print(f"OK: {len(targets)} HTML files + {FACTS_PATH}")
     print("OK: 禁止表現は起業応援プランの文脈外にありません")
-    print("OK: index.html に 10,000円・5,000円・3,000円があります")
+    print("OK: index.html に 制作0円・運用費3,000円の表記があります")
     print("OK: title/og:site_name に『無料』はありません")
     print("All pricing checks passed.")
 
