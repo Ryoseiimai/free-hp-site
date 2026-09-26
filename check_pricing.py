@@ -17,10 +17,9 @@ FORBIDDEN = (
     "必ず",
     "誰でも",
     "1,500円前後",
-    "月3,000円",
 )
 STARTUP_CONTEXT = ("起業応援", "初期0円")
-INDEX_REQUIRED_PRICES = ("10,000円", "5,000円", "3,000円")
+INDEX_REQUIRED_PRICES = ("3,000円",)
 
 
 class MetadataParser(HTMLParser):
