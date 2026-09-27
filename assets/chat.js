@@ -83,11 +83,16 @@
     var header = el("div", "chat-panel-header");
     var title = el("span", "chat-panel-title", "AIチャット窓口");
     title.id = "chat-panel-title";
+    var callBtn = el("button", "chat-panel-call", "電話で相談");
+    callBtn.type = "button";
+    callBtn.id = "chat-panel-call";
+    callBtn.setAttribute("aria-label", "AIと電話で相談する");
     var closeBtn = el("button", "chat-panel-close", "×");
     closeBtn.type = "button";
     closeBtn.id = "chat-panel-close";
     closeBtn.setAttribute("aria-label", "チャットを閉じる");
     header.appendChild(title);
+    header.appendChild(callBtn);
     header.appendChild(closeBtn);
 
     var messagesEl = el("div", "chat-panel-messages");
@@ -124,6 +129,7 @@
       bubble: bubble,
       button: button,
       panel: panel,
+      callBtn: callBtn,
       closeBtn: closeBtn,
       messagesEl: messagesEl,
       form: form,
@@ -185,10 +191,12 @@
 
   var PANEL_CLOSE_DELAY_MS = 1500;
 
-  function applyExtracted(refs, extracted) {
-    if (!extracted || typeof extracted !== "object") return;
+  // fillSiteForm: フォームへの値セットのみを担当（電話モードのcall.jsからも呼べるよう分離）。
+  // 戻り値: フォームが見つかり値をセットできたか
+  function fillSiteForm(extracted) {
+    if (!extracted || typeof extracted !== "object") return false;
     var form = document.getElementById("site-form");
-    if (!form) return;
+    if (!form) return false;
 
     var unmatchedNote = null;
 
@@ -233,13 +241,6 @@
       existing.textContent = unmatchedNote;
     }
 
-    appendMessage(refs, "bot", "下のフォームに入れておきました。内容をご確認のうえ送信してください。");
-    messages.push({ role: "assistant", content: "下のフォームに入れておきました。内容をご確認のうえ送信してください。" });
-
-    window.setTimeout(function () {
-      closePanel(refs);
-    }, PANEL_CLOSE_DELAY_MS);
-
     form.scrollIntoView({ behavior: "smooth", block: "start" });
 
     var focusTargets = ["shop-name", "description", "phone", "address"];
@@ -252,6 +253,18 @@
         break;
       }
     }
+    return true;
+  }
+
+  function applyExtracted(refs, extracted) {
+    if (!fillSiteForm(extracted)) return;
+
+    appendMessage(refs, "bot", "下のフォームに入れておきました。内容をご確認のうえ送信してください。");
+    messages.push({ role: "assistant", content: "下のフォームに入れておきました。内容をご確認のうえ送信してください。" });
+
+    window.setTimeout(function () {
+      closePanel(refs);
+    }, PANEL_CLOSE_DELAY_MS);
   }
 
   function sendMessage(refs, text) {
@@ -329,6 +342,12 @@
       closePanel(refs);
     });
 
+    refs.callBtn.addEventListener("click", function () {
+      if (window.FreehpCall && typeof window.FreehpCall.open === "function") {
+        window.FreehpCall.open();
+      }
+    });
+
     refs.form.addEventListener("submit", function (e) {
       e.preventDefault();
       sendMessage(refs, refs.input.value);
@@ -342,7 +361,18 @@
         }
       }, GREET_DELAY_MS);
     }
+
+    // call.jsから「必ず開く」ために使う（launcherボタンの直接クリックはトグルなので二重発火で閉じてしまう）。
+    window.FreehpChatShared.openPanel = function () {
+      if (refs.panel.hidden) openPanel(refs);
+    };
   }
+
+  // call.js（電話モード）から使う最小限の共有API。会話履歴・フォーム反映ロジックを二重実装しないための橋渡し。
+  window.FreehpChatShared = {
+    apiBase: API_BASE,
+    fillSiteForm: fillSiteForm
+  };
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", init);

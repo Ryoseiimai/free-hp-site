@@ -67,6 +67,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
   padding: 12px 14px;
   border-bottom: 1px solid var(--line, #E5E1D8);
   background: var(--white, #fff);
@@ -76,6 +77,26 @@
   font-size: 14px;
   font-weight: 700;
   color: var(--ink, #1E2A44);
+  flex: 1 1 auto;
+}
+
+.chat-panel-call {
+  border: 1px solid var(--line, #E5E1D8);
+  border-radius: 8px;
+  background: var(--paper, #FBFAF6);
+  color: var(--ink, #1E2A44);
+  font-size: 12px;
+  font-family: inherit;
+  padding: 6px 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex: 0 0 auto;
+}
+
+.chat-panel-call:hover,
+.chat-panel-call:focus-visible {
+  background: var(--white, #fff);
+  border-color: var(--ink, #1E2A44);
 }
 
 .chat-panel-close {
