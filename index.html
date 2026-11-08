@@ -37,6 +37,8 @@
     .hero-lead, .hero-price, .ai-build-lead, .section-lead, .watcher-list li,
     .hiring-copy, .hiring-honest, .step-label, .group-note { text-wrap: pretty; }
     .brk { display: inline-block; }
+    .phrase { display: inline-block; white-space: nowrap; }
+    .landing-title > .brk, .pricing-footnote > .brk, .hiring-copy > .brk { white-space: nowrap; }
     /* index.html限定の没入レイヤー。既存コンポーネントのCSSには干渉させない。 */
     .hero {
       isolation: isolate;
@@ -591,6 +593,7 @@
     }
     @media (max-width: 390px) {
       .site-header-inner { padding-inline: 14px; }
+      .landing-title { font-size: clamp(30px, 8.5vw, 34px); }
       .site-header .brand-name { font-size: 12px; }
       .site-header .header-cta { padding-inline: 12px; font-size: 12px; }
       .immersive-section, .hero, .ai-build { min-height: 520px; }
@@ -1081,7 +1084,7 @@
           <a class="button secondary-action" href="#support">応援する</a>
         </div>
       </div>
-      <p class="pricing-footnote">途中でやめても、作ったページのデータはお渡しします。</p>
+      <p class="pricing-footnote"><span class="brk">途中でやめても、</span><span class="brk">作ったページのデータは</span><span class="brk">お渡しします。</span></p>
     </section>
 
     <section class="hiring" id="hiring" aria-labelledby="hiring-title">
@@ -1090,27 +1093,27 @@
       <p class="section-lead">求人を出している会社向け</p>
 
       <div class="hiring-card" data-reveal>
-        <p class="hiring-copy"><span class="brk">求人の応募者の多くが</span><span class="brk">応募前に会社のホームページを見ます。</span><span class="brk">その「最初に見られる1枚」と</span><span class="brk">採用ページを用意し、</span><span class="brk">毎月の数字まで届けます。</span></p>
-        <p class="hiring-price">初期 50,000円 ＋ 月 15,000円（税込）</p>
+        <p class="hiring-copy"><span class="brk">求人の応募者の多くが</span><span class="brk">応募前に会社の</span><span class="brk">ホームページを見ます。</span><span class="brk">その「最初に見られる1枚」と</span><span class="brk">採用ページを用意し、</span><span class="brk">毎月の数字まで届けます。</span></p>
+        <p class="hiring-price"><span class="phrase">初期 50,000円</span> ＋ <span class="phrase">月 15,000円</span><span class="phrase">（税込）</span></p>
 
         <ul class="hiring-list">
           <li>会社ホームページ1ページ</li>
-          <li>採用ページ（募集要項・1日の流れ・代表の言葉・応募フォーム）</li>
-          <li>Google検索の求人枠に載るための設定（JobPosting構造化データ）</li>
-          <li>Googleマップの整備と口コミ返信の下書き（月3件）</li>
-          <li>求人票の書き直し（ホームページと同じ言葉に）</li>
-          <li>月1回の実数レポート（閲覧数・応募数）</li>
-          <li>更新は月2回・3営業日で反映（できなかった月は値引き）</li>
+          <li><span class="phrase">採用ページ</span><span class="phrase">（募集要項・</span><span class="phrase">1日の流れ・</span><span class="phrase">代表の言葉・</span><span class="phrase">応募フォーム）</span></li>
+          <li><span class="phrase">Google検索の</span><span class="phrase">求人枠に</span><span class="phrase">載るための設定</span><span class="phrase">（JobPosting</span><span class="phrase">構造化データ）</span></li>
+          <li><span class="phrase">Googleマップの整備と</span><span class="phrase">口コミ返信の下書き</span><span class="phrase">（月3件）</span></li>
+          <li><span class="phrase">求人票の書き直し</span><span class="phrase">（ホームページと</span><span class="phrase">同じ言葉に）</span></li>
+          <li><span class="phrase">月1回の実数レポート</span><span class="phrase">（閲覧数・応募数）</span></li>
+          <li><span class="phrase">更新は月2回・</span><span class="phrase">3営業日で反映</span><span class="phrase">（できなかった月は</span><span class="phrase">値引き）</span></li>
         </ul>
 
-        <p class="hiring-target"><strong>対象：</strong>従業員3〜50名で、いま有料の求人（Indeed・転職サイト・タウンワーク等）を出している会社。建設・運輸・情報サービス・介護など</p>
+        <p class="hiring-target"><strong>対象：</strong><span class="phrase">従業員3〜50名で、</span><span class="phrase">いま有料の求人</span><span class="phrase">（Indeed・</span><span class="phrase">転職サイト・</span><span class="phrase">タウンワーク等）を</span><span class="phrase">出している会社。</span><span class="phrase">建設・運輸・</span><span class="phrase">情報サービス・介護など</span></p>
 
-        <p class="hiring-honest">応募数・採用数・検索順位はお約束できません。お約束するのは「測れるようにすること」と「毎月数字を届けること」です。採用での実績はこれからです（2026年8月時点）。</p>
+        <p class="hiring-honest"><span class="phrase">応募数・採用数・検索順位は</span><span class="phrase">お約束できません。</span><span class="phrase">お約束するのは</span><span class="phrase">「測れるようにすること」と</span><span class="phrase">「毎月数字を</span><span class="phrase">届けること」です。</span><span class="phrase">採用での実績は</span><span class="phrase">これからです</span><span class="phrase">（2026年8月時点）。</span></p>
 
-        <p class="hiring-exclude">含まないもの：取材・撮影、広告運用、SNS運用</p>
+        <p class="hiring-exclude"><span class="phrase">含まないもの：</span><span class="phrase">取材・撮影、</span><span class="phrase">広告運用、</span><span class="phrase">SNS運用</span></p>
 
         <a class="button primary-action hiring-cta" href="https://app.spirinc.com/patterns/availability-sharing/hr21V0MxxRBYmB0YKqeni/confirm" target="_blank" rel="noopener noreferrer">
-          まず15分、お話を聞かせてください（無料）
+          <span><span class="phrase">まず15分、</span><span class="phrase">お話を</span><span class="phrase">聞かせてください</span></span>
           <span aria-hidden="true">→</span>
         </a>
         <!-- STRIPE_SAIYO_LINK -->
@@ -1130,7 +1133,7 @@
           <p>お申し込み後にご案内します。事前のご案内なく料金が発生することはありません。運営者は<a href="company.html">運営者情報</a>をご覧ください。</p>
         </details>
         <details class="faq-item">
-          <summary>作ったホームページはいつまで見られますか？</summary>
+          <summary><span><span class="phrase">作ったホームページは</span><span class="phrase">いつまで</span><span class="phrase">見られますか？</span></span></summary>
           <p>作ったホームページに期限はありません。ずっと公開したままにできます（お店に無断でこちらが作った見本だけは、ご連絡がないと90日で非公開になります）。メールでご相談ください。</p>
         </details>
         <details class="faq-item">
@@ -1150,7 +1153,7 @@
         <a class="guide-chip" href="guide-seitai.html">整体院・接骨院のホームページを作る方法</a>
         <a class="guide-chip" href="guide-kyoshitsu.html">教室・スクールのホームページを作る方法</a>
         <a class="guide-chip" href="guide-kouri.html">小売店・雑貨店のホームページを作る方法</a>
-        <a class="guide-chip" href="guide-shuuri.html">修理・住まいのサービスのホームページを作る方法</a>
+        <a class="guide-chip" href="guide-shuuri.html"><span><span class="phrase">修理・住まいのサービスの</span><span class="phrase">ホームページを</span><span class="phrase">作る方法</span></span></a>
         <a class="guide-chip" href="hikaku.html">ホームページを作る方法をくらべる</a>
         <a class="guide-chip" href="partner.html">パートナー募集（配る人になる）</a>
       </div>
@@ -1185,7 +1188,7 @@
       <a href="company.html">運営者情報</a>
       <a href="privacy.html">プライバシーポリシー</a>
       <a href="jidoka.html">AIで会社を自動化したい方へ</a>
-      <a href="https://ryoseiimai.github.io/freehp-ai-team/" target="_blank" rel="noopener">AIチームの紹介 — このサービスを動かしているAIたち</a>
+      <a href="https://ryoseiimai.github.io/freehp-ai-team/" target="_blank" rel="noopener"><span class="phrase">AIチームの紹介 — </span><span class="phrase">このサービスを</span><span class="phrase">動かしているAIたち</span></a>
     </div>
     <p class="footer-tagline">AIで作って、人が最後に整えます。</p>
   </footer>
