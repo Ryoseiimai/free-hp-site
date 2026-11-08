@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import argparse
 from html.parser import HTMLParser
 from pathlib import Path
 
@@ -67,9 +68,15 @@ def display_path(path: Path) -> str:
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--facts", type=Path, default=FACTS_PATH,
+        help="検査する事実ファイル（既定: ~/.freehp-content/facts.md）",
+    )
+    facts_path = parser.parse_args().facts.expanduser().resolve()
     targets = html_files()
-    assert FACTS_PATH.is_file(), f"facts.md が見つかりません: {FACTS_PATH}"
-    scan_targets = [*targets, FACTS_PATH]
+    assert facts_path.is_file(), f"facts.md が見つかりません: {facts_path}"
+    scan_targets = [*targets, facts_path]
 
     wording_errors: list[str] = []
     for path in scan_targets:
@@ -102,7 +109,7 @@ def main() -> None:
         metadata_errors
     )
 
-    print(f"OK: {len(targets)} HTML files + {FACTS_PATH}")
+    print(f"OK: {len(targets)} HTML files + {facts_path}")
     print("OK: 禁止表現は起業応援プランの文脈外にありません")
     print("OK: index.html に 制作0円・運用費3,000円の表記があります")
     print("OK: title/og:site_name に『無料』はありません")
